@@ -1,0 +1,1422 @@
+{
+ "version": "1.0",
+ "entries": [
+  {
+   "id": "MC-VAR-01",
+   "name": "Variable holds several values at once",
+   "chapter_id": "T08",
+   "topic": "Variables and constants",
+   "description": "Believes a variable keeps a history of the values assigned to it, or that assigning a new value adds to the old one, instead of replacing it.",
+   "indicators": [
+    "Trace answers list every value a variable was given",
+    "Chooses the first or a combined value after several assignments"
+   ],
+   "question_patterns": [
+    "Trace a sequence of assignments to the same variable",
+    "Code-output questions with reassignment"
+   ],
+   "causes": [
+    "Everyday meaning of \"store\" as a container that accumulates",
+    "Confusion with lists"
+   ],
+   "strategies": [
+    "Use the labelled-box model: a new value replaces what is in the box",
+    "Trace tables with one column per variable, crossing out old values",
+    "Predict-then-run with the pseudocode editor"
+   ],
+   "student_tip": "A variable holds one value at a time. When you assign a new value, the old one is replaced.",
+   "related": [
+    "MC-VAR-02",
+    "MC-TRACE-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "SEQUENTIAL_EXECUTION_ERROR"
+   ]
+  },
+  {
+   "id": "MC-VAR-02",
+   "name": "Assignment works in both directions",
+   "chapter_id": "T08",
+   "topic": "Comparison and assignment",
+   "description": "Reads X ← Y as a symmetric relationship (as in algebra), or swaps source and target, so that Y receives X's value.",
+   "indicators": [
+    "After A ← B, says A and B both keep their original values or B changes",
+    "Writes the target on the right"
+   ],
+   "question_patterns": [
+    "Swap two variables without a temporary variable",
+    "Trace A ← B; B ← A"
+   ],
+   "causes": [
+    "Algebraic reading of = as equality",
+    "Arrow direction ignored"
+   ],
+   "strategies": [
+    "Read ← aloud as \"becomes\" or \"gets\"",
+    "Contrast a swap with and without a temporary variable using a trace table"
+   ],
+   "student_tip": "In X ← Y, only X changes. Read the arrow as \"X becomes the value of Y\".",
+   "related": [
+    "MC-VAR-03",
+    "MC-VAR-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-VAR-03",
+   "name": "Assignment confused with equality test",
+   "chapter_id": "T08",
+   "topic": "Comparison and assignment",
+   "description": "Treats = in a condition as an assignment, or treats ← as a comparison that returns TRUE or FALSE.",
+   "indicators": [
+    "Writes IF X ← 5 THEN",
+    "Believes a condition such as IF Total = 10 changes Total"
+   ],
+   "question_patterns": [
+    "Identify the error in a condition",
+    "Code output where a comparison is mistaken for assignment"
+   ],
+   "causes": [
+    "Languages that use = for both",
+    "Algebra"
+   ],
+   "strategies": [
+    "Colour-code ← (changes memory) and = (asks a question)",
+    "Debugging tasks with a deliberate IF X ← 5"
+   ],
+   "student_tip": "The arrow ← changes a variable. The = sign in a condition only asks a question; it never changes anything.",
+   "related": [
+    "MC-VAR-02",
+    "MC-SEL-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "ASSIGN_EQUALITY_CONFUSION"
+   ]
+  },
+  {
+   "id": "MC-VAR-04",
+   "name": "Constant can be changed while the program runs",
+   "chapter_id": "T08",
+   "topic": "Variables and constants",
+   "description": "Believes a CONSTANT can be reassigned later in the program, or cannot explain why constants are used.",
+   "indicators": [
+    "Chooses an answer where a constant is updated",
+    "Cannot give the benefit of a constant"
+   ],
+   "question_patterns": [
+    "Which statement causes an error",
+    "Explain why a value is declared as a constant"
+   ],
+   "causes": [
+    "Constants look like variables in pseudocode"
+   ],
+   "strategies": [
+    "Show the error the editor reports when a constant is reassigned",
+    "Discuss maintenance: change one line, not twenty"
+   ],
+   "student_tip": "A constant is set once and never changes while the program runs. That makes programs easier to update.",
+   "related": [
+    "MC-VAR-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-TYPE-01",
+   "name": "Numbers stored as text behave as numbers",
+   "chapter_id": "T08",
+   "topic": "Data types",
+   "description": "Expects \"5\" + \"3\" to give 8, or chooses INTEGER for data such as telephone numbers that are never calculated and may start with 0.",
+   "indicators": [
+    "Chooses 8 for \"5\" & \"3\"",
+    "Selects INTEGER for a phone number or ID with leading zeros"
+   ],
+   "question_patterns": [
+    "Choose the most suitable data type",
+    "Code output with string concatenation"
+   ],
+   "causes": [
+    "Data that looks numeric is assumed to be numeric"
+   ],
+   "strategies": [
+    "Sort examples: is it ever calculated? can it start with 0?",
+    "Run concatenation versus addition side by side"
+   ],
+   "student_tip": "Ask two questions: will it be used in a calculation, and could it start with 0? If not calculated, use STRING.",
+   "related": [
+    "MC-TYPE-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "DATA_TYPE_CONFUSION"
+   ]
+  },
+  {
+   "id": "MC-TYPE-02",
+   "name": "REAL and INTEGER are interchangeable",
+   "chapter_id": "T08",
+   "topic": "Data types",
+   "description": "Does not see that an average or a price needs REAL, or expects DIV and / to give the same result.",
+   "indicators": [
+    "Declares Average as INTEGER",
+    "Expects 7 / 2 to give 3"
+   ],
+   "question_patterns": [
+    "Choose data types for a set of variables",
+    "Code output with DIV, MOD and /"
+   ],
+   "causes": [
+    "Calculator habit",
+    "Not tracing the type of each result"
+   ],
+   "strategies": [
+    "Predict 7 / 2, 7 DIV 2 and 7 MOD 2 before running them",
+    "Annotate each variable with an example value"
+   ],
+   "student_tip": "Results that can have a decimal part, such as averages, need REAL. DIV gives the whole-number part only.",
+   "related": [
+    "MC-TYPE-01",
+    "MC-OP-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-OP-01",
+   "name": "MOD and DIV confused",
+   "chapter_id": "T08",
+   "topic": "Arithmetic operators",
+   "description": "Swaps MOD (remainder) and DIV (integer quotient), or treats MOD as a percentage.",
+   "indicators": [
+    "Gives 3 for 17 MOD 5",
+    "Gives 2 for 17 DIV 5"
+   ],
+   "question_patterns": [
+    "Evaluate expressions with MOD and DIV",
+    "Use MOD to test for even numbers"
+   ],
+   "causes": [
+    "Similar-looking keywords",
+    "Percent sign used for modulus in other languages"
+   ],
+   "strategies": [
+    "Link to short division with remainder",
+    "Tasks: is a number even? what is the last digit?"
+   ],
+   "student_tip": "DIV is how many whole times it fits; MOD is what is left over. 17 DIV 5 = 3 and 17 MOD 5 = 2.",
+   "related": [
+    "MC-TYPE-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-OP-02",
+   "name": "Boolean operator precedence and meaning",
+   "chapter_id": "T08",
+   "topic": "Comparison and assignment",
+   "description": "Uses OR where AND is needed to check a range (or the reverse), or believes NOT applies to the whole following expression without brackets.",
+   "indicators": [
+    "Writes Num >= 1 OR Num <= 100 for a range check",
+    "Misreads NOT A AND B"
+   ],
+   "question_patterns": [
+    "Write a range check",
+    "Evaluate compound conditions"
+   ],
+   "causes": [
+    "Everyday \"or\"",
+    "No mental model of evaluation order"
+   ],
+   "strategies": [
+    "Number-line diagrams for range checks",
+    "Truth-table the condition for boundary values"
+   ],
+   "student_tip": "For a value to be inside a range, both limits must be true, so join them with AND.",
+   "related": [
+    "MC-LOGIC-01",
+    "MC-SEL-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "BOOLEAN_LOGIC_ERROR"
+   ]
+  },
+  {
+   "id": "MC-SEL-01",
+   "name": "Both branches of IF are executed",
+   "chapter_id": "T08",
+   "topic": "Selection",
+   "description": "Believes the ELSE branch also runs after the THEN branch, or that every line inside IF runs regardless of the condition.",
+   "indicators": [
+    "Code-output answers include output from both branches"
+   ],
+   "question_patterns": [
+    "Code output for IF … ELSE with a known value",
+    "Trace tables through selection"
+   ],
+   "causes": [
+    "Reading code top to bottom like prose"
+   ],
+   "strategies": [
+    "Flowchart the decision with two exits",
+    "Highlight the path actually taken in the editor"
+   ],
+   "student_tip": "In IF … THEN … ELSE, exactly one of the two branches runs, never both.",
+   "related": [
+    "MC-SEL-02",
+    "MC-TRACE-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-SEL-02",
+   "name": "Boundary values in conditions",
+   "chapter_id": "T08",
+   "topic": "Selection",
+   "description": "Treats > and >= (or < and <=) as the same, so boundary values are classified wrongly.",
+   "indicators": [
+    "Wrong output for the exact boundary value",
+    "Chooses > where >= is required"
+   ],
+   "question_patterns": [
+    "Grade boundaries",
+    "Choose normal, boundary and erroneous test data"
+   ],
+   "causes": [
+    "Not testing boundary values"
+   ],
+   "strategies": [
+    "Always test the boundary and one either side",
+    "Number lines with open and closed circles"
+   ],
+   "student_tip": "Check the exact boundary value: is 50 a pass if the rule is Mark > 50?",
+   "related": [
+    "MC-TEST-01",
+    "MC-OP-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-SEL-03",
+   "name": "CASE matches more than one option",
+   "chapter_id": "T08",
+   "topic": "Selection",
+   "description": "Believes CASE OF continues into the following options after a match, or that OTHERWISE always runs.",
+   "indicators": [
+    "Output includes several CASE branches",
+    "OTHERWISE output added to a matched value"
+   ],
+   "question_patterns": [
+    "Code output for CASE OF"
+   ],
+   "causes": [
+    "Fall-through in some languages"
+   ],
+   "strategies": [
+    "Compare CASE OF with an equivalent IF … ELSE IF chain"
+   ],
+   "student_tip": "CASE OF runs only the first option that matches. OTHERWISE runs only when nothing else matched.",
+   "related": [
+    "MC-SEL-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-LOOP-01",
+   "name": "Off-by-one loop count",
+   "chapter_id": "T08",
+   "topic": "Iteration",
+   "description": "Believes FOR I ← 1 TO N runs N − 1 or N + 1 times, or miscounts loops that start at 0.",
+   "indicators": [
+    "Answers that are one more or one less than the correct count"
+   ],
+   "question_patterns": [
+    "How many times does the loop run",
+    "Code output of a counter loop"
+   ],
+   "causes": [
+    "Confusion between 0-based and 1-based counting",
+    "Fence-post reasoning"
+   ],
+   "strategies": [
+    "Trace small cases (TO 1, TO 2) before generalising",
+    "Count iterations with tally marks in a trace table"
+   ],
+   "student_tip": "FOR I ← 1 TO 5 runs five times: I is 1, 2, 3, 4 and 5. Try a tiny case to check.",
+   "related": [
+    "MC-LOOP-02",
+    "MC-ARR-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "LOOP_TERMINATION_ERROR"
+   ]
+  },
+  {
+   "id": "MC-LOOP-02",
+   "name": "Pre-condition and post-condition loops confused",
+   "chapter_id": "T08",
+   "topic": "Iteration",
+   "description": "Believes a REPEAT … UNTIL loop can run zero times, or that a WHILE loop always runs at least once; or reverses the meaning of UNTIL.",
+   "indicators": [
+    "Says REPEAT may be skipped",
+    "Uses the WHILE condition in UNTIL without negating it"
+   ],
+   "question_patterns": [
+    "Which loop runs at least once",
+    "Convert WHILE to REPEAT"
+   ],
+   "causes": [
+    "Condition position not linked to when it is checked"
+   ],
+   "strategies": [
+    "Flowchart both loops and mark where the check happens",
+    "Run both with a condition that is false at the start"
+   ],
+   "student_tip": "WHILE checks before the loop body (may run zero times); REPEAT … UNTIL checks after (always runs at least once).",
+   "related": [
+    "MC-LOOP-03",
+    "MC-LOOP-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-LOOP-03",
+   "name": "Loop condition checked continuously",
+   "chapter_id": "T08",
+   "topic": "Iteration",
+   "description": "Believes a WHILE loop stops the moment its condition becomes false part-way through the body, rather than at the next check.",
+   "indicators": [
+    "Trace stops mid-body",
+    "Misses the final statement after the condition changes"
+   ],
+   "question_patterns": [
+    "Trace a WHILE loop where the condition changes before the last statement in the body"
+   ],
+   "causes": [
+    "Thinking of the condition as a rule that is always enforced"
+   ],
+   "strategies": [
+    "Step through with the editor, pausing at the condition each time"
+   ],
+   "student_tip": "The condition is checked only at the top of each pass. The rest of the body still runs once it has started.",
+   "related": [
+    "MC-LOOP-02",
+    "MC-TRACE-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-LOOP-04",
+   "name": "Nested loop iterations added, not multiplied",
+   "chapter_id": "T08",
+   "topic": "Nested statements",
+   "description": "Believes an inner loop of M inside an outer loop of N runs N + M times, or that the inner loop runs once in total.",
+   "indicators": [
+    "Gives N + M for total inner iterations",
+    "Output shows the inner loop only once"
+   ],
+   "question_patterns": [
+    "Count outputs of nested loops",
+    "Trace 2D array traversal"
+   ],
+   "causes": [
+    "Not resetting the inner loop variable mentally"
+   ],
+   "strategies": [
+    "Grid diagrams: rows × columns",
+    "Trace table with both loop variables"
+   ],
+   "student_tip": "The inner loop starts again for every pass of the outer loop, so the total is outer × inner.",
+   "related": [
+    "MC-LOOP-01",
+    "MC-ARR-03"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-LOOP-05",
+   "name": "Totalling or counting variable not initialised or reset",
+   "chapter_id": "T12",
+   "topic": "Totalling, counting, max, min, average",
+   "description": "Initialises a total or counter inside the loop, or not at all, so the result is only the last value or undefined.",
+   "indicators": [
+    "Total ← 0 placed inside the loop",
+    "Final total equals the last input"
+   ],
+   "question_patterns": [
+    "Find the error in a totalling algorithm",
+    "Complete a totalling algorithm"
+   ],
+   "causes": [
+    "Not separating set-up from repetition"
+   ],
+   "strategies": [
+    "Label the parts of a standard method: initialise, repeat, output"
+   ],
+   "student_tip": "Set totals and counters to 0 once, before the loop starts.",
+   "related": [
+    "MC-LOOP-01",
+    "MC-ALG-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-ARR-01",
+   "name": "Array index and value confused",
+   "chapter_id": "T09",
+   "topic": "Indexing",
+   "description": "Confuses the position of an element with the element itself, for example answering the index when asked for the value.",
+   "indicators": [
+    "Gives the index instead of the stored value",
+    "Outputs I instead of Names[I]"
+   ],
+   "question_patterns": [
+    "What is output by OUTPUT Scores[3]",
+    "Find the position of the largest value"
+   ],
+   "causes": [
+    "Indices and values are both numbers"
+   ],
+   "strategies": [
+    "Draw arrays as a row of labelled boxes with the index above each box"
+   ],
+   "student_tip": "Scores[3] means the value in box number 3, not the number 3 itself.",
+   "related": [
+    "MC-ARR-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "ARRAY_INDEX_ERROR"
+   ]
+  },
+  {
+   "id": "MC-ARR-02",
+   "name": "Array bounds and first index",
+   "chapter_id": "T09",
+   "topic": "Declaring arrays",
+   "description": "Assumes arrays always start at 0, or loops beyond the declared upper bound.",
+   "indicators": [
+    "Loop from 0 for ARRAY[1:10]",
+    "Accesses element 11 of a 10-element array"
+   ],
+   "question_patterns": [
+    "Declare and iterate over an array",
+    "Find the error in a loop over an array"
+   ],
+   "causes": [
+    "Experience with 0-based languages"
+   ],
+   "strategies": [
+    "Always read the declared bounds before writing the loop"
+   ],
+   "student_tip": "Look at the declaration: ARRAY[1:10] starts at 1 and ends at 10.",
+   "related": [
+    "MC-ARR-01",
+    "MC-LOOP-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-ARR-03",
+   "name": "2D array row and column order",
+   "chapter_id": "T09",
+   "topic": "2D arrays",
+   "description": "Swaps row and column indices in a 2D array.",
+   "indicators": [
+    "Reads Table[2,3] as row 3 column 2"
+   ],
+   "question_patterns": [
+    "Value at a given position in a 2D array",
+    "Traverse a 2D array"
+   ],
+   "causes": [
+    "Coordinate (x, y) habit from mathematics"
+   ],
+   "strategies": [
+    "Use a table on the board and say \"row, then column\" each time"
+   ],
+   "student_tip": "In Table[R, C] the first index is the row and the second is the column.",
+   "related": [
+    "MC-LOOP-04"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-STR-01",
+   "name": "String positions and SUBSTRING arguments",
+   "chapter_id": "T08",
+   "topic": "String handling",
+   "description": "Treats the third argument of SUBSTRING as an end position rather than a length, or counts string positions from 0.",
+   "indicators": [
+    "SUBSTRING(\"Computer\", 2, 3) answered as \"omp\" or \"ompu\""
+   ],
+   "question_patterns": [
+    "Evaluate SUBSTRING, LENGTH, UCASE"
+   ],
+   "causes": [
+    "Different conventions across languages"
+   ],
+   "strategies": [
+    "Write the string with position numbers under each letter"
+   ],
+   "student_tip": "SUBSTRING(text, start, length): the last number is how many characters to take.",
+   "related": [
+    "MC-ARR-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-SUB-01",
+   "name": "Procedure and function confused",
+   "chapter_id": "T10",
+   "topic": "Functions and return values",
+   "description": "Believes a procedure returns a value, or that a function must output its result instead of returning it.",
+   "indicators": [
+    "Uses CALL with a function in an expression",
+    "Function body uses OUTPUT instead of RETURN"
+   ],
+   "question_patterns": [
+    "Choose procedure or function",
+    "Complete a function header"
+   ],
+   "causes": [
+    "Both are \"blocks of code\""
+   ],
+   "strategies": [
+    "A function is like a calculator key that gives back an answer; a procedure is a set of instructions"
+   ],
+   "student_tip": "A function sends a value back with RETURN so it can be used in an expression. A procedure is run with CALL.",
+   "related": [
+    "MC-SUB-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-SUB-02",
+   "name": "Parameters and arguments confused",
+   "chapter_id": "T10",
+   "topic": "Parameters and arguments",
+   "description": "Cannot distinguish the parameter in the header from the argument passed in the call, or believes the names must match.",
+   "indicators": [
+    "Thinks CALL Greet(Name) fails if the parameter is called Person"
+   ],
+   "question_patterns": [
+    "Identify parameters and arguments",
+    "Trace a call with different names"
+   ],
+   "causes": [
+    "Same names often used in examples"
+   ],
+   "strategies": [
+    "Use different names in caller and header deliberately"
+   ],
+   "student_tip": "The parameter is the name in the header; the argument is the value you pass in the call. Their names do not have to match.",
+   "related": [
+    "MC-SUB-03"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-SUB-03",
+   "name": "Local variables visible everywhere",
+   "chapter_id": "T10",
+   "topic": "Local and global scope",
+   "description": "Believes a variable declared inside a procedure can be used in the main program, or that changing a local copy changes the global.",
+   "indicators": [
+    "Main program outputs a variable declared only in a procedure"
+   ],
+   "question_patterns": [
+    "Identify local and global variables",
+    "Code output involving scope"
+   ],
+   "causes": [
+    "No model of separate memory for each call"
+   ],
+   "strategies": [
+    "Draw a separate box for each procedure call"
+   ],
+   "student_tip": "A local variable only exists inside its own procedure or function.",
+   "related": [
+    "MC-SUB-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "VARIABLE_SCOPE_ERROR"
+   ]
+  },
+  {
+   "id": "MC-TRACE-01",
+   "name": "Trace table not updated in execution order",
+   "chapter_id": "T07",
+   "topic": "Trace tables",
+   "description": "Fills trace tables from intuition about the result, skipping steps or recording values in the wrong order.",
+   "indicators": [
+    "Correct final value but wrong intermediate rows",
+    "Rows skipped"
+   ],
+   "question_patterns": [
+    "Complete a trace table",
+    "Find the value after the third pass"
+   ],
+   "causes": [
+    "Jumping to the purpose of the algorithm",
+    "Not executing line by line"
+   ],
+   "strategies": [
+    "One new row each time a value changes",
+    "Pair-tracing: one reads, one writes"
+   ],
+   "student_tip": "Follow the algorithm one line at a time and add a row each time a value changes.",
+   "related": [
+    "MC-VAR-01",
+    "MC-LOOP-03"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "TRACE_PREDICTION_ERROR"
+   ]
+  },
+  {
+   "id": "MC-TEST-01",
+   "name": "Test data categories confused",
+   "chapter_id": "T07",
+   "topic": "Test data",
+   "description": "Confuses normal, abnormal (erroneous), extreme and boundary test data.",
+   "indicators": [
+    "Classifies 100 as abnormal for a 0–100 range"
+   ],
+   "question_patterns": [
+    "Classify test data for a validation rule"
+   ],
+   "causes": [
+    "Terms sound similar"
+   ],
+   "strategies": [
+    "Number line marking each category for one rule"
+   ],
+   "student_tip": "Extreme data is the largest or smallest value that should be accepted; boundary data includes values just outside the range too.",
+   "related": [
+    "MC-SEL-02",
+    "MC-VAL-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "TEST_DATA_CONFUSION"
+   ]
+  },
+  {
+   "id": "MC-VAL-01",
+   "name": "Validation and verification confused",
+   "chapter_id": "T07",
+   "topic": "Validation and verification",
+   "description": "Believes validation checks that data is correct (true), or that verification checks that data is reasonable.",
+   "indicators": [
+    "Calls double entry a validation check",
+    "Thinks a range check proves data is accurate"
+   ],
+   "question_patterns": [
+    "Classify checks as validation or verification"
+   ],
+   "causes": [
+    "Both words mean \"checking\""
+   ],
+   "strategies": [
+    "Validation = sensible by rules; verification = copied correctly"
+   ],
+   "student_tip": "Validation checks data follows the rules; verification checks it was entered or copied accurately.",
+   "related": [
+    "MC-TEST-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-ALG-01",
+   "name": "Linear search stops in the wrong place",
+   "chapter_id": "T12",
+   "topic": "Linear search",
+   "description": "Stops a linear search after the first comparison, or keeps searching after the item is found, or reports \"not found\" inside the loop.",
+   "indicators": [
+    "Outputs \"not found\" for each non-matching element"
+   ],
+   "question_patterns": [
+    "Complete or correct a linear search"
+   ],
+   "causes": [
+    "Not separating \"still searching\" from \"finished\""
+   ],
+   "strategies": [
+    "Use a Found flag and decide only after the loop"
+   ],
+   "student_tip": "Only decide \"not found\" after every item has been checked.",
+   "related": [
+    "MC-LOOP-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-ALG-02",
+   "name": "Bubble sort pass behaviour",
+   "chapter_id": "T12",
+   "topic": "Bubble sort",
+   "description": "Believes one pass of a bubble sort sorts the whole list, or that it swaps non-adjacent elements.",
+   "indicators": [
+    "State after first pass shown as fully sorted"
+   ],
+   "question_patterns": [
+    "Show the list after one pass",
+    "How many passes are needed"
+   ],
+   "causes": [
+    "Knowing the outcome but not the process"
+   ],
+   "strategies": [
+    "Act it out with cards; compare neighbours only"
+   ],
+   "student_tip": "Each pass compares neighbours and moves the largest remaining value to the end. Usually more than one pass is needed.",
+   "related": [
+    "MC-TRACE-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-SYN-01",
+   "name": "Pseudocode structure keywords",
+   "chapter_id": "T07",
+   "topic": "Pseudocode",
+   "description": "Omits or mismatches block terminators (ENDIF, NEXT, ENDWHILE) or uses language-specific syntax that changes meaning.",
+   "indicators": [
+    "Missing NEXT",
+    "ENDIF used to close a loop"
+   ],
+   "question_patterns": [
+    "Identify errors in pseudocode",
+    "Write a complete algorithm"
+   ],
+   "causes": [
+    "Indentation relied on instead of terminators"
+   ],
+   "strategies": [
+    "Write the closing keyword at the same time as the opening one"
+   ],
+   "student_tip": "Every IF needs ENDIF, every FOR needs NEXT, every WHILE needs ENDWHILE.",
+   "related": [
+    "MC-TRACE-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "PSEUDOCODE_SYNTAX_ERROR"
+   ]
+  },
+  {
+   "id": "MC-BIN-01",
+   "name": "Binary place values",
+   "chapter_id": "T01",
+   "topic": "Binary and denary",
+   "description": "Reads binary place values in the wrong order (from the left starting at 1) or adds digits instead of place values.",
+   "indicators": [
+    "Distractor equal to the reversed bit pattern",
+    "Answer equal to the count of 1s"
+   ],
+   "question_patterns": [
+    "Binary to denary",
+    "Denary to binary"
+   ],
+   "causes": [
+    "Not anchoring the 1s column on the right"
+   ],
+   "strategies": [
+    "Always write 128 64 32 16 8 4 2 1 above the bits first"
+   ],
+   "student_tip": "Write the place values 128 to 1 above the bits, starting with 1 on the right, then add the columns that have a 1.",
+   "related": [
+    "MC-BIN-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "BINARY_CONVERSION_ERROR"
+   ]
+  },
+  {
+   "id": "MC-BIN-02",
+   "name": "Hexadecimal conversion by nibble",
+   "chapter_id": "T01",
+   "topic": "Hexadecimal",
+   "description": "Converts a whole byte to hexadecimal in one step, or treats hex digits A–F as two-digit numbers.",
+   "indicators": [
+    "Answers 1011 as \"11\" in hex",
+    "Distractors that join denary values of each nibble"
+   ],
+   "question_patterns": [
+    "Binary to hex",
+    "Hex to denary"
+   ],
+   "causes": [
+    "Not splitting into groups of four bits"
+   ],
+   "strategies": [
+    "Split into nibbles, convert each with a 0–F table"
+   ],
+   "student_tip": "Split the binary into groups of four from the right. Each group becomes one hex digit (10 = A … 15 = F).",
+   "related": [
+    "MC-BIN-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-BIN-03",
+   "name": "Overflow ignored in binary addition",
+   "chapter_id": "T01",
+   "topic": "Binary addition and overflow",
+   "description": "Keeps a ninth bit in an 8-bit result, or does not recognise that a carry out of the most significant bit is an overflow.",
+   "indicators": [
+    "Chooses a 9-bit answer or an answer that ignores the lost carry"
+   ],
+   "question_patterns": [
+    "Add two 8-bit numbers that overflow",
+    "Explain overflow"
+   ],
+   "causes": [
+    "Ordinary arithmetic has no fixed width"
+   ],
+   "strategies": [
+    "Use an 8-box grid so the ninth bit visibly \"falls off\""
+   ],
+   "student_tip": "An 8-bit register has room for 8 bits only. A carry out of the leftmost bit is lost: that is overflow.",
+   "related": [
+    "MC-BIN-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-BIN-04",
+   "name": "Two's complement sign bit",
+   "chapter_id": "T01",
+   "topic": "Two's complement",
+   "description": "Treats the most significant bit in two's complement as a plain sign flag, or forgets it has the value −128.",
+   "indicators": [
+    "10000011 read as −3"
+   ],
+   "question_patterns": [
+    "Two's complement to denary",
+    "Denary to two's complement"
+   ],
+   "causes": [
+    "Sign-and-magnitude intuition"
+   ],
+   "strategies": [
+    "Use −128 as the left-most place value and add as usual"
+   ],
+   "student_tip": "In two's complement the left-most bit is worth −128. Add it to the other place values.",
+   "related": [
+    "MC-BIN-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "TWO_COMPLEMENT_ERROR"
+   ]
+  },
+  {
+   "id": "MC-BIN-05",
+   "name": "Shift direction and effect",
+   "chapter_id": "T01",
+   "topic": "Logical shifts",
+   "description": "Reverses the effect of left and right shifts, or believes no bits are lost.",
+   "indicators": [
+    "Says LSBs are lost in a left shift"
+   ],
+   "question_patterns": [
+    "Result of a logical shift",
+    "Effect of a shift on the value"
+   ],
+   "causes": [
+    "Not visualising the register width"
+   ],
+   "strategies": [
+    "Slide bit cards along a fixed 8-box strip"
+   ],
+   "student_tip": "A left shift multiplies by 2 for each place and loses bits off the left; a right shift divides and loses bits off the right.",
+   "related": [
+    "MC-BIN-03"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "BINARY_SHIFT_ERROR"
+   ]
+  },
+  {
+   "id": "MC-REP-01",
+   "name": "File size units and calculation",
+   "chapter_id": "T01",
+   "topic": "File size calculation",
+   "description": "Forgets to multiply by colour depth or sample resolution, mixes bits and bytes, or uses 1000 instead of 1024 where the syllabus requires 1024.",
+   "indicators": [
+    "Answer out by a factor of 8",
+    "Missing a multiplication term"
+   ],
+   "question_patterns": [
+    "Image or sound file size",
+    "Convert between units"
+   ],
+   "causes": [
+    "Formula learned without meaning"
+   ],
+   "strategies": [
+    "Write units at every step and cancel them"
+   ],
+   "student_tip": "Write the units at every step. Bits ÷ 8 gives bytes; ÷ 1024 gives KiB.",
+   "related": [
+    "MC-REP-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "STORAGE_CONCEPT_ERROR"
+   ]
+  },
+  {
+   "id": "MC-REP-02",
+   "name": "Lossy and lossless compression confused",
+   "chapter_id": "T01",
+   "topic": "Lossy and lossless compression",
+   "description": "Believes lossless compression removes data permanently, or that run-length encoding is lossy.",
+   "indicators": [
+    "Classifies RLE as lossy",
+    "Says lossless files cannot be restored exactly"
+   ],
+   "question_patterns": [
+    "Choose a compression method for a scenario"
+   ],
+   "causes": [
+    "\"Compression\" assumed to always lose quality"
+   ],
+   "strategies": [
+    "Compress and decompress a short RLE string by hand"
+   ],
+   "student_tip": "Lossless means the original can be rebuilt exactly. Lossy removes some data for good.",
+   "related": [
+    "MC-REP-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-NET-01",
+   "name": "Error detection methods confused",
+   "chapter_id": "T02",
+   "topic": "Parity check",
+   "description": "Believes parity or a checksum can correct errors, or confuses parity, checksum and echo check.",
+   "indicators": [
+    "Says a parity check corrects the bit",
+    "Matches checksum to the echo description"
+   ],
+   "question_patterns": [
+    "Match method to description",
+    "Find the error using parity"
+   ],
+   "causes": [
+    "Detection and correction not distinguished"
+   ],
+   "strategies": [
+    "Parity card trick; then discuss why it only detects"
+   ],
+   "student_tip": "Parity, checksums and echo checks detect errors. Data is then sent again (for example with ARQ).",
+   "related": [
+    "MC-NET-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "NETWORK_CONCEPT_ERROR"
+   ]
+  },
+  {
+   "id": "MC-NET-02",
+   "name": "Internet and world wide web confused",
+   "chapter_id": "T05",
+   "topic": "Internet vs WWW",
+   "description": "Uses \"internet\" and \"world wide web\" as the same thing.",
+   "indicators": [
+    "Says the web is the infrastructure of cables and routers"
+   ],
+   "question_patterns": [
+    "Describe the difference between the internet and the WWW"
+   ],
+   "causes": [
+    "Everyday usage"
+   ],
+   "strategies": [
+    "Roads (internet) and shops (web pages)"
+   ],
+   "student_tip": "The internet is the network of networks; the web is the collection of pages you reach over it.",
+   "related": [
+    "MC-NET-03"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-NET-03",
+   "name": "Encryption type and purpose",
+   "chapter_id": "T02",
+   "topic": "Asymmetric encryption",
+   "description": "Believes encryption stops data being intercepted, or swaps the roles of public and private keys.",
+   "indicators": [
+    "Says encryption prevents interception",
+    "Encrypts with the private key for confidentiality"
+   ],
+   "question_patterns": [
+    "Explain symmetric and asymmetric encryption"
+   ],
+   "causes": [
+    "Interception and understanding not distinguished"
+   ],
+   "strategies": [
+    "Padlock analogy: anyone can close the public padlock; only the owner has the key"
+   ],
+   "student_tip": "Encryption does not stop interception; it makes intercepted data meaningless without the key.",
+   "related": [
+    "MC-SEC-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-SEC-01",
+   "name": "Cyber threats confused",
+   "chapter_id": "T05",
+   "topic": "Threats",
+   "description": "Confuses phishing, pharming, malware types or brute-force attacks, or matches the wrong prevention method.",
+   "indicators": [
+    "Pharming described as a fake email"
+   ],
+   "question_patterns": [
+    "Match threat to description and prevention"
+   ],
+   "causes": [
+    "Similar names and overlapping effects"
+   ],
+   "strategies": [
+    "Sort cards by how the attack reaches the victim"
+   ],
+   "student_tip": "Phishing tricks you with a message; pharming redirects you to a fake site even if you typed the right address.",
+   "related": [
+    "MC-NET-03"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-HW-01",
+   "name": "RAM, ROM and storage confused",
+   "chapter_id": "T03",
+   "topic": "Primary storage",
+   "description": "Believes RAM is permanent storage, ROM can be written during normal use, or that more storage makes the CPU faster.",
+   "indicators": [
+    "Says RAM keeps data when powered off"
+   ],
+   "question_patterns": [
+    "Compare RAM and ROM",
+    "Choose storage for a scenario"
+   ],
+   "causes": [
+    "\"Memory\" used loosely for storage"
+   ],
+   "strategies": [
+    "Desk (RAM) versus filing cabinet (secondary storage)"
+   ],
+   "student_tip": "RAM is volatile working memory; ROM keeps its contents and is read-only; secondary storage keeps your files.",
+   "related": [
+    "MC-HW-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-HW-02",
+   "name": "Fetch-decode-execute register roles",
+   "chapter_id": "T03",
+   "topic": "Fetch-decode-execute cycle",
+   "description": "Mixes up the roles of PC, MAR, MDR, CIR and ACC, or the order of the cycle.",
+   "indicators": [
+    "Says the MAR holds the instruction"
+   ],
+   "question_patterns": [
+    "Describe the fetch stage",
+    "Match register to role"
+   ],
+   "causes": [
+    "Similar acronyms"
+   ],
+   "strategies": [
+    "Role-play the registers with labelled cards"
+   ],
+   "student_tip": "The PC holds the address of the next instruction; the MAR holds the address being used; the MDR holds the data or instruction just fetched.",
+   "related": [
+    "MC-HW-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-SW-01",
+   "name": "Compiler and interpreter confused",
+   "chapter_id": "T04",
+   "topic": "Compilers and interpreters",
+   "description": "Believes an interpreter produces an executable file, or that a compiler reports errors one line at a time while running.",
+   "indicators": [
+    "Assigns compiler behaviour to interpreter"
+   ],
+   "question_patterns": [
+    "Compare translators"
+   ],
+   "causes": [
+    "Both \"translate\""
+   ],
+   "strategies": [
+    "Translator of a whole book versus a live interpreter at a meeting"
+   ],
+   "student_tip": "A compiler translates the whole program first and produces an executable; an interpreter translates and runs one line at a time.",
+   "related": [
+    "MC-SW-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "SOFTWARE_CONCEPT_ERROR"
+   ]
+  },
+  {
+   "id": "MC-SW-02",
+   "name": "Operating system functions",
+   "chapter_id": "T04",
+   "topic": "Operating system functions",
+   "description": "Attributes application functions to the operating system or confuses interrupts with errors only.",
+   "indicators": [
+    "Lists a word processor feature as an OS function"
+   ],
+   "question_patterns": [
+    "Identify OS functions",
+    "Explain how an interrupt is handled"
+   ],
+   "causes": [
+    "The OS is invisible to users"
+   ],
+   "strategies": [
+    "Sort software features into OS and application"
+   ],
+   "student_tip": "The operating system manages memory, files, devices, users and processes so applications can run.",
+   "related": [
+    "MC-SW-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-EMB-01",
+   "name": "Sensors make decisions",
+   "chapter_id": "T06",
+   "topic": "Sensors, microprocessors and actuators",
+   "description": "Believes a sensor decides or acts (for example, \"the sensor turns the heater on\"), rather than only measuring and sending data to a microprocessor.",
+   "indicators": [
+    "Describes the sensor switching an actuator"
+   ],
+   "question_patterns": [
+    "Describe how an automated system works"
+   ],
+   "causes": [
+    "Everyday descriptions of automatic devices"
+   ],
+   "strategies": [
+    "Input, process, output diagram for every automated system"
+   ],
+   "student_tip": "A sensor only measures. The microprocessor compares the reading with a stored value and tells the actuator what to do.",
+   "related": [
+    "MC-AI-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "SENSOR_MODEL_ERROR"
+   ]
+  },
+  {
+   "id": "MC-AI-01",
+   "name": "AI systems understand like humans",
+   "chapter_id": "T06",
+   "topic": "Machine learning",
+   "description": "Believes AI or expert systems think or understand, or confuses an expert system's knowledge base and inference engine.",
+   "indicators": [
+    "Says machine learning programs are written rule by rule by a programmer"
+   ],
+   "question_patterns": [
+    "Components of an expert system",
+    "Characteristics of AI"
+   ],
+   "causes": [
+    "Media portrayal"
+   ],
+   "strategies": [
+    "Classify examples by how they learn from data"
+   ],
+   "student_tip": "Machine learning finds patterns in data; an expert system applies rules from a knowledge base using an inference engine.",
+   "related": [
+    "MC-EMB-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": [
+    "AI_CONCEPT_ERROR"
+   ]
+  },
+  {
+   "id": "MC-LOGIC-01",
+   "name": "Gate behaviour confused",
+   "chapter_id": "T13",
+   "topic": "Truth tables",
+   "description": "Confuses NAND with NOR, or OR with XOR (in particular the case where both inputs are 1).",
+   "indicators": [
+    "Truth table rows wrong only for the 1,1 input",
+    "Swaps NAND and NOR outputs"
+   ],
+   "question_patterns": [
+    "Complete a truth table",
+    "Identify a gate from its truth table"
+   ],
+   "causes": [
+    "Everyday \"or\" usually means exclusive or"
+   ],
+   "strategies": [
+    "Gate cards with the 1,1 row highlighted",
+    "Build circuits in a logic simulator"
+   ],
+   "student_tip": "OR is 1 when either or both inputs are 1. XOR is 1 only when the inputs are different.",
+   "related": [
+    "MC-LOGIC-02",
+    "MC-OP-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-LOGIC-02",
+   "name": "Logic expression from a circuit",
+   "chapter_id": "T13",
+   "topic": "Logic expressions",
+   "description": "Writes a logic expression that ignores the order in which gates are applied, or loses brackets.",
+   "indicators": [
+    "NOT applied to the wrong sub-expression"
+   ],
+   "question_patterns": [
+    "Write the expression for a circuit",
+    "Draw the circuit for an expression"
+   ],
+   "causes": [
+    "Reading circuits left to right without grouping"
+   ],
+   "strategies": [
+    "Label every intermediate wire with its sub-expression"
+   ],
+   "student_tip": "Label each wire after a gate with its own expression, then combine them with brackets.",
+   "related": [
+    "MC-LOGIC-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-DB-01",
+   "name": "Primary key need not be unique",
+   "chapter_id": "T14",
+   "topic": "Primary keys",
+   "description": "Chooses a field such as a name as the primary key, or believes a primary key may repeat or be empty.",
+   "indicators": [
+    "Selects StudentName or Town as primary key"
+   ],
+   "question_patterns": [
+    "Choose a suitable primary key",
+    "Explain why a field is unsuitable"
+   ],
+   "causes": [
+    "Thinking of the most important field rather than the identifying one"
+   ],
+   "strategies": [
+    "Find two real records that would share the proposed key"
+   ],
+   "student_tip": "A primary key must be different for every record and never empty. Names can repeat, so they are poor keys.",
+   "related": [
+    "MC-DB-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-DB-02",
+   "name": "Field, record and table confused",
+   "chapter_id": "T14",
+   "topic": "Tables, records and fields",
+   "description": "Calls a row a field or a column a record.",
+   "indicators": [
+    "Answers \"record\" for a column heading"
+   ],
+   "question_patterns": [
+    "Count fields and records in a table"
+   ],
+   "causes": [
+    "Terms learned without the table picture"
+   ],
+   "strategies": [
+    "Label a printed table: columns are fields, rows are records"
+   ],
+   "student_tip": "Fields are columns (one kind of data); records are rows (everything about one item).",
+   "related": [
+    "MC-DB-01"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  },
+  {
+   "id": "MC-DB-03",
+   "name": "SQL clause roles",
+   "chapter_id": "T14",
+   "topic": "SQL SELECT",
+   "description": "Puts conditions in SELECT, confuses WHERE with ORDER BY, or believes COUNT adds values while SUM counts rows.",
+   "indicators": [
+    "Uses ORDER BY to filter",
+    "Swaps SUM and COUNT"
+   ],
+   "question_patterns": [
+    "Complete an SQL query",
+    "Predict the output of a query"
+   ],
+   "causes": [
+    "Clause names read as English"
+   ],
+   "strategies": [
+    "Build queries clause by clause and run them in DBWOW"
+   ],
+   "student_tip": "SELECT chooses columns, FROM chooses the table, WHERE chooses rows, ORDER BY sorts them. COUNT counts rows; SUM adds values.",
+   "related": [
+    "MC-DB-02"
+   ],
+   "evidence": "At least two opportunities; a distractor linked to this misconception chosen on two or more different questions, or three or more errors across at least two related questions.",
+   "legacy_tags": []
+  }
+ ]
+}

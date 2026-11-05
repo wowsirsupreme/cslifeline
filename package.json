@@ -1,0 +1,17 @@
+{
+  "name": "cslifeline",
+  "version": "4.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CS Lifeline — Computer Science learning analytics and early-warning system",
+  "scripts": {
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:e2e": "node tests/e2e/run.mjs",
+    "test:rules": "cd tools && npx firebase emulators:exec --only firestore --project demo-cslifeline \"node --test ../tests/rules/\"",
+    "serve": "node scripts/serve.mjs",
+    "build:functions": "node scripts/sync-functions-shared.mjs",
+    "build:wowsir-bank": "node scripts/build-wowsir-bank.mjs",
+    "export:taxonomy": "node scripts/export-taxonomy-json.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

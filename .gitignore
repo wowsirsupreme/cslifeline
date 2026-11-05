@@ -1,0 +1,10 @@
+tools/node_modules/
+node_modules/
+functions/node_modules/
+__pycache__/
+*.pyc
+.firebase/
+*-debug.log
+ml/.venv/
+tests/e2e/out/
+dist/

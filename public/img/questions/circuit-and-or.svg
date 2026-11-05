@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" width="420" height="200" role="img" aria-label="Logic circuit X = (A AND B) OR C">
+  <rect width="420" height="200" fill="#ffffff"/>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#111">
+    <text x="12" y="56">A</text><text x="12" y="106">B</text><text x="12" y="166">C</text><text x="392" y="111">X</text>
+  </g>
+  <g stroke="#111" stroke-width="2.5" fill="none">
+    <path d="M32 50 H110"/><path d="M32 100 H110"/>
+    <path d="M110 35 V115 H140 A40 40 0 0 0 140 35 Z"/>
+    <path d="M180 75 H240 V88 H262"/>
+    <path d="M32 160 H240 V122 H262"/>
+    <path d="M255 70 Q290 105 255 140 Q320 140 350 105 Q320 70 255 70 Z"/>
+    <path d="M350 105 H385"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#444">
+    <text x="128" y="80">AND</text><text x="282" y="110">OR</text>
+  </g>
+</svg>

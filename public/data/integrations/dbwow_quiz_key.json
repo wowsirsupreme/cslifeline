@@ -1,0 +1,356 @@
+{
+ "source": "github.com/wowsirsupreme/dbwow src/learning/content.ts",
+ "extracted_at": "2026-11-05T15:01:48.968Z",
+ "topics": {
+  "intro": {
+   "title": "Introduction to databases",
+   "quiz": [
+    {
+     "q": "Which object is mainly used to enter and edit one record at a time?",
+     "options": [
+      "Report",
+      "Form",
+      "Query",
+      "Relationship"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "What does a relational database use to connect tables?",
+     "options": [
+      "Colours",
+      "Key fields",
+      "File names",
+      "Fonts"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "terms": {
+   "title": "Database terminology",
+   "quiz": [
+    {
+     "q": "In a Students table, what is \"DateOfBirth\"?",
+     "options": [
+      "A record",
+      "A field",
+      "A table",
+      "A query"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "One row in a table is called a…",
+     "options": [
+      "Field",
+      "Record",
+      "Key",
+      "Index"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "tables": {
+   "title": "Tables, records and fields",
+   "quiz": [
+    {
+     "q": "Which view lets you change a field's data type?",
+     "options": [
+      "Datasheet View",
+      "Design View",
+      "Print Preview",
+      "Form View"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "types": {
+   "title": "Data types",
+   "quiz": [
+    {
+     "q": "Which data type is best for a telephone number such as 0244123456?",
+     "options": [
+      "Number",
+      "Short Text",
+      "Currency",
+      "AutoNumber"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "Which type automatically gives each new record a unique number?",
+     "options": [
+      "AutoNumber",
+      "Number",
+      "Yes/No",
+      "Lookup"
+     ],
+     "answer": 0
+    }
+   ]
+  },
+  "pk": {
+   "title": "Primary keys",
+   "quiz": [
+    {
+     "q": "Why is StudentName a poor primary key?",
+     "options": [
+      "It is too long",
+      "Two students can have the same name",
+      "Text cannot be a key",
+      "It is not a number"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "fk": {
+   "title": "Foreign keys",
+   "quiz": [
+    {
+     "q": "Students.ClassID refers to Classes.ClassID. Which is the foreign key?",
+     "options": [
+      "Classes.ClassID",
+      "Students.ClassID",
+      "Both",
+      "Neither"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "rel": {
+   "title": "Relationships",
+   "quiz": [
+    {
+     "q": "On a one-to-many line, where does the ∞ appear?",
+     "options": [
+      "At the primary key table",
+      "At the foreign key (many) table",
+      "In the middle",
+      "Nowhere"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "one2one": {
+   "title": "One-to-one relationships",
+   "quiz": [
+    {
+     "q": "When does DBWOW show a relationship as One-To-One?",
+     "options": [
+      "When both joined fields are unique",
+      "When the tables have one field",
+      "Always",
+      "When integrity is off"
+     ],
+     "answer": 0
+    }
+   ]
+  },
+  "one2many": {
+   "title": "One-to-many relationships",
+   "quiz": [
+    {
+     "q": "One customer places many orders. Where does CustomerID go as a foreign key?",
+     "options": [
+      "Customers",
+      "Orders",
+      "Both as primary keys",
+      "A new Products table"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "many2many": {
+   "title": "Many-to-many relationships",
+   "quiz": [
+    {
+     "q": "How is a many-to-many relationship implemented?",
+     "options": [
+      "One huge table",
+      "A junction table with two foreign keys",
+      "Two primary keys in each table",
+      "It cannot be done"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "ri": {
+   "title": "Referential integrity",
+   "quiz": [
+    {
+     "q": "With referential integrity enforced (no cascade), what happens when you delete a class that has students?",
+     "options": [
+      "Students are deleted too",
+      "The delete is refused",
+      "The students' ClassID becomes 0",
+      "Nothing"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "queries": {
+   "title": "Queries",
+   "quiz": [
+    {
+     "q": "Which criteria finds names starting with K?",
+     "options": [
+      "= K",
+      "Like \"K*\"",
+      ">K",
+      "Is K"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "What does [Enter town] in the Criteria row create?",
+     "options": [
+      "A field",
+      "A parameter prompt",
+      "A table",
+      "An error"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "sortfilter": {
+   "title": "Sorting and filtering",
+   "quiz": [
+    {
+     "q": "Sorting surnames ascending puts which first?",
+     "options": [
+      "Zulu",
+      "Addo",
+      "Mensah",
+      "Random"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "forms": {
+   "title": "Forms",
+   "quiz": [
+    {
+     "q": "Which property binds a text box to a field?",
+     "options": [
+      "Caption",
+      "Control Source",
+      "Name",
+      "Tab Index"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "reports": {
+   "title": "Reports",
+   "quiz": [
+    {
+     "q": "Where should a grand total go?",
+     "options": [
+      "Detail",
+      "Page Header",
+      "Report Footer",
+      "Form Header"
+     ],
+     "answer": 2
+    }
+   ]
+  },
+  "validation": {
+   "title": "Validation rules",
+   "quiz": [
+    {
+     "q": "Which rule allows only scores from 0 to 100?",
+     "options": [
+      ">100",
+      "Between 0 And 100",
+      "Like 100",
+      "In (0,100)"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "normal": {
+   "title": "Normalisation",
+   "quiz": [
+    {
+     "q": "A Students table stores TeacherName for each student's class. What should you do?",
+     "options": [
+      "Nothing",
+      "Move class details to a Classes table and link with ClassID",
+      "Delete the students",
+      "Make TeacherName the primary key"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "sql": {
+   "title": "SQL fundamentals",
+   "quiz": [
+    {
+     "q": "Which clause filters groups after GROUP BY?",
+     "options": [
+      "WHERE",
+      "HAVING",
+      "ORDER BY",
+      "FROM"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "Which statement changes existing records?",
+     "options": [
+      "SELECT",
+      "INSERT",
+      "UPDATE",
+      "CREATE"
+     ],
+     "answer": 2
+    }
+   ]
+  },
+  "security": {
+   "title": "Database security",
+   "quiz": [
+    {
+     "q": "What is the safest way to put a user's input into SQL?",
+     "options": [
+      "Join strings",
+      "Use a parameter",
+      "Upper-case it",
+      "Remove spaces"
+     ],
+     "answer": 1
+    }
+   ]
+  },
+  "interchange": {
+   "title": "Data import and export",
+   "quiz": [
+    {
+     "q": "An imported row has \"abc\" in a Number column. What does DBWOW do?",
+     "options": [
+      "Silently skips it",
+      "Imports 0",
+      "Reports the row as failed with the reason",
+      "Crashes"
+     ],
+     "answer": 2
+    }
+   ]
+  }
+ }
+}

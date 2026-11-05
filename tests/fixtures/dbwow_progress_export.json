@@ -1,0 +1,6 @@
+{
+  "_note": "Synthetic example in the shape of DBWOW users/{uid}.progress (a JSON string). Not a real learner.",
+  "uid": "dbw_demo_01",
+  "exported_at": "2026-11-01T10:00:00Z",
+  "progress": "{\"quizzes\":{\"pk:0\":1,\"intro:0\":0,\"sql:1\":2,\"nosuch:0\":1},\"steps\":{\"schooldb:0\":true,\"schooldb:1\":false},\"achievements\":{},\"events\":{\"export\":2}}"
+}

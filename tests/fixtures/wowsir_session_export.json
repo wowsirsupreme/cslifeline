@@ -1,0 +1,15 @@
+{
+  "_note": "Synthetic example in the shape of WOW Sir Realtime Database data: sessions/{id}/meta, sessions/{id}/players, sessions_questions/{id}. Not real learners.",
+  "meta": { "id": "sess_demo_01", "quizId": "quiz_loops", "quizTitle": "Loops check", "teacherId": "t_demo", "code": "ABC123", "status": "ended", "currentQ": 3, "totalQ": 3, "startedAt": 1793800000000, "settings": { "antiCheat": true, "showLeaderboard": true, "timeLimit": 20, "pointsPerQ": 100 } },
+  "questions": [
+    { "id": "wq1", "topicKey": "gr9-programming", "type": "mcq", "text": "How many times does FOR I <- 1 TO 4 run?", "options": ["3", "4", "5", "1"], "answer": "1" },
+    { "id": "wq2", "topicKey": "gr9-algorithms", "type": "mcq", "text": "Which loop always runs at least once?", "options": ["REPEAT", "WHILE"], "answer": "0" },
+    { "id": "wq3", "topicKey": "gr6-ch4-excel1", "type": "mcq", "text": "Which key confirms a cell entry?", "options": ["Enter", "Esc"], "answer": "0" }
+  ],
+  "players": {
+    "p1": { "id": "p1", "name": "Ama B", "avatarId": 3, "score": 200, "streak": 2, "bestStreak": 2, "correct": 2, "total": 3, "tabSwitches": 1, "tabSwitchesByQ": { "1": 1 }, "windowResizes": 0, "lastSeen": 1793800090000,
+      "answers": { "0": { "choice": "1", "correct": true, "timeMs": 5400 }, "1": { "choice": "1", "correct": false, "timeMs": 9100 }, "2": { "choice": "0", "correct": true, "timeMs": 3000 } } },
+    "p2": { "id": "p2", "name": "Kojo", "avatarId": 1, "score": 100, "streak": 1, "bestStreak": 1, "correct": 1, "total": 2, "tabSwitches": 0, "windowResizes": 0, "lastSeen": 1793800080000,
+      "answers": { "0": { "choice": "2", "correct": false, "timeMs": 7000 }, "1": { "choice": "0", "correct": true, "timeMs": 4000 } } }
+  }
+}
