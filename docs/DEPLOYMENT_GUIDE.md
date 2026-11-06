@@ -1,18 +1,18 @@
 # Deployment guide
 
-CS Lifeline is a static web application (Netlify) on top of the existing Firebase project `cslifeline-63e76`. Nothing is compiled.
+CS Lifeline is a static web application (hosted on Vercel; Netlify also works) on top of the existing Firebase project `cslifeline-63e76`. Nothing is compiled.
 
 ## 0. What you need
 
 * The Firebase project (Spark plan is enough for the core app; Blaze is needed only for Cloud Functions, and possibly for Storage image uploads on newer projects).
 * Node.js 20+ and `npm i` in the repository (installs `firebase-tools`, `firebase-admin` and the rules-test library as dev dependencies).
 * Java 11+ for the rules tests (Firebase emulator).
-* A Netlify account (or Firebase Hosting — `firebase.json` also publishes `public/`).
+* A Vercel account (or Netlify, or Firebase Hosting — `netlify.toml` and `firebase.json` also publish `public/`).
 
 ## 1. Firebase console (one-off)
 
 1. **Authentication → Sign-in method:** enable Email/Password; enable Google if wanted (`googleSignIn` in `public/js/core/config.js` controls the button).
-2. **Authentication → Settings → Authorised domains:** add your Netlify domain (e.g. `cslifeline.netlify.app`) and any custom domain.
+2. **Authentication → Settings → Authorised domains:** add your Vercel domain (e.g. `cslifeline.vercel.app`) and any custom domain. Preview deployments use other `*.vercel.app` addresses; add one only if you need to sign in on a preview.
 3. Confirm the web-app configuration in `public/js/core/config.js` matches Project settings → Your apps (it is the v3 project's config).
 
 ## 2. Test and deploy the rules and indexes
@@ -26,11 +26,13 @@ npx firebase deploy --only firestore:rules,firestore:indexes,storage
 ```
 Deploying the v4 rules immediately stops v3 pages from writing data in the old shape. Deploy the new site (step 3) at the same time, and run the migration (step 5) right after.
 
-## 3. Publish the site on Netlify
+## 3. Publish the site on Vercel
 
-* **Git:** push the repository and create a Netlify site from it. `netlify.toml` sets `publish = "public"`, no build command, the security headers and the `/student`, `/teacher`, `/admin` redirects.
-* **Manual:** drag the `public/` folder onto Netlify's deploy page (then add the headers from `netlify.toml` under Site settings, or deploy with `npx netlify deploy --prod --dir public`).
+* In Vercel: **Add New → Project → Import** `wowsirsupreme/cslifeline`. Leave the framework as "Other"; `vercel.json` already sets the output directory to `public/`, no install or build step, the security headers (strict Content-Security-Policy), trailing-slash routes for `/student/`, `/teacher/`, `/admin/` and the `/demo` shortcut. Deploy.
+* Every push to `main` redeploys production; other branches get preview addresses.
+* From a terminal instead: `npx vercel --prod` in the repository folder.
 * Open `https://<site>/?mode=demo` to check the demonstration, then `https://<site>/` for the real sign-in.
+* Netlify alternative: `netlify.toml` contains the same settings.
 
 ## 4. First administrator
 
@@ -84,4 +86,4 @@ Then set `functionsDeployed: true` in `public/js/core/config.js` and redeploy th
 
 ## 9. Updating
 
-Edit files under `public/`, run `npm test && npm run test:e2e`, push (Netlify redeploys). If rules change, run `npm run test:rules` and deploy them. If shared engine files change and Functions are used, redeploy Functions.
+Edit files under `public/`, run `npm test && npm run test:e2e`, push (Vercel redeploys). If rules change, run `npm run test:rules` and deploy them. If shared engine files change and Functions are used, redeploy Functions.

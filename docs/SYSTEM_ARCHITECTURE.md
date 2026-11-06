@@ -3,7 +3,7 @@
 ## Overview
 
 ```
- Browser (static site on Netlify)                          Firebase project (cslifeline-63e76)
+ Browser (static site on Vercel)                           Firebase project (cslifeline-63e76)
  ┌───────────────────────────────────────────────┐          ┌─────────────────────────────────────┐
  │ index.html  student/  teacher/  admin/        │          │ Authentication (email, Google)      │
  │   portals/*.js  →  views/*.js  (pages)        │          │ Cloud Firestore  ← firestore.rules  │
@@ -29,7 +29,7 @@
 
 | Decision | Reason |
 |---|---|
-| Keep plain HTML, CSS and ES modules; no framework, no build step. | The v3 stack and Netlify routes keep working; there is nothing to compile, so a teacher-developer can edit and redeploy. Modules give the separation that v3's 1,800-line inline scripts lacked. |
+| Keep plain HTML, CSS and ES modules; no framework, no build step. | The v3 routes keep working and the site deploys as plain static files (Vercel, or Netlify); there is nothing to compile, so a teacher-developer can edit and redeploy. Modules give the separation that v3's 1,800-line inline scripts lacked. |
 | One data layer (`core/store.js`) with two interchangeable backends. | Pages never call Firebase directly. The demonstration backend (pattern taken from DBWOW's test backend) lets the whole product be explored with synthetic data, and lets the browser tests run without a server. |
 | Pure engines in `public/js/engine/`. | The same marking, record-building and integration code runs in the browser, in Node tests, in Cloud Functions (copied by `scripts/sync-functions-shared.mjs`) and in the synthetic-data generator. One definition of a response record ends the v3 read/write mismatch. |
 | Security in `firestore.rules`, not in the interface. | Every role check in the UI is a convenience; the rules enforce roles, class isolation, answer-key secrecy, release of results, immutability of outcomes and audit logs. |

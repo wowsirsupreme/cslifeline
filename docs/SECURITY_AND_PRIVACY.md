@@ -31,7 +31,7 @@ The rules suite (`tests/rules/rules.test.mjs`, 14 scenarios) covers each of thes
 
 ## 3. Web security
 
-* Strict Content-Security-Policy (`netlify.toml`): scripts only from the site itself and the Firebase SDK host; no inline scripts; `frame-ancestors 'none'`; `object-src 'none'`; HSTS; restrictive Permissions-Policy.
+* Strict Content-Security-Policy (`vercel.json`, mirrored in `netlify.toml`): scripts only from the site itself and the Firebase SDK host; no inline scripts; `frame-ancestors 'none'`; `object-src 'none'`; HSTS; restrictive Permissions-Policy.
 * All text is inserted with `textContent` (the UI kit); the only `innerHTML` use is for the fixed icon set (fixes S12).
 * CSV exports prefix cells starting with `= + - @` to prevent spreadsheet formula injection.
 * Image uploads: staff only, under their own folder, ≤ 3 MB, PNG/JPEG/GIF/WebP only (SVG refused because it can carry script).

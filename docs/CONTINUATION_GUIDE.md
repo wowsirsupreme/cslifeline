@@ -11,7 +11,7 @@ All items in CHANGELOG.md. Tests: 68 unit, 7 Python, 49 browser end-to-end — a
 | # | Task | Why it was not done here | How |
 |---|---|---|---|
 | 1 | Run the security-rules tests | The Firestore emulator download is blocked in the build environment | `npm i && npm run test:rules` on a computer with Java 11+. Fix any failure before deploying. |
-| 2 | Deploy rules, indexes and the site | Needs your Firebase and Netlify accounts | DEPLOYMENT_GUIDE.md §2–3 |
+| 2 | Deploy rules, indexes and the site | Needs your Firebase and Vercel accounts | DEPLOYMENT_GUIDE.md §2–3 |
 | 3 | Provision the first administrator | Needs a service-account key | DEPLOYMENT_GUIDE.md §4 |
 | 4 | Migrate v3 data | Needs the key and your list of genuine v3 teachers | DEPLOYMENT_GUIDE.md §5 (dry run first) |
 | 5 | Test the live Firebase flows | No credentials here | The checklist in DEPLOYMENT_GUIDE.md §8 |

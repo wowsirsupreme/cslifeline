@@ -16,6 +16,7 @@ The demonstration runs entirely in the browser on synthetic data (two schools, f
 
 | Folder | Contents |
 |---|---|
+| `vercel.json`, `netlify.toml` | Hosting configuration (Vercel is primary). |
 | `public/` | The web application (static HTML + ES modules, no build step). `index.html` sign-in, `student/`, `teacher/`, `admin/` portals, `js/engine/` pure analytics engines, `js/core/` data layer, `js/views/` pages, `data/` question bank and demo dataset, `templates/` import templates and sample payloads. |
 | `firestore.rules`, `firestore.indexes.json`, `storage.rules` | Database security rules (the real access control) and indexes. |
 | `functions/` | Optional Cloud Functions (Blaze plan): automatic marking, the signed ingest API for other platforms, closing expired assessments. |
@@ -29,7 +30,7 @@ The demonstration runs entirely in the browser on synthetic data (two schools, f
 
 | Command | What it does |
 |---|---|
-| `npm run serve` | Serve `public/` locally (same routes as Netlify). |
+| `npm run serve` | Serve `public/` locally (same routes as the hosted site). |
 | `npm test` | Unit tests for engines, marking, interpreter, integration adapters, ingest API, migration (68 tests). |
 | `npm run test:e2e` | Browser tests of every page and key workflow in all three portals (49 checks; needs Playwright + Chromium). |
 | `npm run test:ml` | Python tests, including exact feature parity between the browser and Python and between the in-browser model and scikit-learn. |
@@ -39,7 +40,7 @@ The demonstration runs entirely in the browser on synthetic data (two schools, f
 
 ## Deploying
 
-See `docs/DEPLOYMENT_GUIDE.md`. In short: deploy the rules and indexes to the existing Firebase project, publish `public/` on Netlify (the included `netlify.toml` does this), add the Netlify domain to Firebase Authentication's authorised domains, provision the first administrator with `scripts/provision-admin.mjs`, then migrate any v3 data with `scripts/migrate-v3.mjs` (dry run first).
+See `docs/DEPLOYMENT_GUIDE.md`. In short: deploy the rules and indexes to the existing Firebase project, import the GitHub repository into Vercel (the included `vercel.json` publishes `public/` with the security headers; `netlify.toml` does the same on Netlify), add the Vercel domain to Firebase Authentication's authorised domains, provision the first administrator with `scripts/provision-admin.mjs`, then migrate any v3 data with `scripts/migrate-v3.mjs` (dry run first).
 
 ## Status in one paragraph
 

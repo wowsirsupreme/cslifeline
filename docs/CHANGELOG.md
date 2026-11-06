@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.0.1 — 6 November 2026
+* Hosting moved to Vercel (`vercel.json` with the same headers and routes); `netlify.toml` kept as an alternative.
+
 ## 4.0.0 — 6 November 2026 (rebuild of v3 "FIXED_2")
 
 ### Security
