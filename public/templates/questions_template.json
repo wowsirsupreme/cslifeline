@@ -1,0 +1,90 @@
+[
+ {
+  "id": "T08_EX_01",
+  "type": "mcq",
+  "chapter_id": "T08",
+  "subchapter": "8.1",
+  "topic": "Iteration",
+  "learning_objective": "Use count-controlled loops",
+  "grade": 10,
+  "difficulty": 2,
+  "marks": 1,
+  "text": "How many times does the body of FOR I ← 1 TO 4 run?",
+  "options": [
+   "3",
+   "4",
+   "5",
+   "1"
+  ],
+  "answer": 1,
+  "explanation": "I takes the values 1, 2, 3 and 4.",
+  "hint": "List the values I takes.",
+  "misconception_tag": "MC-LOOP-01",
+  "option_misconceptions": {
+   "0": "MC-LOOP-01",
+   "2": "MC-LOOP-01"
+  }
+ },
+ {
+  "id": "T01_EX_02",
+  "type": "truefalse",
+  "chapter_id": "T01",
+  "text": "A nibble is 4 bits.",
+  "answer": true,
+  "explanation": "A nibble is half a byte."
+ },
+ {
+  "id": "T08_EX_03",
+  "type": "code_output",
+  "chapter_id": "T08",
+  "text": "What is output?",
+  "code": "X ← 3\nOUTPUT X * 2",
+  "answer": [
+   "6"
+  ],
+  "explanation": "3 × 2 = 6."
+ },
+ {
+  "id": "T07_EX_04",
+  "type": "ordering",
+  "chapter_id": "T07",
+  "text": "Put the stages of the program development life cycle in order.",
+  "items": [
+   "Design",
+   "Analysis",
+   "Testing",
+   "Coding"
+  ],
+  "answer": [
+   1,
+   0,
+   3,
+   2
+  ]
+ },
+ {
+  "id": "T07_EX_05",
+  "type": "trace_table",
+  "chapter_id": "T07",
+  "text": "Complete the trace table.",
+  "code": "T ← 0\nFOR I ← 1 TO 3\n  T ← T + I\nNEXT I",
+  "columns": [
+   "I",
+   "T"
+  ],
+  "answer": [
+   [
+    "1",
+    "1"
+   ],
+   [
+    "2",
+    "3"
+   ],
+   [
+    "3",
+    "6"
+   ]
+  ]
+ }
+]

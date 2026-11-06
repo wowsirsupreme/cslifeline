@@ -10,7 +10,7 @@
 * Features (fv-1.1): acc_all, acc_recent, acc_trend, acc_assessment, chapter_min_acc, chapters_below_50, diag_error_rate, repeat_error_rate, completion_rate, active_days_28, days_since_active, rel_time_median, hint_rate, n_responses. Page interruptions are not used.
 * Selection rule: most interpretable model within 0.02 PR-AUC of the best (grouped 5-fold CV on the training cohort). Chosen: **Logistic regression**.
 * Thresholds: moderate ≥ 0.1022, high ≥ 0.1792 — moderate = highest threshold with recall >= 80% (out-of-fold, training cohort); precision 70% not reachable; high = F1-maximising threshold above moderate.
-* Data hash 4ed8f13812f4c637, seed 2026, scikit-learn 1.9.1, Python 3.13.18, trained 2026-11-06T03:35:55Z.
+* Data hash 4ed8f13812f4c637, seed 2026, scikit-learn 1.9.1, Python 3.13.18, trained 2026-11-06T03:55:37Z.
 
 ## Model comparison
 

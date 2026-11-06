@@ -1,0 +1,18 @@
+[
+ {
+  "event_id": "EVT-WOW-0001",
+  "schema_version": "1.0",
+  "source_platform": "WOW_SIR",
+  "source_learner_id": "sess_42:p_7",
+  "event_type": "question_answered",
+  "subject": "CS-0478",
+  "time_precision": "session",
+  "chapter_id": "T08",
+  "question_id": "WOWSIR:q_17",
+  "correct": false,
+  "attempt_number": 1,
+  "duration_ms": 9100,
+  "occurred_at": "2026-11-05T10:00:00Z",
+  "is_synthetic": true
+ }
+]

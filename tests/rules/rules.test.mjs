@@ -94,3 +94,27 @@ test('suspended teachers lose access', async () => {
   await env.withSecurityRulesDisabled(ctx => updateDoc(doc(ctx.firestore(), 'users/t1'), { status: 'suspended' }));
   await assertFails(getDoc(doc(as('t1'), 'responses/r1')));
 });
+test('interventions, outcomes and predictions: staff of the class only; outcomes are immutable', async () => {
+  const iv = { student_uid: 's1', class_code: '10A', target: { type: 'chapter', id: 'T08' }, status: 'active' };
+  await assertSucceeds(setDoc(doc(as('t1'), 'interventions/i1'), iv));
+  await assertFails(setDoc(doc(as('t2'), 'interventions/i2'), iv));
+  await assertFails(getDoc(doc(as('s1'), 'interventions/i1')));
+  const out = { intervention_id: 'i1', student_uid: 's1', class_code: '10A', recorded_by: 't1', evaluation: { outcome: 'improved' } };
+  await assertSucceeds(setDoc(doc(as('t1'), 'intervention_outcomes/o1'), out));
+  await assertFails(updateDoc(doc(as('t1'), 'intervention_outcomes/o1'), { 'evaluation.outcome': 'declined' }));
+  await assertFails(getDoc(doc(as('t2'), 'predictions/p1')));
+});
+test('model registry, integrations and learning events are administrator-only', async () => {
+  await assertFails(setDoc(doc(as('t1'), 'model_registry/m1'), { status: 'production' }));
+  await assertSucceeds(setDoc(doc(as('admin'), 'model_registry/m1'), { status: 'candidate' }));
+  await assertFails(getDoc(doc(as('t1'), 'learning_events/e1')));
+  await assertFails(setDoc(doc(as('t1'), 'platform_integrations/WOW_SIR'), { authorisation: { status: 'approved' } }));
+  await assertSucceeds(getDoc(doc(as('t1'), 'model_registry/m1')));
+  await assertFails(getDoc(doc(as('s1'), 'model_registry/m1')));
+});
+test('teachers may record consent or suspend, but never change a student\'s role or class', async () => {
+  await assertSucceeds(updateDoc(doc(as('t1'), 'users/s1'), { consent: { research_use: 'granted' } }));
+  await assertSucceeds(updateDoc(doc(as('t1'), 'users/s1'), { status: 'suspended' }));
+  await assertFails(updateDoc(doc(as('t1'), 'users/s1'), { class_code: '10B' }));
+  await assertFails(updateDoc(doc(as('t2'), 'users/s1'), { consent: { research_use: 'granted' } }));
+});

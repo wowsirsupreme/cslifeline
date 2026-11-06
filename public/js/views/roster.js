@@ -12,7 +12,7 @@ export async function rosterView(ctx) {
   const classes = await myClasses(store);
   if (!classes.length) return h('div', pageHead('Classes and roster'), noClasses());
   const students = await store.listStudents(classes.map(c => c.id));
-  const joinUrl = (c) => `${location.origin}/?join=${encodeURIComponent(c.id)}`;
+  const joinUrl = (c) => `${location.origin}/?tab=register&class=${encodeURIComponent(c.id)}`;
 
   const classCards = classes.map(c => {
     const mine = students.filter(s => s.class_code === c.id);

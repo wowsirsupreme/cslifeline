@@ -1,0 +1,15 @@
+{
+  "event_id": "EVT-001",
+  "source_platform": "WOW_SIR",
+  "learner_id": "ANON-001",
+  "event_type": "question_answered",
+  "subject": "Computer Science",
+  "chapter": "Programming",
+  "topic": "Selection",
+  "question_id": "Q-001",
+  "response_correct": false,
+  "attempt_number": 2,
+  "duration_seconds": 35,
+  "timestamp": "2026-11-05T14:00:00Z",
+  "data_version": "1.0"
+}

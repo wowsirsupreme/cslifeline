@@ -1,0 +1,2 @@
+id,type,chapter_id,subchapter,topic,learning_objective,grade,difficulty,marks,text,code,optionA,optionB,optionC,optionD,optionE,answer,explanation,hint,misconception_tag,option_misconceptions,image_url,image_alt,group_id,stimulus,items,left,right,columns,active
+T01_BIN_EX1,mcq,T01,1.1,Number systems,Convert between binary and denary,10,1,1,What is the denary value of the binary number 00110101?,,43,53,63,106,,B,32 + 16 + 4 + 1 = 53.,Write the place values 128 64 32 16 8 4 2 1 above the bits.,MC-BIN-01,0:MC-BIN-01;3:MC-BIN-04,,,,,,,,,true

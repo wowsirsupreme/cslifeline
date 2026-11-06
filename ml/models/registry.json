@@ -8,9 +8,9 @@
       "validated_on_real_data": false,
       "trained_on": "synthetic",
       "feature_version": "fv-1.1",
-      "path": "ml/models/logistic-regression-20261106-4ed8f1",
       "promoted_at": "2026-11-06T03:35:56.701385+00:00",
-      "promotion_reason": "Demonstration model for the synthetic showcase; trained and tested on synthetic cohorts H1/H2 only."
+      "promotion_reason": "Demonstration model for the synthetic showcase; trained and tested on synthetic cohorts H1/H2 only.",
+      "path": "ml/models/logistic-regression-20261106-4ed8f1"
     }
   ]
 }

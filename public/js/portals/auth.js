@@ -88,7 +88,7 @@ function teacherPanel(body) {
 
 function demoInvite(body) {
   mount(body, h('div.stack',
-    h('p', 'The demonstration runs entirely in your browser with a synthetic dataset of four schools, 18 classes and about 400 learners. Nothing is sent to any server and no real student is involved.'),
+    h('p', 'The demonstration runs entirely in your browser with a synthetic dataset: two schools, five classes and 92 learners in the current term (the demonstration model was trained and tested on a further 584 synthetic learners from two earlier terms). Nothing is sent to any server and no real student is involved.'),
     callout('Results and predictions in the demonstration are produced from synthetic data. They show how the software works; they are not evidence of how well the model predicts real learners.', 'demo'),
     btn('Open the demonstration', () => { setMode('demo'); location.href = '/?mode=demo'; }, { kind: 'primary', ic: 'play' })));
 }

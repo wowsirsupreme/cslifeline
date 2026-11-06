@@ -307,12 +307,20 @@ def save_to_registry(result: dict) -> Path:
     entry = result["entry"]
     d = MODELS_DIR / entry["model_version"]
     d.mkdir(parents=True, exist_ok=True)
+    prev = d / "registry_entry.json"
+    if prev.exists():  # same data + same day → same version: keep any promotion decision already made
+        old = json.loads(prev.read_text())
+        for k in ("status", "promoted_at", "promotion_reason"):
+            if k in old:
+                entry[k] = old[k]
     joblib.dump(result["model"], d / "model.joblib")
     (d / "registry_entry.json").write_text(json.dumps(entry, indent=2, default=_json))
     reg_path = MODELS_DIR / "registry.json"
     reg = json.loads(reg_path.read_text()) if reg_path.exists() else {"models": []}
+    kept = {m["model_version"]: m for m in reg["models"]}.get(entry["model_version"], {})
     reg["models"] = [m for m in reg["models"] if m["model_version"] != entry["model_version"]] + [
-        {k: entry[k] for k in ("model_version", "model_name", "model_type", "status", "validated_on_real_data", "trained_on", "feature_version")} | {"path": str(d.relative_to(ROOT))}]
+        {k: entry[k] for k in ("model_version", "model_name", "model_type", "status", "validated_on_real_data", "trained_on", "feature_version")}
+        | {k: kept[k] for k in ("promoted_at", "promotion_reason") if k in kept} | {"path": str(d.relative_to(ROOT))}]
     reg_path.write_text(json.dumps(reg, indent=2))
     return d
 

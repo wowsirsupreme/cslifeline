@@ -15,7 +15,7 @@
 // learning histories.
 
 import { hash32, toMs } from '../core/util.js';
-import { mapExternalTopic } from '../engine/curriculum.js';
+import { mapExternalTopic, CHAPTERS } from '../engine/curriculum.js';
 
 export const EVENT_SCHEMA_VERSION = '1.0';
 export const PLATFORMS = {
@@ -56,6 +56,20 @@ export function makeEventId(platform, ...parts) { return 'EVT-' + platform + '-'
  * chapter, topic, question_id, response_correct, attempt_number, duration_seconds,
  * timestamp, data_version}.
  */
+// Chapter names other platforms commonly send, mapped to 0478 chapters. Exact chapter titles also match.
+const CHAPTER_ALIASES = { programming: 'T08', 'programming concepts': 'T08', arrays: 'T09', 'file handling': 'T10', algorithms: 'T07', 'algorithm design': 'T07',
+  'problem solving': 'T07', 'data representation': 'T01', 'number systems': 'T01', networks: 'T02', 'data transmission': 'T02', hardware: 'T03', software: 'T04',
+  internet: 'T05', 'cyber security': 'T05', cybersecurity: 'T05', 'emerging technologies': 'T06', 'logic gates': 'T13', 'boolean logic': 'T13', databases: 'T14', database: 'T14' };
+/** Map a free-text chapter (and topic) name to a chapter ID, or null when unknown (never guessed). */
+export function defaultChapterLookup(name, topic = '') {
+  const n = String(name || '').trim().toLowerCase();
+  if (/^T\d{2}$/i.test(n)) return CHAPTERS[n.toUpperCase()] ? n.toUpperCase() : null;
+  const byTitle = Object.values(CHAPTERS).find(c => c.title.toLowerCase() === n);
+  if (byTitle) return byTitle.id;
+  if (n === 'programming' && /array/i.test(topic)) return 'T09';
+  return CHAPTER_ALIASES[n] || null;
+}
+
 export function normaliseIncoming(raw, { chapterLookup } = {}) {
   const e = { ...raw };
   if (e.data_version && !e.schema_version) { e.schema_version = e.data_version; delete e.data_version; }
@@ -63,7 +77,7 @@ export function normaliseIncoming(raw, { chapterLookup } = {}) {
   if ('response_correct' in e && !('correct' in e)) { e.correct = e.response_correct; delete e.response_correct; }
   if (typeof e.duration_seconds === 'number' && e.duration_ms === undefined) { e.duration_ms = Math.round(e.duration_seconds * 1000); delete e.duration_seconds; }
   if (e.learner_id && !e.source_learner_id) { e.source_learner_id = e.learner_id; delete e.learner_id; }
-  if (e.chapter && !e.chapter_id) { e.source_chapter = e.chapter; e.chapter_id = chapterLookup ? chapterLookup(e.chapter) : null; delete e.chapter; }
+  if (e.chapter && !e.chapter_id) { e.source_chapter = e.chapter; e.chapter_id = (chapterLookup || defaultChapterLookup)(e.chapter, e.topic); delete e.chapter; }
   if (!e.time_precision) e.time_precision = e.occurred_at ? 'exact' : 'snapshot';
   if (e.subject === 'Computer Science') e.subject = 'CS-0478';
   return e;
