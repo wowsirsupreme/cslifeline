@@ -28,7 +28,7 @@ Deploying the v4 rules immediately stops v3 pages from writing data in the old s
 
 ## 3. Publish the site on Vercel
 
-* In Vercel: **Add New → Project → Import** `wowsirsupreme/cslifeline`. Leave the framework as "Other"; `vercel.json` already sets the output directory to `public/`, no install or build step, the security headers (strict Content-Security-Policy), trailing-slash routes for `/student/`, `/teacher/`, `/admin/` and the `/demo` shortcut. Deploy.
+* In Vercel: **Add New → Project → Import** `wowsirsupreme/cslifeline`. Leave the framework as "Other"; `vercel.json` runs a tiny build step (`scripts/vercel-build.mjs` copies `public/` to `dist/` and checks every page exists; no dependencies are installed), and sets the security headers (strict Content-Security-Policy), trailing-slash routes for `/student/`, `/teacher/`, `/admin/` and the `/demo` shortcut. Deploy.
 * Every push to `main` redeploys production; other branches get preview addresses.
 * From a terminal instead: `npx vercel --prod` in the repository folder.
 * Open `https://<site>/?mode=demo` to check the demonstration, then `https://<site>/` for the real sign-in.
