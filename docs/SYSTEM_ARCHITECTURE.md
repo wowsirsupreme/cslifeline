@@ -3,7 +3,7 @@
 ## Overview
 
 ```
- Browser (static site on Vercel)                           Firebase project (cslifeline-63e76)
+ Browser (static site on Vercel)                           Firebase project (cslifeline-94bf7)
  ┌───────────────────────────────────────────────┐          ┌─────────────────────────────────────┐
  │ index.html  student/  teacher/  admin/        │          │ Authentication (email, Google)      │
  │   portals/*.js  →  views/*.js  (pages)        │          │ Cloud Firestore  ← firestore.rules  │

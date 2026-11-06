@@ -14,12 +14,12 @@ export const CONFIG = {
   backend: 'firebase',
   firebaseSdkVersion: '10.12.0',
   firebase: {
-    apiKey: 'AIzaSyCPdz5f1MqwPzw6RYRxDfYrSJ5ur96Ch_0',
-    authDomain: 'cslifeline-63e76.firebaseapp.com',
-    projectId: 'cslifeline-63e76',
-    storageBucket: 'cslifeline-63e76.firebasestorage.app',
-    messagingSenderId: '209375265757',
-    appId: '1:209375265757:web:927002d3a2b6f25a03ec34',
+    apiKey: 'AIzaSyAfLIord8mLc34fcjrXkLr2uMO1hphCAJw',
+    authDomain: 'cslifeline-94bf7.firebaseapp.com',
+    projectId: 'cslifeline-94bf7',
+    storageBucket: 'cslifeline-94bf7.firebasestorage.app',
+    messagingSenderId: '363722770519',
+    appId: '1:363722770519:web:1c7585a62525dd9823fb12',
   },
   // Set to true after `firebase deploy --only functions`. When false, assessment
   // submissions are scored from the teacher dashboard (the teacher's browser holds

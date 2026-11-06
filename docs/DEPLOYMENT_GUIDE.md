@@ -1,6 +1,6 @@
 # Deployment guide
 
-CS Lifeline is a static web application (hosted on Vercel; Netlify also works) on top of the existing Firebase project `cslifeline-63e76`. Nothing is compiled.
+CS Lifeline is a static web application (hosted on Vercel; Netlify also works) on top of the existing Firebase project `cslifeline-94bf7`. Nothing is compiled.
 
 ## 0. What you need
 
@@ -13,7 +13,7 @@ CS Lifeline is a static web application (hosted on Vercel; Netlify also works) o
 
 1. **Authentication → Sign-in method:** enable Email/Password; enable Google if wanted (`googleSignIn` in `public/js/core/config.js` controls the button).
 2. **Authentication → Settings → Authorised domains:** add your Vercel domain (e.g. `cslifeline.vercel.app`) and any custom domain. Preview deployments use other `*.vercel.app` addresses; add one only if you need to sign in on a preview.
-3. Confirm the web-app configuration in `public/js/core/config.js` matches Project settings → Your apps (it is the v3 project's config).
+3. Confirm the web-app configuration in `public/js/core/config.js` matches Project settings → Your apps (project `cslifeline-94bf7`, set up for v4; `.firebaserc` points the Firebase CLI at it).
 
 ## 2. Test and deploy the rules and indexes
 
@@ -21,7 +21,7 @@ CS Lifeline is a static web application (hosted on Vercel; Netlify also works) o
 npm i
 npm run test:rules                      # Firestore emulator; all 14 scenarios must pass
 npx firebase login
-npx firebase use cslifeline-63e76
+npx firebase use cslifeline-94bf7
 npx firebase deploy --only firestore:rules,firestore:indexes,storage
 ```
 Deploying the v4 rules immediately stops v3 pages from writing data in the old shape. Deploy the new site (step 3) at the same time, and run the migration (step 5) right after.
@@ -45,6 +45,9 @@ GOOGLE_APPLICATION_CREDENTIALS=./service-account.json npm run provision-admin --
 4. In the admin portal: create the school, the classes (class codes are what students type to join), approve teachers and assign their classes, check Settings.
 
 ## 5. Migrate v3 data (if the v3 database has records)
+
+v4 uses a new, empty Firebase project (`cslifeline-94bf7`); the v3 records are still in the old project `cslifeline-63e76`. If you need them, first copy the v3 collections into the new project (Firestore export/import through Google Cloud, or ask for a copy script), then run the migration below against the new project. If the v3 data was only testing, skip this step.
+
 
 ```
 GOOGLE_APPLICATION_CREDENTIALS=./service-account.json npm run migrate:v3                      # dry run: report only
