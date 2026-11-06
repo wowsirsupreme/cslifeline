@@ -8,7 +8,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = join(ROOT, 'public'), OUT = join(ROOT, 'dist');
 rmSync(OUT, { recursive: true, force: true });
 cpSync(SRC, OUT, { recursive: true });
-const required = ['index.html', 'student/index.html', 'teacher/index.html', 'admin/index.html', 'js/core/config.js', 'css/app.css', 'data/demo/demo_dataset.json'];
+const required = ['index.html', 'student/index.html', 'teacher/index.html', 'admin/index.html', 'js/core/config.js', 'css/app.css', 'data/demo/demo_dataset.json', 'fonts/inter-latin-400-normal.woff2'];
 const missing = required.filter(f => !existsSync(join(OUT, f)));
 if (missing.length) { console.error('Missing from build output:', missing.join(', ')); process.exit(1); }
 const count = (d) => readdirSync(d).reduce((n, f) => n + (statSync(join(d, f)).isDirectory() ? count(join(d, f)) : 1), 0);

@@ -1,6 +1,8 @@
 # Changelog
 
 ## 4.0.1 — 6 November 2026
+* Restored the v3 visual identity as the default theme: midnight background, lifeline teal (#00D4AA), amber / crimson / emerald signals, Sora headings, Inter text, JetBrains Mono code, teal background glow, gradient primary buttons and accent-topped stat tiles. The theme button switches to a light version with the same teal identity. v3's faintest grey was lightened for readable contrast.
+* Fonts are hosted with the site (no Google Fonts requests, so no learner IP addresses go to a third party); the Content-Security-Policy stays at 'self' for fonts.
 * Hosting moved to Vercel (`vercel.json` with the same headers and routes); `netlify.toml` kept as an alternative.
 
 ## 4.0.0 — 6 November 2026 (rebuild of v3 "FIXED_2")
