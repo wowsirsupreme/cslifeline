@@ -273,3 +273,4 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   .topbar .badge.demo { max-width: 8.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .topbar .badge.demo::after { content: ''; }
 }
+.topbar .userbox { flex-wrap: nowrap; }

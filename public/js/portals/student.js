@@ -19,6 +19,11 @@ import { seededShuffle, hash32, shuffle, toMs, fmtDuration } from '../core/util.
 const TAX = new Map(TAXONOMY.map(t => [t.id, t]));
 let practiceState = null; // survives navigation inside the practice route
 
+// Taxonomy descriptions are written for teachers ("The learner believes…"); students see a non-labelling version.
+function forStudents(text = '') {
+  return String(text).replace(/^The learner /, 'A common mistake: a student ');
+}
+
 startPortal({
   portal: 'student', allow: ['student'],
   nav: [
@@ -69,7 +74,7 @@ async function home({ store, navigate }) {
         ...todo.map(a => h('div.row.between', h('div', h('strong', a.title || 'Practice from your teacher'), h('div.small.muted', `${a.question_ids?.length || 0} questions${a.due_at ? ` · by ${fmtDate(a.due_at)}` : ''}`)), btn('Practise', () => startPractice(navigate, { ids: a.question_ids, mode: 'intervention', assignment: a, title: a.title }), { sm: true }))))
         : empty('Nothing waiting', 'No assessments or practice sets are waiting for you.', btn('Practise anything', () => navigate('/practice'), { kind: 'primary' }), 'check')),
       card(cardHead('Ideas worth revisiting'), ideas.length ? h('div.stack', h('p.small.muted', 'Based on your recent answers. Short practice on these will help most.'),
-        ...ideas.map(x => h('div', { style: { borderTop: '1px solid var(--line)', paddingTop: '.6rem' } }, h('strong', x.entry.name), h('p.small', { style: { margin: '.2rem 0 .4rem' } }, x.entry.description),
+        ...ideas.map(x => h('div', { style: { borderTop: '1px solid var(--line)', paddingTop: '.6rem' } }, h('strong', x.entry.name), h('p.small', { style: { margin: '.2rem 0 .4rem' } }, forStudents(x.entry.description)),
           btn('Practise this idea', () => startPractice(navigate, { misconception: x.misconception_id, title: x.entry.name }), { sm: true, ic: 'target' }))))
         : empty('Keep going', s.marked < 10 ? 'Answer a few more questions and suggestions will appear here.' : 'Nothing stands out right now. Try a chapter you have not practised yet.', null, 'target'))),
     card(cardHead('Chapters', btn('Practise', () => navigate('/practice'), { sm: true })), ...['P1', 'P2'].map(p => h('div', h('h3', { style: { marginTop: '.5rem' } }, p === 'P1' ? 'Paper 1 — Computer systems' : 'Paper 2 — Algorithms, programming and logic'),
@@ -292,7 +297,7 @@ async function progress({ store }) {
     h('div.grid-tiles', tile('Accuracy', fmtPct(s.accuracy), `${s.marked} marked answers`), tile('Assessment accuracy', fmtPct(s.assessment_accuracy), `${s.assessment_n} answers`), tile('Sessions completed', s.sessions_completed), tile('Awaiting marking', s.awaiting_marking)),
     h('div.grid-2',
       card('Accuracy by week', tr.series.length ? chart('line', { labels: tr.series.map(w => w.week), datasets: [{ label: 'Accuracy %', data: tr.series.map(w => Math.round(w.accuracy * 100)), borderColor: c1, backgroundColor: c1, tension: .25 }] }, { scales: { y: { min: 0, max: 100 } } }, { label: 'Weekly accuracy' }) : empty('No data yet', 'Your weekly progress will appear here.')),
-      card('Ideas worth revisiting', ideas.length ? h('div.stack', ...ideas.map(x => h('div', h('strong', x.entry.name), h('p.small', x.entry.description), h('p.small.muted', 'Try this: ' + (x.entry.strategies?.[0] || ''))))) : h('p.muted', 'Nothing stands out at the moment.'))),
+      card('Ideas worth revisiting', ideas.length ? h('div.stack', ...ideas.map(x => h('div', h('strong', x.entry.name), h('p.small', forStudents(x.entry.description)), h('p.small.muted', 'Try this: ' + (x.entry.strategies?.[0] || ''))))) : h('p.muted', 'Nothing stands out at the moment.'))),
     card('Chapters', ...CHAPTER_IDS.map(id => barRow(`${id} ${CHAPTERS[id].title}`, s.chapters[id].accuracy, s.chapters[id].n ? `${fmtPct(s.chapters[id].accuracy)} (${s.chapters[id].n})` : '—'))),
     card('History', dataTable(hist, [
       { key: 'recorded_at', label: 'When', render: r => rel(r.recorded_at), sort: r => r.recorded_at },

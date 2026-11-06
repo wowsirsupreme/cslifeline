@@ -203,3 +203,41 @@ Contains a useful **code-level misconception checker** (`=` used for assignment,
 7. Intervention workflow with before/after evidence.
 8. Cross-platform integration layer with honest identity handling.
 9. Tests, documentation, deployment.
+
+---
+
+## 11. Resolution status (6 November 2026)
+
+| Finding | Status | Where |
+|---|---|---|
+| S1–S3 role self-assignment | Fixed | `firestore.rules` users rules; `portals/auth.js`; `scripts/provision-admin.mjs` |
+| S4 predictable passwords | Fixed; v3 accounts reset by migration | `store.createRosterStudent`; `migrate-v3.mjs --reset-predictable-passwords` |
+| S5 answer keys sent to students | Fixed | `assessment_keys`; `store.saveAssessment`; `submission_results` release rule |
+| S6 trust-on-failure | Fixed | `ui/shell.js` (no profile → finish registration, never a role) |
+| S7 writing others' records | Fixed | responses / submissions rules |
+| S8 no class isolation | Fixed | `staffFor()` in rules |
+| S9 shadow ban | Replaced by visible suspension | roster, admin users, migration |
+| S10 config in source | Accepted (not a secret); protection by rules | SECURITY_AND_PRIVACY.md |
+| S11 leaderboard names | Daily challenge shows no class-wide name list | student portal |
+| S12 XSS | Fixed (textContent rendering, CSP) | `ui/kit.js`, `netlify.toml` |
+| 3.1 class_code mismatch | Fixed (one schema) | `engine/records.js`; migration adds class_code |
+| 3.2 submissions rejected / never marked | Fixed | rules; Assessments → Results |
+| 3.3 coding always correct | Fixed; v3 records neutralised | `engine/marking.js`; migration |
+| 3.4 heuristic shown as risk | Fixed: rules are labelled with their source; predictions only from registered models | `app/data.js attentionList`, `views/common.js riskBadge` |
+| 3.5 students see risk | Fixed (tested) | student portal; e2e check |
+| 3.6 interpreter | Replaced; passes the reference suite | `engine/pseudocode/interpreter.js` |
+| F1 `/admin/` 404 | Fixed | `public/admin/`, `views/admin.js` |
+| F2 question types | 13 types | `engine/questions.js` |
+| F3 interventions | Implemented with before/after evidence | `views/interventions.js`, `engine/interventions.js` |
+| F4 taxonomy | 68 entries with indicators, causes, strategies, evidence rules | `engine/taxonomy-data.js` |
+| F5 offline loss | Outbox + deterministic IDs | `core/store.js` |
+| F6 import validation | Validation, duplicate detection, rejected-row report | `engine/importer.js`, `views/questionbank.js` |
+| F7 duplicates | Removed (modular code) | — |
+| F8 leaderboard index | Not needed (no ordered composite query) | — |
+| F9 standard assessment avoided weak chapters | Teacher-built assessments; practice targets weak ideas | — |
+| F10 live-signal writes | Removed | — |
+| F11 inline monoliths | Modular ES modules | `public/js/` |
+| F12 tutorials unreachable | Reachable from the student portal | `portals/student.js` |
+| §4 question bank errors | Fixed; bank grown to 214 validated items | `public/data/question-bank.js` |
+| §5 behavioural labels | Removed; context only | `engine/behaviour.js`, `risk.js` |
+| §6 M1–M7 ML | Fixed | `ml/`, MACHINE_LEARNING_METHODOLOGY.md |

@@ -106,7 +106,12 @@ export async function questionEdit(ctx) {
   const refresh = () => {
     let q; try { q = normaliseQuestion(build(), { source: 'teacher' }); } catch (e) { errBox.replaceChildren(callout(e.message, 'danger')); return null; }
     const v = validateQuestion(q, { taxonomyIds: TAX_IDS });
-    errBox.replaceChildren(v.errors.length ? callout(['Fix before saving: ', v.errors.join('; ')], 'danger') : v.warnings.length ? callout(v.warnings.join('; '), 'warn') : callout('Valid.', 'ok'));
+    // Diagnostic quality: a linked distractor separates a misconception from guessing only if some other wrong option is NOT linked to it.
+    const wrong = (q.options || []).length - (Array.isArray(q.answer) ? q.answer.length : 1);
+    const perMis = {}; Object.values(q.option_misconceptions || {}).forEach(m => { perMis[m] = (perMis[m] || 0) + 1; });
+    const blunt = q.options?.length > 2 ? Object.entries(perMis).filter(([, k]) => k >= wrong).map(([m]) => m) : [];
+    if (blunt.length) v.warnings.push(`Every wrong option is linked to ${blunt.join(', ')}, so choosing one cannot be told apart from a guess. Link only the options that this misconception would produce, or link different options to different misconceptions.`);
+    errBox.replaceChildren(v.errors.length ? callout(['Fix before saving: ', v.errors.join('; ')], 'danger') : v.warnings.length ? callout(v.warnings.join(' '), 'warn') : callout('Valid.', 'ok'));
     try { preview.replaceChildren(renderQuestion(q, { disabled: false })); } catch (e) { preview.replaceChildren(callout('Preview unavailable: ' + e.message, 'warn')); }
     return v.ok ? q : null;
   };

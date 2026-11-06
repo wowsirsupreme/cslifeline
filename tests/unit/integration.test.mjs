@@ -82,3 +82,13 @@ test('demo backend: query operators, merge, overlay and reset', async () => {
   assert.ok(await b3.get('users', 'u2'), 'reset restores the base dataset');
   assert.equal(matches({ a: { b: 2 } }, [['a.b', '==', 2]]), true);
 });
+
+test('default chapter lookup: the brief\'s example maps to T08; unknown names are not guessed', async () => {
+  const { normaliseIncoming, defaultChapterLookup } = await import('../../public/js/integration/events.js');
+  const e = normaliseIncoming(JSON.parse((await import('node:fs')).readFileSync(new URL('../fixtures/brief_event.json', import.meta.url), 'utf8')));
+  assert.equal(e.chapter_id, 'T08');
+  assert.equal(e.source_learner_id, 'ANON-001');
+  assert.equal(defaultChapterLookup('Data Representation'), 'T01');
+  assert.equal(defaultChapterLookup('Programming', 'Arrays'), 'T09');
+  assert.equal(defaultChapterLookup('Scratch animation'), null);
+});
