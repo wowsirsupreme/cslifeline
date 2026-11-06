@@ -25,6 +25,19 @@ export async function classContext(ctx, { allowAll = true } = {}) {
   return { codes, picker, classes, current: cur };
 }
 
+/** v3-style class chips for the sidebar; share the stored choice with classContext. */
+export async function classChips(ctx) {
+  const classes = await myClasses(ctx.store);
+  if (classes.length < 2) return null;
+  let cur = ''; try { cur = localStorage.getItem(KEY) || ''; } catch { /* ignore */ }
+  const ids = classes.map(c => c.id);
+  if (cur !== 'ALL' && !ids.includes(cur)) cur = 'ALL';
+  const pick = (id) => { try { localStorage.setItem(KEY, id); } catch { /* ignore */ } ctx.navigate(location.hash.replace(/^#/, '') || '/'); };
+  const chip = (id, label, title) => h('button', { type: 'button', class: 'class-chip', 'aria-pressed': String(cur === id), title, on: { click: () => pick(id) } }, label);
+  return h('div.class-chips', h('div.sb-div', { role: 'presentation' }), h('div.nav-group', 'Class'),
+    h('div.chip-row', chip('ALL', 'All', `All my classes (${ids.length})`), ...classes.map(c => chip(c.id, c.id, c.name || c.id))));
+}
+
 export function riskBadge(p) {
   if (!p) return badge('No prediction');
   const cls = { high: 'risk-high', moderate: 'risk-borderline', low: 'risk-low' }[p.risk_category] || 'risk-unknown';

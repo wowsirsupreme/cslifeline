@@ -8,9 +8,11 @@ import { questionBank, questionEdit, questionImport } from '../views/questionban
 import { reportsView, researchExport } from '../views/reports.js';
 import { rosterView } from '../views/roster.js';
 import { effectiveStatus } from '../engine/interventions.js';
+import { classChips } from '../views/common.js';
 
 startPortal({
   portal: 'teacher', allow: ['teacher', 'admin'],
+  sidebarExtra: classChips,
   nav: [
     { items: [{ path: '/', label: 'Dashboard', ic: 'home' }, { path: '/students', label: 'Students', ic: 'users' }, { path: '/analytics', label: 'Class analytics', ic: 'chart' },
       { path: '/misconceptions', label: 'Misconceptions', ic: 'brain' }, { path: '/early-warning', label: 'Early warning', ic: 'alert' },

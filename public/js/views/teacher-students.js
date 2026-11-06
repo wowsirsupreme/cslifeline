@@ -28,7 +28,9 @@ export async function dashboard(ctx) {
   const ivCount = (st) => ivs.filter(i => i.eff === st).length;
   const [c1, c2] = palette();
   const names = Object.fromEntries(data.students.map(s => [s.id, studentName(s)]));
-  return h('div', pageHead('Dashboard', 'What is happening in your classes now.', cc.picker), provenance(data),
+  const now = new Date();
+  const refresh = btn('Refresh', () => navigate(location.hash.replace(/^#/, '') || '/'), { sm: true, ic: 'clock', title: 'Load the latest records' });
+  return h('div', pageHead('Class overview', `${cc.current === 'ALL' ? 'All your classes' : cc.current} · updated ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`, cc.picker, refresh), provenance(data),
     h('div.grid-tiles',
       tile('Students', n(sum.total_students), `${sum.students_with_data} with answers`),
       tile('Active', n(sum.active_students), `answered in the last ${sum.active_window_days} days`),
@@ -41,8 +43,7 @@ export async function dashboard(ctx) {
         h('div.row.between', h('a', { href: `#/student/${a.student.id}` }, h('strong', studentName(a.student))), h('span.row', riskBadge(a.prediction))),
         h('ul', { style: { margin: '.3rem 0 0', paddingLeft: '1.1rem' } }, ...a.reasons.map(r => h('li.small', r.text, ' ', h('span.muted', `(${r.source})`)))))),
         attention.length > 8 ? h('p.small.muted', `and ${attention.length - 8} more`) : null) : empty('No one flagged', 'No student currently meets any attention rule, misconception or risk threshold.', null, 'check')),
-      card(cardHead('Most frequent misconceptions', btn('Details', () => navigate('/misconceptions'), { sm: true })), mis.length ? h('div.table-wrap', h('table', h('thead', h('tr', h('th', 'Misconception'), h('th.num', 'Demonstrated'), h('th.num', 'Possible'), h('th.num', 'Knowledge gap'))),
-        h('tbody', ...mis.map(m => h('tr', h('td', h('a', { href: `#/misconceptions?m=${m.misconception_id}` }, m.name), h('div.small.muted', chapterTitle(m.chapter_id))), h('td.num', m.counts.demonstrated), h('td.num', m.counts.possible), h('td.num', m.counts.knowledge_gap))))))
+      card(cardHead('Most frequent misconceptions', btn('Details', () => navigate('/misconceptions'), { sm: true })), mis.length ? misBars(mis)
         : empty('Not enough evidence yet', 'Misconceptions appear only after repeated, consistent errors — never from one wrong answer.', null, 'brain'))),
     h('div.grid-2',
       card('Chapter-level difficulties', sum.difficult_chapters.length ? h('div', ...sum.difficult_chapters.map(c => barRow(c.title, c.accuracy, `${fmtPct(c.accuracy)} (${c.n})`))) : h('p.muted', 'Chapters appear once they have at least 5 marked answers.')),
@@ -56,6 +57,41 @@ export async function dashboard(ctx) {
       { key: 'status', label: 'Status', render: s => badge(s.status, s.status === 'scored' ? 'ok' : s.status === 'needs_marking' ? 'warn' : 'info') },
       { key: 'submitted_at', label: 'Submitted', render: s => rel(toMs(s.submitted_at)), sort: s => toMs(s.submitted_at) },
     ], { search: false, pageSize: 8, empty: 'No submissions yet.' })));
+}
+
+// v3 topic radar: accuracy per chapter that has marked answers (needs three or more).
+function topicRadar(sum) {
+  const ids = CHAPTER_IDS.filter(id => sum.chapters[id]?.n);
+  if (ids.length < 3) return card('Topic radar', h('p.muted', 'The radar appears once the student has marked answers in at least three chapters.'));
+  const [c1] = palette();
+  const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink-2').trim(), grid = getComputedStyle(document.documentElement).getPropertyValue('--line').trim();
+  return card('Topic radar', chart('radar', { labels: ids, datasets: [{ label: 'Accuracy %', data: ids.map(id => Math.round(sum.chapters[id].accuracy * 100)), borderColor: c1, backgroundColor: c1 + '33', pointBackgroundColor: c1, pointRadius: 3, borderWidth: 2 }] },
+    { plugins: { legend: { display: false }, tooltip: { callbacks: { title: (it) => `${it[0].label} ${CHAPTERS[it[0].label].title}`, label: (it) => `${it.raw}% (${sum.chapters[it.label].n} answers)` } } },
+      scales: { r: { min: 0, max: 100, ticks: { stepSize: 25, color: ink, backdropColor: 'transparent', font: { size: 10 } }, grid: { color: grid }, angleLines: { color: grid }, pointLabels: { color: ink, font: { size: 11, weight: '600' } } } } },
+    { label: 'Accuracy by chapter, radar chart', height: 300 }),
+    h('p.small.muted', 'Only chapters with marked answers are shown. Hover a point for the chapter name and the number of answers.'));
+}
+
+// Accuracy by chapter, split by Paper 1 (theory) and Paper 2 (problem solving and programming).
+function chapterPapers(sum) {
+  const body = h('div');
+  const show = (paper) => mount(body, ...CHAPTER_IDS.filter(id => CHAPTERS[id].paper === paper).map(id => barRow(`${id} ${CHAPTERS[id].title}`, sum.chapters[id].accuracy, sum.chapters[id].n ? `${fmtPct(sum.chapters[id].accuracy)} (${sum.chapters[id].n})` : '—')));
+  const seg = h('div.seg.seg-sm', { role: 'tablist', 'aria-label': 'Paper' });
+  for (const [id, label] of [['P1', 'Paper 1'], ['P2', 'Paper 2']]) seg.appendChild(h('button', { type: 'button', role: 'tab', class: 'seg-btn', 'data-id': id, 'aria-selected': String(id === 'P1'),
+    on: { click: () => { [...seg.children].forEach(b => b.setAttribute('aria-selected', String(b.dataset.id === id))); show(id); } } }, label));
+  show('P1');
+  return card(cardHead('Accuracy by chapter', seg), body);
+}
+
+// v3 bar list: uppercase name, thin bar, count. The most frequent is crimson, the rest amber.
+function misBars(mis) {
+  const total = (m) => m.counts.demonstrated + m.counts.possible;
+  const max = Math.max(...mis.map(total), 1);
+  return h('div.mis-bars', ...mis.map((m, i) => h('a.mis-bar', { href: `#/misconceptions?m=${m.misconception_id}`, title: `${m.counts.demonstrated} demonstrated · ${m.counts.possible} possible · ${m.counts.knowledge_gap || 0} knowledge gap — ${chapterTitle(m.chapter_id)}` },
+    h('div.mis-top', h('span.mis-name', m.name), h('span.mis-n', `${total(m)} ${total(m) === 1 ? 'student' : 'students'}`)),
+    h('div.mis-track', h('div', { class: 'mis-fill ' + (i === 0 ? 'crimson' : 'amber'), style: { width: `${Math.round(total(m) / max * 100)}%` } })),
+    h('div.small.muted', `${m.counts.demonstrated} demonstrated · ${m.counts.possible} possible · ${chapterTitle(m.chapter_id)}`))),
+    h('p.small.muted', { style: { marginTop: '.6rem' } }, 'Counts are students, not answers. A flag needs repeated, consistent errors.'));
 }
 
 export async function studentsList(ctx) {
@@ -103,11 +139,11 @@ export async function studentDetail(ctx) {
   const body = h('div');
   const [c1] = palette();
   const views = {
-    overview: () => h('div', h('div.grid-tiles', tile('Marked answers', n(sum.marked)), tile('Accuracy', fmtPct(sum.accuracy), sum.accuracy_ci?.lo != null ? `95% CI ${fmtPct(sum.accuracy_ci.lo)}–${fmtPct(sum.accuracy_ci.hi)}` : ''),
+    overview: () => h('div', h('div.grid-tiles.student-stats', tile('Marked answers', n(sum.marked)), tile('Accuracy', fmtPct(sum.accuracy), sum.accuracy_ci?.lo != null ? `95% CI ${fmtPct(sum.accuracy_ci.lo)}–${fmtPct(sum.accuracy_ci.hi)}` : ''),
         tile('Assessment accuracy', fmtPct(sum.assessment_accuracy), `${sum.assessment_n} answers`), tile('Active days (28)', sum.active_days_28), tile('Sessions completed', `${sum.sessions_completed}/${sum.sessions_started}`), tile('Awaiting marking', sum.awaiting_marking)),
-      h('div.grid-2', card('Accuracy by week', sum.trend.series.length ? chart('line', { labels: sum.trend.series.map(w => w.week), datasets: [{ label: 'Accuracy %', data: sum.trend.series.map(w => Math.round(w.accuracy * 100)), borderColor: c1, backgroundColor: c1, tension: .25 }] }, { scales: { y: { min: 0, max: 100 } } }, { label: 'Weekly accuracy' }) : h('p.muted', 'No data yet.'),
-          sum.trend.slope_per_week != null ? h('p.small.muted', `Trend: ${sum.trend.slope_per_week >= 0 ? '+' : ''}${(sum.trend.slope_per_week * 100).toFixed(1)} points per week (least-squares over weekly accuracy).`) : null),
-        card('Chapters', ...CHAPTER_IDS.map(id => barRow(`${id} ${CHAPTERS[id].title}`, sum.chapters[id].accuracy, sum.chapters[id].n ? `${fmtPct(sum.chapters[id].accuracy)} (${sum.chapters[id].n})` : '—'))))),
+      h('div.grid-2', topicRadar(sum), chapterPapers(sum)),
+      card('Accuracy by week', sum.trend.series.length ? chart('line', { labels: sum.trend.series.map(w => w.week), datasets: [{ label: 'Accuracy %', data: sum.trend.series.map(w => Math.round(w.accuracy * 100)), borderColor: c1, backgroundColor: c1, tension: .25 }] }, { scales: { y: { min: 0, max: 100 } } }, { label: 'Weekly accuracy' }) : h('p.muted', 'No data yet.'),
+          sum.trend.slope_per_week != null ? h('p.small.muted', `Trend: ${sum.trend.slope_per_week >= 0 ? '+' : ''}${(sum.trend.slope_per_week * 100).toFixed(1)} points per week (least-squares over weekly accuracy).`) : null)),
     responses: () => {
       const wrongTwice = Object.entries(rs.filter(r => r.correct === false).reduce((m, r) => { m[r.question_id] = (m[r.question_id] || 0) + 1; return m; }, {})).filter(([, c]) => c >= 2);
       const repeatedChoice = Object.entries(rs.filter(r => r.correct === false && r.chosen != null).reduce((m, r) => { const k = r.question_id + '|' + r.chosen; m[k] = (m[k] || 0) + 1; return m; }, {})).filter(([, c]) => c >= 2);

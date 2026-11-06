@@ -77,6 +77,7 @@ export async function startPortal(cfg) {
         if (it.badge) Promise.resolve(it.badge(ctx)).then(n => { if (n) a.appendChild(h('span.count', String(n))); }).catch(() => {});
       }
     });
+    if (cfg.sidebarExtra) { const slot = h('div.sb-extra'); side.appendChild(slot); Promise.resolve(cfg.sidebarExtra(ctx)).then(el => { if (el && slot.isConnected) mount(slot, el); }).catch(() => {}); }
     if (store.isDemo) side.appendChild(h('div', { style: { margin: '1.5rem .6rem 0' } }, callout([h('strong', 'Demonstration mode. '), 'All learners, results and predictions are synthetic. ',
       h('a', { href: '#', on: { click: (e) => { e.preventDefault(); store.backend.resetDemo(); location.reload(); } } }, 'Reset'), ' · ',
       h('a', { href: '/', on: { click: () => { setMode('firebase'); } } }, 'Leave demo')], 'demo')));

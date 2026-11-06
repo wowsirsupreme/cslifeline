@@ -1,6 +1,9 @@
 # Changelog
 
 ## 4.0.1 — 6 November 2026
+* Sign-in page rebuilt on the v3 landing layout: "Catch misconceptions before they compound." headline, feature cards, Student / Teacher tabs with Join class / Sign in / Google (students) and Sign in / Request account (teachers), icon inputs, privacy note and project credits. Claims kept accurate (explained flags rather than "SHAP", 14 chapters, no shared or predictable passwords). The demonstration account picker uses the same card.
+* Teacher dashboard: "Class overview" header with update time and Refresh, misconceptions shown as v3 bars (most frequent in crimson, counts are students), class chips in the sidebar sharing the class picker's choice.
+* Student detail: topic radar over chapters with marked answers, centred stat boxes, accuracy by chapter with a Paper 1 / Paper 2 switch.
 * Layout and feel matched to the cslifelinego (v3) interface: brain logo with teal full stop and portal badge, icon quick links in the top bar (wide screens), initials avatar, sidebar section labels with dividers and outlined active link, stat cards with coloured icon squares, risk pills with a glowing dot, thin progress bars with monospaced percentages, v3 answer-option cards (native inputs kept for keyboard and screen readers), icon toasts, blurred dialog backdrop. Feedback text shown to students no longer uses teacher wording.
 * Restored the v3 visual identity as the default theme: midnight background, lifeline teal (#00D4AA), amber / crimson / emerald signals, Sora headings, Inter text, JetBrains Mono code, teal background glow, gradient primary buttons and accent-topped stat tiles. The theme button switches to a light version with the same teal identity. v3's faintest grey was lightened for readable contrast.
 * Fonts are hosted with the site (no Google Fonts requests, so no learner IP addresses go to a third party); the Content-Security-Policy stays at 'self' for fonts.
