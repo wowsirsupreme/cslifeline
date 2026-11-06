@@ -1,6 +1,6 @@
 // Reports (print / PDF and CSV) and the pseudonymised research export.
 // Every report states its data source, filters and generation date, and is limited to the teacher's classes.
-import { h, btn, badge, card, callout, pageHead, field, input, select, checkbox, toast, errorToast, download, barRow, chart, palette, fmtPct, fmtDate, n } from '../ui/kit.js';
+import { h, tile, btn, badge, card, callout, pageHead, field, input, select, checkbox, toast, errorToast, download, barRow, chart, palette, fmtPct, fmtDate, n } from '../ui/kit.js';
 import { classContext, noClasses } from './common.js';
 import { loadClassData, classFindings, latestPredictionByStudent, allQuestions, indexById, studentName } from '../app/data.js';
 import { classSummary, studentSummary, accuracy, byChapter } from '../engine/analytics.js';
@@ -154,7 +154,7 @@ async function buildReport(store, codes, f) {
     default: throw new Error('Unknown report type');
   }
 }
-const tileR = (label, value) => h('div.tile', h('div.label', label), h('div.value', value));
+const tileR = (label, value) => tile(label, value);
 
 // ── Research export (pseudonymised) ─────────────────────────────────────────
 export async function researchExport(ctx) {

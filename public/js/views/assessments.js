@@ -1,7 +1,7 @@
 // Teacher assessments: build and publish, mark, release results, item analysis.
 // Students receive questions without answers; answer keys live in assessment_keys (teacher-only by rule).
 // Pending submissions are marked here, in the teacher's browser, unless the scoring Cloud Function is deployed.
-import { h, btn, badge, card, cardHead, callout, empty, pageHead, field, input, textarea, select, checkbox, dataTable, modal, confirmDialog, toast, errorToast, download, barRow, fmtPct, fmtDate, rel, n } from '../ui/kit.js';
+import { h, tile, btn, badge, card, cardHead, callout, empty, pageHead, field, input, textarea, select, checkbox, dataTable, modal, confirmDialog, toast, errorToast, download, barRow, fmtPct, fmtDate, rel, n } from '../ui/kit.js';
 import { renderQuestion, questionMeta } from '../ui/question-view.js';
 import { myClasses, noClasses } from './common.js';
 import { allQuestions, indexById, studentName } from '../app/data.js';
@@ -196,10 +196,10 @@ export async function assessmentResults(ctx) {
     btn('Download CSV', () => download(`${a.title.replace(/\W+/g, '_')}_results.csv`, toCSV(rows.map(r => ({ student: r.name, class: r.class_code, score: r.score, max: r.max, percent: r.pct == null ? '' : Math.round(r.pct * 100), status: r.status, released: r.released, submitted: r.submitted ? new Date(r.submitted).toISOString() : '' })))), { ic: 'download' })),
   markedNow ? callout(`${markedNow} new submission${markedNow > 1 ? 's were' : ' was'} marked just now using the answer key held in your account.`, 'ok') : null,
   !keys ? callout('The answer key for this assessment could not be read, so new submissions cannot be marked from this account.', 'danger') : null,
-  h('div.grid-tiles', h('div.tile', h('div.label', 'Submitted'), h('div.value', `${subs.length}/${students.length}`), h('div.sub', `${notSubmitted.length} not yet`)),
-    h('div.tile', h('div.label', 'Average'), h('div.value', fmtPct(avg)), h('div.sub', `${scored.length} fully marked`)),
-    h('div.tile', { class: rows.some(r => r.pending) ? 'tile attention' : 'tile' }, h('div.label', 'Need your marking'), h('div.value', n(rows.filter(r => r.pending).length)), h('div.sub', 'coding / structured answers')),
-    h('div.tile', h('div.label', 'Not released'), h('div.value', n(unreleased.length)), h('div.sub', a.release_feedback === 'manual' ? 'you release results' : 'released when marked'))),
+  h('div.grid-tiles', tile('Submitted', `${subs.length}/${students.length}`, `${notSubmitted.length} not yet`),
+    tile('Average', fmtPct(avg), `${scored.length} fully marked`),
+    tile('Need your marking', n(rows.filter(r => r.pending).length), 'coding / structured answers', { attention: rows.some(r => r.pending) }),
+    tile('Not released', n(unreleased.length), a.release_feedback === 'manual' ? 'you release results' : 'released when marked')),
   card(cardHead('Submissions', unreleased.length ? btn(`Release ${unreleased.length} result${unreleased.length > 1 ? 's' : ''}`, async () => { await store.releaseResults(unreleased); toast('Results released', 'ok'); navigate(`/assessment/${a.id}/results`); }, { sm: true, kind: 'primary' }) : null),
     dataTable(rows, [
       { key: 'name', label: 'Student', render: r => h('a', { href: `#/student/${r.s.student_uid}` }, r.name) },

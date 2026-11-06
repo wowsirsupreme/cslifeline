@@ -1,6 +1,6 @@
 // Question bank: browse, create/edit every question type, archive, import (validated, duplicate-aware) and export.
 // Import follows DBWOW's rule: nothing is silently discarded — every rejected row is listed with its reason.
-import { h, btn, badge, card, cardHead, callout, empty, pageHead, field, input, textarea, select, checkbox, tabs, dataTable, modal, confirmDialog, toast, errorToast, download, filePicker, n } from '../ui/kit.js';
+import { h, tile, btn, badge, card, cardHead, callout, empty, pageHead, field, input, textarea, select, checkbox, tabs, dataTable, modal, confirmDialog, toast, errorToast, download, filePicker, n } from '../ui/kit.js';
 import { renderQuestion, questionMeta } from '../ui/question-view.js';
 import { allQuestions, indexById } from '../app/data.js';
 import { CHAPTERS, CHAPTER_IDS, chapterTitle } from '../engine/curriculum.js';
@@ -230,8 +230,8 @@ export async function questionImport(ctx) {
     };
     const total = prep.ready.length + prep.duplicates.length + prep.rejected.length;
     out.replaceChildren(card(cardHead(`Checked ${total} row${total === 1 ? '' : 's'} from ${file?.name || 'file'}`),
-      h('div.grid-tiles', h('div.tile', h('div.label', 'Ready'), h('div.value', String(prep.ready.length))), h('div.tile', h('div.label', 'Possible duplicates'), h('div.value', String(prep.duplicates.length))),
-        h('div.tile', { class: prep.rejected.length ? 'tile attention' : 'tile' }, h('div.label', 'Rejected'), h('div.value', String(prep.rejected.length))), h('div.tile', h('div.label', 'Warnings'), h('div.value', String(prep.warnings.length)))),
+      h('div.grid-tiles', tile('Ready', String(prep.ready.length)), tile('Possible duplicates', String(prep.duplicates.length)),
+        tile('Rejected', String(prep.rejected.length), '', { attention: prep.rejected.length }), tile('Warnings', String(prep.warnings.length))),
       tabs([{ id: 'ready', label: `Ready (${prep.ready.length})` }, { id: 'dups', label: `Duplicates (${prep.duplicates.length})` }, { id: 'rej', label: `Rejected (${prep.rejected.length})` }, { id: 'warn', label: `Warnings (${prep.warnings.length})` }], draw), view,
       h('div.card-foot', btn('Import', async () => {
         const chosenDups = prep.duplicates.filter(d => dupChoice.get(d.row) !== 'skip');

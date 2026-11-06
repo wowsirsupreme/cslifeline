@@ -27,8 +27,8 @@ export async function classContext(ctx, { allowAll = true } = {}) {
 
 export function riskBadge(p) {
   if (!p) return badge('No prediction');
-  const tone = { high: 'danger', moderate: 'warn', low: 'ok', unknown: '' }[p.risk_category] || '';
-  return h('span.row', { style: { gap: '.3rem' } }, badge(`${RISK_LABELS[p.risk_category] || p.risk_category}${p.risk_probability != null ? ' ' + fmtPct(p.risk_probability) : ''}`, tone),
+  const cls = { high: 'risk-high', moderate: 'risk-borderline', low: 'risk-low' }[p.risk_category] || 'risk-unknown';
+  return h('span.row', { style: { gap: '.3rem' } }, h('span', { class: 'risk-pill ' + cls }, h('span.risk-dot', { 'aria-hidden': 'true' }), `${RISK_LABELS[p.risk_category] || p.risk_category}${p.risk_probability != null ? ' ' + fmtPct(p.risk_probability) : ''}`),
     p.prediction_status !== 'validated' ? badge('demo model', 'demo') : null);
 }
 

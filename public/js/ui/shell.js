@@ -16,7 +16,8 @@ function toggleTheme() {
   document.documentElement.dataset.theme = next; try { localStorage.setItem('csl.theme', next); } catch { /* ignore */ }
 }
 
-export const brandMark = () => h('span.brand-mark', icon('lifeline'));
+export const brandMark = () => h('span.brand-mark', icon('brain'));
+const initials = (n = '') => n.replace(/\(.*?\)/g, '').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
 
 /**
  * @param cfg { portal: 'student'|'teacher'|'admin', allow: [roles], nav: [{ group, items: [{ path, label, ic, badge?() }] }], routes: [{ path, view }] }
@@ -41,14 +42,16 @@ export async function startPortal(cfg) {
   const scrim = h('div.scrim', { on: { click: () => closeNav() } });
   const outbox = h('span.badge.warn', { hidden: true, title: 'Answers saved on this device and waiting to be sent' });
   const offline = h('span.badge.warn', { hidden: navigator.onLine }, icon('wifioff'), 'Offline');
+  const topLinks = h('nav.nav-links', { 'aria-label': 'Quick links' });
   const menuBtn = h('button', { type: 'button', class: 'btn ghost icon-btn menu-btn', 'aria-label': 'Open menu', 'aria-expanded': 'false', on: { click: () => side.classList.contains('open') ? closeNav() : openNav() } }, icon('menu'));
   const userBox = h('div.row.userbox', { style: { gap: '.4rem' } },
-    h('span.small.muted', { style: { maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis' } }, store.me.display_name || store.auth.email),
+    h('span.avatar', { title: store.me.display_name || store.auth.email, 'aria-label': 'Signed in as ' + (store.me.display_name || store.auth.email) }, initials(store.me.display_name || store.auth.email)),
     h('button', { type: 'button', class: 'btn ghost icon-btn', title: 'Light or dark theme', 'aria-label': 'Toggle light or dark theme', on: { click: toggleTheme } }, icon('sun')),
     h('button', { type: 'button', class: 'btn ghost sm', on: { click: async () => { await store.signOut(); location.href = '/'; } } }, icon('logout'), h('span', 'Sign out')));
   const top = h('header.topbar', menuBtn,
-    h('a.brand', { href: HOME[cfg.portal] + '#/' }, brandMark(), h('span', 'CS Lifeline'), h('small', { style: { marginLeft: '.3rem' } }, cfg.portal)),
-    store.isDemo ? h('span.badge.demo', { title: 'Every record in this mode is synthetic and stays in this browser' }, 'DEMONSTRATION — synthetic data') : null,
+    h('a.brand', { href: HOME[cfg.portal] + '#/' }, brandMark(), h('span', 'CS Lifeline', h('span.brand-dot', '.')), h('span.brand-badge', cfg.portal)),
+    topLinks,
+    store.isDemo ? h('span.badge.demo', { title: 'Every record in this mode is synthetic and stays in this browser' }, 'Demo — synthetic data') : null,
     h('span.spacer'), offline, outbox, userBox);
   mount(root, top, h('div.layout', side, scrim, main));
   window.addEventListener('online', () => { offline.hidden = true; store.flushOutbox(); });
@@ -60,17 +63,20 @@ export async function startPortal(cfg) {
   function closeNav() { side.classList.remove('open'); scrim.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); }
 
   async function drawNav() {
-    clear(side);
+    clear(side); clear(topLinks);
     const cur = currentPath();
-    for (const g of cfg.nav) {
-      if (g.group) side.appendChild(h('div.nav-group', g.group));
+    const isActive = (it) => (it.path === '/' ? cur === '/' : cur === it.path || cur.startsWith(it.path + '/'));
+    for (const it of (cfg.nav[0]?.items || []).slice(0, 5)) topLinks.appendChild(h('a', { class: 'top-link', href: '#' + it.path, 'aria-current': isActive(it) ? 'page' : null }, icon(it.ic), h('span', it.label)));
+    cfg.nav.forEach((g, gi) => {
+      if (gi > 0) side.appendChild(h('div.sb-div', { role: 'presentation' }));
+      side.appendChild(h('div.nav-group', g.group || ({ teacher: 'Dashboard', student: 'Learning', admin: 'Platform' }[cfg.portal] || 'Menu')));
       for (const it of g.items) {
-        const active = it.path === '/' ? cur === '/' : cur === it.path || cur.startsWith(it.path + '/');
+        const active = isActive(it);
         const a = h('a', { class: 'nav-link', href: '#' + it.path, 'aria-current': active ? 'page' : null, on: { click: () => closeNav() } }, icon(it.ic), h('span', it.label));
         side.appendChild(a);
         if (it.badge) Promise.resolve(it.badge(ctx)).then(n => { if (n) a.appendChild(h('span.count', String(n))); }).catch(() => {});
       }
-    }
+    });
     if (store.isDemo) side.appendChild(h('div', { style: { margin: '1.5rem .6rem 0' } }, callout([h('strong', 'Demonstration mode. '), 'All learners, results and predictions are synthetic. ',
       h('a', { href: '#', on: { click: (e) => { e.preventDefault(); store.backend.resetDemo(); location.reload(); } } }, 'Reset'), ' · ',
       h('a', { href: '/', on: { click: () => { setMode('firebase'); } } }, 'Leave demo')], 'demo')));

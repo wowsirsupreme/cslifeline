@@ -86,8 +86,16 @@ export function btn(label, onClick, { kind = '', ic = null, sm = false, title = 
   return h('button', { type, class: ['btn', kind, sm ? 'sm' : ''].filter(Boolean).join(' '), title, disabled, on: onClick ? { click: onClick } : {} }, ic ? icon(ic) : null, label);
 }
 export function badge(text, tone = '') { return h('span', { class: 'badge' + (tone ? ' ' + tone : '') }, text); }
-export function tile(label, value, sub = '', { attention = false, title = null } = {}) {
-  return h('div', { class: 'tile' + (attention ? ' attention' : ''), title }, h('div.label', label), h('div.value', value ?? '—'), sub ? h('div.sub', sub) : null);
+// v3 stat card: coloured icon square, big value, small label. Icon and tone follow the label unless given.
+const TILE_GUESS = [[/attention|risk|reject|fail|overdue|refus|withdrawn|inactive/i, 'alert', 'crimson'], [/accuracy|average|score|correct|accepted|granted|production model/i, 'target', 'emerald'],
+  [/participation|submitted|active|activity|waiting|pending|to mark|not released|duplicates|not recorded/i, 'clock', 'amber'], [/intervention/i, 'flag', 'amber'],
+  [/misconception/i, 'brain', 'crimson'], [/student|learner|teacher|user|administrator/i, 'users', 'teal'], [/class|school/i, 'db', 'teal'], [/question|answer|response/i, 'layers', 'teal'],
+  [/model|prediction/i, 'chart', 'teal']];
+export function tile(label, value, sub = '', { attention = false, title = null, ic = null, tone = null } = {}) {
+  const g = TILE_GUESS.find(([re]) => re.test(String(label))) || [null, 'chart', 'teal'];
+  const t = attention ? 'crimson' : (tone || g[2]);
+  return h('div', { class: `tile ${t}` + (attention ? ' attention' : ''), title }, h('div', { class: `stat-icon ${t}` }, icon(ic || g[1])),
+    h('div.value', value ?? '—'), h('div.label', label), sub ? h('div.sub', sub) : null);
 }
 export function card(title, ...body) {
   const head = typeof title === 'string' ? h('div.card-head', h('h2', title)) : title;
@@ -118,7 +126,7 @@ export function heatCell(p, n) {
 let toastRoot;
 export function toast(msg, tone = '', ms = 4500) {
   if (!toastRoot) { toastRoot = h('div.toasts', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(toastRoot); }
-  const t = h('div', { class: 'toast' + (tone ? ' ' + tone : '') }, h('span', msg), h('button', { type: 'button', 'aria-label': 'Dismiss', on: { click: () => t.remove() } }, '×'));
+  const t = h('div', { class: 'toast' + (tone ? ' ' + tone : '') }, icon(tone === 'ok' ? 'check' : tone === 'error' || tone === 'danger' ? 'x' : tone === 'warn' ? 'alert' : 'bell'), h('span', msg), h('button', { type: 'button', 'aria-label': 'Dismiss', on: { click: () => t.remove() } }, '×'));
   toastRoot.appendChild(t);
   if (ms) setTimeout(() => t.remove(), ms);
   return t;

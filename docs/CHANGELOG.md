@@ -1,6 +1,7 @@
 # Changelog
 
 ## 4.0.1 — 6 November 2026
+* Layout and feel matched to the cslifelinego (v3) interface: brain logo with teal full stop and portal badge, icon quick links in the top bar (wide screens), initials avatar, sidebar section labels with dividers and outlined active link, stat cards with coloured icon squares, risk pills with a glowing dot, thin progress bars with monospaced percentages, v3 answer-option cards (native inputs kept for keyboard and screen readers), icon toasts, blurred dialog backdrop. Feedback text shown to students no longer uses teacher wording.
 * Restored the v3 visual identity as the default theme: midnight background, lifeline teal (#00D4AA), amber / crimson / emerald signals, Sora headings, Inter text, JetBrains Mono code, teal background glow, gradient primary buttons and accent-topped stat tiles. The theme button switches to a light version with the same teal identity. v3's faintest grey was lightened for readable contrast.
 * Fonts are hosted with the site (no Google Fonts requests, so no learner IP addresses go to a third party); the Content-Security-Policy stays at 'self' for fonts.
 * Hosting moved to Vercel (`vercel.json` with the same headers and routes); `netlify.toml` kept as an alternative.

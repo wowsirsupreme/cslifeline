@@ -159,7 +159,7 @@ export function feedbackBox(q, result, { key = null } = {}) {
   if (k.explanation) box.appendChild(h('p', k.explanation));
   for (const mid of result.misconception_hits || []) {
     const t = TAX.get(mid); if (!t) continue;
-    box.appendChild(h('div.callout', { style: { marginTop: '.5rem' } }, h('strong', 'A common mix-up: '), t.name + '. ', t.description,
+    box.appendChild(h('div.callout', { style: { marginTop: '.5rem' } }, h('strong', 'A common mix-up: '), t.name + '. ', String(t.description || '').replace(/^The learner /, 'A student '),
       t.strategies?.[0] ? h('p.small', { style: { margin: '.4rem 0 0' } }, h('strong', 'Try this: '), t.strategies[0]) : null));
   }
   return box;
