@@ -97,7 +97,11 @@ small, .small { font-size: .82rem; }
 .grid-2 { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-3 { display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .grid-tiles { display: grid; gap: .85rem; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 1rem; }
-@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); } }
+.grid > *, .grid-2 > *, .grid-3 > *, .card, .stack > * { min-width: 0; }
+.table-wrap { max-width: 100%; }
+.page-actions .btn, .card-head .btn { white-space: normal; max-width: 100%; text-align: left; overflow-wrap: anywhere; }
+.page-actions select { max-width: 100%; }
 .stack > * + * { margin-top: .75rem; }
 .row { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
 .row.between { justify-content: space-between; }
@@ -260,4 +264,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   .main { padding: 0; max-width: none; }
   .report { border: 0; padding: 0; }
   .card { box-shadow: none; break-inside: avoid; }
+}
+
+/* Compact top bar on phones: keep icons, drop secondary text (fixes horizontal overflow at 390px) */
+.topbar { min-width: 0; }
+@media (max-width: 640px) {
+  .topbar .userbox > .small, .topbar .userbox .btn > span, .topbar .brand small { display: none; }
+  .topbar .badge.demo { max-width: 8.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar .badge.demo::after { content: ''; }
 }

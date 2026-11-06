@@ -42,7 +42,7 @@ export async function startPortal(cfg) {
   const outbox = h('span.badge.warn', { hidden: true, title: 'Answers saved on this device and waiting to be sent' });
   const offline = h('span.badge.warn', { hidden: navigator.onLine }, icon('wifioff'), 'Offline');
   const menuBtn = h('button', { type: 'button', class: 'btn ghost icon-btn menu-btn', 'aria-label': 'Open menu', 'aria-expanded': 'false', on: { click: () => side.classList.contains('open') ? closeNav() : openNav() } }, icon('menu'));
-  const userBox = h('div.row', { style: { gap: '.4rem' } },
+  const userBox = h('div.row.userbox', { style: { gap: '.4rem' } },
     h('span.small.muted', { style: { maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis' } }, store.me.display_name || store.auth.email),
     h('button', { type: 'button', class: 'btn ghost icon-btn', title: 'Light or dark theme', 'aria-label': 'Toggle light or dark theme', on: { click: toggleTheme } }, icon('sun')),
     h('button', { type: 'button', class: 'btn ghost sm', on: { click: async () => { await store.signOut(); location.href = '/'; } } }, icon('logout'), h('span', 'Sign out')));
