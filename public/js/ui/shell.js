@@ -11,7 +11,7 @@ export function portalFor(role) { return role === 'admin' ? HOME.admin : role ==
 
 function applyTheme() { try { const t = localStorage.getItem('csl.theme'); if (t) document.documentElement.dataset.theme = t; } catch { /* ignore */ } }
 function toggleTheme() {
-  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const cur = document.documentElement.dataset.theme || 'dark'; // v3 midnight theme is the default
   const next = cur === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = next; try { localStorage.setItem('csl.theme', next); } catch { /* ignore */ }
 }
