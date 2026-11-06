@@ -1,0 +1,18 @@
+rules_version = '2';
+// Question images only. Teachers/admins upload under question-images/<their uid>/; anyone signed in can read.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function staff() {
+      return request.auth != null &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['teacher', 'admin'] &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.status == 'active';
+    }
+    match /question-images/{owner}/{file} {
+      allow read: if request.auth != null;
+      allow write: if staff() && request.auth.uid == owner
+                   && request.resource.size < 3 * 1024 * 1024
+                   && request.resource.contentType.matches('image/(png|jpeg|gif|webp|svg\\+xml)');
+    }
+    match /{all=**} { allow read, write: if false; }
+  }
+}

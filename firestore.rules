@@ -1,0 +1,204 @@
+rules_version = '2';
+// CS Lifeline v4 — Firestore security rules.
+// Deploy: firebase deploy --only firestore:rules   (see docs/DEPLOYMENT_GUIDE.md)
+//
+// Principles
+//   * Roles come from users/{uid}.role. A user can only ever create their own profile as
+//     'student' (joining an open class) or 'teacher_pending'. Only an admin can grant
+//     'teacher' or 'admin'. (Fixes v3 audit S1–S3.)
+//   * Teachers see only the classes listed in their own users/{uid}.class_codes.
+//   * Students see only their own records and never see predictions, interventions,
+//     misconception labels or answer keys. (Fixes S5, S7, S8, audit 3.5.)
+//   * Assessment answer keys live in assessment_keys, readable only by teachers.
+//   * Scores and feedback live in submission_results and are readable by the student
+//     only after the teacher releases them.
+//   * Audit logs are append-only.
+//   * Anything not matched below is denied.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+    function signedIn() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+    function me() { return get(/databases/$(database)/documents/users/$(uid())).data; }
+    function hasProfile() { return signedIn() && exists(/databases/$(database)/documents/users/$(uid())); }
+    function active() { return hasProfile() && me().status == 'active'; }
+    function isAdmin() { return active() && me().role == 'admin'; }
+    function isTeacher() { return active() && me().role == 'teacher'; }
+    function isStaff() { return isAdmin() || isTeacher(); }
+    function isStudent() { return active() && me().role == 'student'; }
+    function myClasses() { return me().get('class_codes', []); }
+    function teaches(code) { return isTeacher() && code in myClasses(); }
+    function staffFor(code) { return isAdmin() || teaches(code); }
+    function myClass() { return me().get('class_code', ''); }
+    function unchanged(keys) { return !request.resource.data.diff(resource.data).affectedKeys().hasAny(keys); }
+    function onlyChanges(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+    function str(v, max) { return v is string && v.size() <= max; }
+    function cls(code) { return get(/databases/$(database)/documents/classes/$(code)).data; }
+
+    // ── Users ──────────────────────────────────────────────────────────────
+    match /users/{userId} {
+      allow get: if signedIn() && (uid() == userId || isAdmin()
+                   || (isTeacher() && resource.data.get('class_code', '') in myClasses()));
+      allow list: if isAdmin() || (isTeacher() && resource.data.role == 'student' && resource.data.class_code in myClasses());
+
+      // Self-registration: student joining an OPEN class, or a pending teacher request.
+      allow create: if signedIn() && uid() == userId
+        && request.resource.data.keys().hasOnly(['display_name', 'email', 'role', 'status', 'class_code', 'school_id', 'grade',
+             'pseudo_id', 'consent', 'class_codes', 'created_at', 'last_seen', 'is_synthetic', 'roster_created_by'])
+        && str(request.resource.data.display_name, 60)
+        && request.resource.data.get('is_synthetic', false) == false
+        && (
+          (request.resource.data.role == 'student' && request.resource.data.status == 'active'
+             && exists(/databases/$(database)/documents/classes/$(request.resource.data.class_code))
+             && cls(request.resource.data.class_code).join_open == true
+             && request.resource.data.pseudo_id is string && request.resource.data.pseudo_id.matches('^L-[A-Z0-9]{10}$'))
+          ||
+          (request.resource.data.role == 'teacher_pending' && request.resource.data.status == 'pending'
+             && request.resource.data.get('class_codes', []).size() == 0)
+        );
+
+      // Own profile: only harmless fields.
+      allow update: if signedIn() && uid() == userId && onlyChanges(['display_name', 'last_seen', 'preferences'])
+                       && (!('display_name' in request.resource.data) || str(request.resource.data.display_name, 60));
+      // Teacher: suspend/reactivate a student in their class, record consent. Cannot change role or class.
+      allow update: if isTeacher() && resource.data.role == 'student' && resource.data.class_code in myClasses()
+                       && onlyChanges(['status', 'consent', 'updated_at', 'updated_by'])
+                       && request.resource.data.status in ['active', 'suspended'];
+      // Admin: anything (role provisioning, class assignment, erasure).
+      allow update, delete: if isAdmin();
+      allow create: if isAdmin();
+    }
+
+    // ── Organisation ───────────────────────────────────────────────────────
+    match /schools/{id} { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /settings/{id} { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /curriculum/{id} { allow read: if signedIn(); allow write: if isAdmin(); }
+
+    match /classes/{code} {
+      // Any signed-in user may look up one class by its code (needed to join a class).
+      allow get: if signedIn();
+      allow list: if isAdmin() || (isTeacher() && uid() in resource.data.get('teacher_uids', []));
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (teaches(code) && onlyChanges(['join_open', 'name', 'updated_at']));
+    }
+
+    // ── Question bank ──────────────────────────────────────────────────────
+    match /questions/{id} {
+      allow read: if isStaff() || (isStudent() && resource.data.visibility == 'practice' && resource.data.active == true);
+      allow create, update: if isStaff() && str(request.resource.data.text, 20000);
+      allow delete: if isAdmin();
+    }
+    match /question_groups/{id} { allow read: if active(); allow write: if isStaff(); }
+
+    // ── Assessments ────────────────────────────────────────────────────────
+    match /assessments/{id} {
+      allow read: if isAdmin()
+        || (isTeacher() && (resource.data.created_by == uid() || resource.data.get('class_codes', []).hasAny(myClasses())))
+        || (isStudent() && myClass() in resource.data.get('class_codes', []) && resource.data.status in ['published', 'closed']);
+      allow create: if isStaff() && request.resource.data.created_by == uid();
+      allow update, delete: if isAdmin() || (isTeacher() && resource.data.created_by == uid());
+    }
+    match /assessment_keys/{id} {
+      allow read: if isAdmin() || (isTeacher() && (resource.data.created_by == uid() || resource.data.get('class_codes', []).hasAny(myClasses())));
+      allow create: if isStaff() && request.resource.data.created_by == uid();
+      allow update, delete: if isAdmin() || (isTeacher() && resource.data.created_by == uid());
+    }
+
+    // ── Learning activity ──────────────────────────────────────────────────
+    match /sessions/{id} {
+      allow read: if signedIn() && (resource.data.student_uid == uid() || staffFor(resource.data.class_code));
+      allow create: if isStudent() && request.resource.data.student_uid == uid() && request.resource.data.class_code == myClass();
+      allow update: if isStudent() && resource.data.student_uid == uid() && unchanged(['student_uid', 'class_code', 'pseudo_id']);
+    }
+
+    // Practice responses are written by the student (formative, scored_by 'client').
+    // Assessment responses are written only by staff scoring (or the Cloud Function via Admin SDK).
+    // Responses are never overwritten by students; the outbox treats "already exists" as delivered.
+    match /responses/{id} {
+      allow read: if signedIn() && (resource.data.student_uid == uid() || staffFor(resource.data.class_code));
+      allow create: if isStudent()
+        && request.resource.data.student_uid == uid()
+        && request.resource.data.class_code == myClass()
+        && request.resource.data.mode in ['practice', 'challenge', 'intervention']
+        && request.resource.data.question_id is string
+        && (request.resource.data.correct == null || request.resource.data.correct is bool)
+        && request.resource.data.get('is_synthetic', false) == false
+        && request.resource.data.get('scored_by', 'client') == 'client';
+      allow create, update: if staffFor(request.resource.data.class_code);
+      allow delete: if isAdmin();
+    }
+
+    match /submissions/{id} {
+      allow read: if signedIn() && (resource.data.student_uid == uid() || staffFor(resource.data.class_code));
+      // One submission per student per assessment: id = <assessmentId>__<uid>
+      allow create: if isStudent()
+        && id == request.resource.data.assessment_id + '__' + uid()
+        && request.resource.data.student_uid == uid()
+        && request.resource.data.class_code == myClass()
+        && request.resource.data.status == 'submitted'
+        && !('score' in request.resource.data) && !('results' in request.resource.data)
+        && get(/databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)).data.status == 'published'
+        && myClass() in get(/databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)).data.class_codes;
+      allow update: if staffFor(resource.data.class_code) && unchanged(['student_uid', 'answers', 'assessment_id', 'submitted_at']);
+      allow delete: if isAdmin();
+    }
+    match /submission_results/{id} {
+      allow get: if signedIn() && ((resource.data.student_uid == uid() && resource.data.released == true) || staffFor(resource.data.class_code));
+      allow list: if staffFor(resource.data.class_code);
+      allow create, update: if staffFor(request.resource.data.class_code);
+    }
+
+    match /practice_assignments/{id} {
+      allow read: if signedIn() && (resource.data.student_uid == uid() || staffFor(resource.data.class_code));
+      allow create, delete: if staffFor(request.resource.data.class_code);
+      allow update: if staffFor(resource.data.class_code)
+        || (isStudent() && resource.data.student_uid == uid() && onlyChanges(['status', 'completed_at']) && request.resource.data.status == 'completed');
+    }
+
+    match /notifications/{id} {
+      allow read: if signedIn() && resource.data.to_uid == uid();
+      allow create: if isStaff() && request.resource.data.from_uid == uid();
+      allow update: if signedIn() && resource.data.to_uid == uid() && onlyChanges(['read']);
+    }
+
+    // ── Teacher-only analytics ─────────────────────────────────────────────
+    match /misconception_reviews/{id} {
+      allow read, write: if staffFor(resource == null ? request.resource.data.class_code : resource.data.class_code);
+    }
+    match /predictions/{id} {
+      allow read: if staffFor(resource.data.class_code);
+      allow create, update: if staffFor(request.resource.data.class_code)
+        && request.resource.data.model_version is string
+        && request.resource.data.prediction_status in ['demonstration', 'validated'];
+      allow delete: if isAdmin();
+    }
+    match /interventions/{id} {
+      allow read: if staffFor(resource.data.class_code);
+      allow create, update: if staffFor(request.resource.data.class_code);
+      allow delete: if isAdmin();
+    }
+    match /intervention_outcomes/{id} {
+      allow read: if staffFor(resource.data.class_code);
+      allow create: if staffFor(request.resource.data.class_code) && request.resource.data.recorded_by == uid();
+      allow update, delete: if false;   // outcome records are immutable evidence
+    }
+
+    // ── Machine learning, integration, governance ─────────────────────────
+    match /model_registry/{id} { allow read: if isStaff(); allow write: if isAdmin(); }
+    match /platform_integrations/{id} { allow read, write: if isAdmin(); }
+    match /raw_source_records/{id} { allow read, write: if isAdmin(); }
+    match /learning_events/{id} { allow read, write: if isAdmin(); }
+    match /learner_identity_map/{id} {
+      allow read: if isAdmin() || (isTeacher() && resource.data.get('class_code', '') in myClasses());
+      allow create, update: if isAdmin() || (isTeacher() && request.resource.data.class_code in myClasses() && request.resource.data.verified_by == uid());
+      allow delete: if isAdmin();
+    }
+    match /audit_logs/{id} {
+      allow create: if signedIn() && request.resource.data.actor_uid == uid();
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+  }
+}

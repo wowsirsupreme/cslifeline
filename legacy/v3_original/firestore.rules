@@ -1,0 +1,82 @@
+// firestore.rules
+// Deploy via: firebase deploy --only firestore:rules
+// Or paste into Firebase Console → Firestore → Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuth() { return request.auth != null; }
+    function uid()    { return request.auth.uid; }
+    function isTeacher() {
+      return isAuth() &&
+        get(/databases/$(database)/documents/users/$(uid())).data.role in ['teacher','admin'];
+    }
+    function isStudent() {
+      return isAuth() &&
+        get(/databases/$(database)/documents/users/$(uid())).data.role == 'student';
+    }
+
+    // Users — anyone can read their own, teachers can read all
+    match /users/{userId} {
+      allow read:   if isAuth() && (uid() == userId || isTeacher());
+      allow create: if isAuth() && uid() == userId;
+      // Students write own profile; teachers can update shadowBanned field
+      allow update: if isAuth() && (uid() == userId ||
+        (isTeacher() && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['shadowBanned', 'lastSeen'])));
+    }
+
+    // Sessions — students write their own, teachers read
+    match /sessions/{sessionId} {
+      allow read:   if isAuth() && isTeacher();
+      allow create: if isAuth();
+      allow update: if isAuth() && (resource.data.student_uid == uid() || isTeacher());
+    }
+
+    // Responses — students write, teachers read all
+    match /responses/{responseId} {
+      allow read:   if isAuth() && (resource.data.student_uid == uid() || isTeacher());
+      allow create: if isAuth();
+    }
+
+    // Live signals — students write their OWN doc (uid = doc id), teachers read all
+    match /live_signals/{studentUid} {
+      allow read:   if isAuth() && isTeacher();
+      allow write:  if isAuth() && uid() == studentUid;
+    }
+
+    // Predictions — written by Colab via Admin SDK, read by all auth users
+    match /predictions/{studentUid} {
+      allow read:   if isAuth() && (uid() == studentUid || isTeacher());
+      allow write:  if false;  // Admin SDK only (Colab)
+    }
+
+    // Questions bank — read by all auth, write by teachers only
+    match /questions/{qId} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isTeacher();
+    }
+
+    // Published assessments — teachers write, students read active ones for their class
+    match /published_assessments/{assessId} {
+      allow read:   if isAuth() && (
+        isTeacher() ||
+        (isStudent() && resource.data.class_code ==
+          get(/databases/$(database)/documents/users/$(uid())).data.classCode &&
+          resource.data.status == 'active')
+      );
+      allow create: if isAuth() && isTeacher();
+      allow update: if isAuth() && isTeacher();
+      allow delete: if isAuth() && isTeacher();
+    }
+
+    // Daily/Weekly challenge scores
+    match /challenge_scores/{scoreId} {
+      allow read:   if isAuth();
+      allow create: if isAuth() && request.resource.data.student_uid == uid();
+      allow update: if isAuth() && resource.data.student_uid == uid();
+    }
+  }
+}

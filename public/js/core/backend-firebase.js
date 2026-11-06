@@ -145,6 +145,24 @@ export class FirebaseBackend {
     return () => unsub();
   }
 
+  /** Create an account on a secondary app instance so the signed-in teacher stays signed in.
+   *  The new user writes their own profile (allowed by the student self-registration rule). */
+  async createUserSecondary(email, password, displayName, profile) {
+    await this.init();
+    const appM = await import(`${CDN}/firebase-app.js`);
+    const name = 'roster-' + Date.now();
+    const app2 = appM.initializeApp(CONFIG.firebase, name);
+    try {
+      const auth2 = this.au.getAuth(app2);
+      const cred = await this.au.createUserWithEmailAndPassword(auth2, email, password);
+      await this.au.updateProfile(cred.user, { displayName });
+      const db2 = this.fs.getFirestore(app2);
+      await this.fs.setDoc(this.fs.doc(db2, 'users', cred.user.uid), { ...clean(profile), created_at: this.fs.serverTimestamp(), last_seen: null });
+      await this.au.signOut(auth2);
+      return cred.user.uid;
+    } finally { await appM.deleteApp(app2).catch(() => {}); }
+  }
+
   async uploadFile(path, file) {
     await this.init();
     const st = await import(`${CDN}/firebase-storage.js`);

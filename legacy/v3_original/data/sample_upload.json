@@ -1,0 +1,76 @@
+[
+  {
+    "id": "P1_T1_SAMPLE_001",
+    "paper": "P1",
+    "chapter_id": "T01",
+    "topic": "Data Representation",
+    "type": "MCQ",
+    "difficulty": 1,
+    "misconception_tag": "BINARY_CONVERSION_ERROR",
+    "text": "Which of the following is the correct denary value of the binary number 00110101?",
+    "options": ["43", "53", "63", "73"],
+    "correct": 1,
+    "hint": "Add the place values where there is a 1: 32+16+4+1.",
+    "explanation": "00110101 = 0+0+32+16+0+4+0+1 = 53."
+  },
+  {
+    "id": "P1_T2_SAMPLE_001",
+    "paper": "P1",
+    "chapter_id": "T02",
+    "topic": "Data Transmission",
+    "type": "MCQ",
+    "difficulty": 2,
+    "misconception_tag": "NETWORK_CONCEPT_ERROR",
+    "text": "Which of the following best describes the purpose of a checksum in data transmission?",
+    "options": [
+      "To encrypt data before sending",
+      "To detect errors that may have occurred during transmission",
+      "To compress data to reduce file size",
+      "To route packets to the correct destination"
+    ],
+    "correct": 1,
+    "hint": "A checksum is a value calculated from data — what happens when the receiver calculates the same value?",
+    "explanation": "A checksum is calculated from the data before and after transmission. If both checksums match, no errors occurred. If they differ, the data was corrupted in transit."
+  },
+  {
+    "id": "P2_T8_SAMPLE_001",
+    "paper": "P2",
+    "chapter_id": "T08",
+    "topic": "Programming",
+    "type": "trace_output",
+    "difficulty": 2,
+    "misconception_tag": "LOOP_TERMINATION_ERROR",
+    "text": "What is the output of this pseudocode?\n\nCount ← 10\nWHILE Count > 6\n   OUTPUT Count\n   Count ← Count - 3\nENDWHILE",
+    "options": ["10 7", "10 7 4", "10", "7"],
+    "correct": 0,
+    "hint": "Trace: Count=10 (10>6 TRUE, output 10, Count=7), Count=7 (7>6 TRUE, output 7, Count=4), Count=4 (4>6 FALSE, stop).",
+    "explanation": "Count starts at 10. 10>6 → output 10, Count=7. 7>6 → output 7, Count=4. 4>6 → FALSE, loop ends. Output: 10 7."
+  },
+  {
+    "id": "P2_T13_SAMPLE_001",
+    "paper": "P2",
+    "chapter_id": "T13",
+    "topic": "Boolean Logic",
+    "type": "MCQ",
+    "difficulty": 3,
+    "misconception_tag": "BOOLEAN_LOGIC_ERROR",
+    "text": "Simplify the Boolean expression: A AND (A OR B)",
+    "options": ["A AND B", "A OR B", "A", "B"],
+    "correct": 2,
+    "hint": "Use the Absorption Law: A AND (A OR B) = A.",
+    "explanation": "By the Absorption Law, A AND (A OR B) simplifies to A. If A is true, A OR B is true, so A AND (A OR B) = A. If A is false, the whole expression is false."
+  },
+  {
+    "id": "P2_T7_SAMPLE_001",
+    "paper": "P2",
+    "chapter_id": "T07",
+    "topic": "Algorithm Design",
+    "type": "coding",
+    "difficulty": 3,
+    "misconception_tag": "SEQUENTIAL_EXECUTION_ERROR",
+    "text": "Write pseudocode to find and output the largest number in an array called Scores declared as ARRAY[1:10] OF INTEGER.",
+    "starter": "DECLARE Scores : ARRAY[1:10] OF INTEGER\nDECLARE Max : INTEGER\n// Assume array is already filled\n// Write your algorithm below\n",
+    "hint": "Set Max to Scores[1] first, then loop through the rest comparing each element.",
+    "explanation": "Initialise Max to the first element. Loop from 2 to 10, updating Max whenever Scores[I] > Max. OUTPUT Max after the loop."
+  }
+]

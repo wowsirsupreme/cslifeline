@@ -1,0 +1,14 @@
+# _redirects — Netlify redirect rules
+# Static files are served FIRST (Netlify default behavior with force=false)
+# These rules only fire when no real file exists at the path
+
+/student    /student/index.html    200
+/student/   /student/index.html    200
+/teacher    /teacher/index.html    200
+/teacher/   /teacher/index.html    200
+/admin      /admin/index.html      200
+/admin/     /admin/index.html      200
+
+# DO NOT add a /* catch-all here.
+# A catch-all would intercept /js/auth.js, /data/questions.js etc
+# and serve HTML instead of JS — breaking all ES module imports.

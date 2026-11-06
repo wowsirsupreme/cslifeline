@@ -204,6 +204,12 @@ export class DemoBackend {
     return () => this.listeners.delete(l);
   }
 
+  async createUserSecondary(email, _password, displayName, profile) {
+    const uid = randomId('demo_u_', 12);
+    await this.set('users', uid, { ...profile, email, display_name: displayName, created_at: new Date().toISOString(), demo_login: true, is_synthetic: true });
+    return uid;
+  }
+
   async uploadFile(_path, file) {
     // No storage service in demonstration mode: images are kept inline as data URLs.
     return await new Promise((resolve, reject) => {

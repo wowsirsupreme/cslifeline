@@ -10,7 +10,8 @@ import { CONFIG, resolveMode } from './config.js';
 import { DemoBackend } from './backend-demo.js';
 import { randomId, newPseudoId, toMs, uniq, clean } from './util.js';
 import { stripAnswerKey } from '../engine/questions.js';
-import { markResponse, totalMarks, splitKey, joinKey } from '../engine/marking.js';
+import { totalMarks, splitKey } from '../engine/marking.js';
+import { buildResponseDoc, scoreSubmissionRecords } from '../engine/records.js';
 import { DEFAULT_THRESHOLDS } from '../engine/risk.js';
 
 const OUTBOX_KEY = 'csl.outbox.v1';
@@ -181,7 +182,7 @@ class Store {
 
   // ── Assessments ─────────────────────────────────────────────────────────
   listAssessments() {
-    if (this.me?.role === 'student') return this.backend.query('assessments', [['class_codes', 'array-contains', this.me.class_code]]).then(a => a.filter(x => x.status !== 'draft'));
+    if (this.me?.role === 'student') return this.backend.query('assessments', [['class_codes', 'array-contains', this.me.class_code], ['status', 'in', ['published', 'closed']]]);
     if (this.me?.role === 'admin') return this.backend.query('assessments');
     return this.backend.query('assessments', [['created_by', '==', this.auth.uid]]);
   }
@@ -217,27 +218,9 @@ class Store {
   listSessions(where) { return this.backend.query('sessions', where); }
 
   // ── Responses (with outbox) ─────────────────────────────────────────────
-  /** Build a response document in the shared schema (fixes v3 finding 3.1: class_code is always present). */
-  buildResponse({ session_id, question, answer, result, behaviour = {}, mode, attempt = 1, assessment_id = null, submission_id = null, student = this.me, studentUid = this.auth?.uid }) {
-    const optionType = Array.isArray(question.options) && question.options.length && ['mcq', 'pseudocode', 'debugging', 'code_output', 'truefalse'].includes(question.type);
-    return clean({
-      schema_version: CONFIG.schemaVersion, source_platform: 'CS_LIFELINE',
-      student_uid: studentUid, pseudo_id: student?.pseudo_id || null, class_code: student?.class_code || null, school_id: student?.school_id || null,
-      session_id: session_id || null, submission_id, assessment_id, mode, attempt,
-      question_id: question.id, question_type: question.type, chapter_id: question.chapter_id || null, subchapter: question.subchapter || null,
-      topic: question.topic || null, paper: question.paper || null, difficulty: question.difficulty || null,
-      misconception_tag: question.misconception_tag || null,
-      answer: answer === undefined ? null : (typeof answer === 'string' ? answer.slice(0, 20000) : answer),
-      chosen: optionType && answer !== null && answer !== undefined && answer !== '' ? (question.type === 'truefalse' ? (answer === true || answer === 'true' || answer === 0 ? 0 : 1) : Number(answer)) : null,
-      correct: result.correct, score: result.score, max: result.max, needs_manual: !!result.needs_manual,
-      misconception_hits: result.misconception_hits || [],
-      marking_detail: result.detail || null,
-      time_ms: behaviour.time_ms ?? null, first_answer_ms: behaviour.time_to_first_ms ?? null, revisions: behaviour.revisions ?? null,
-      hint_used: !!behaviour.hint_used, visibility_interruptions: behaviour.interruptions ?? null, away_ms: behaviour.away_ms ?? null, offline_during: !!behaviour.offline,
-      recorded_at: this.backend.serverTime(), client_ts: Date.now(),
-      scored_by: result.scored_by || 'client',
-      is_synthetic: false,
-    });
+  /** Build a response document in the shared schema (engine/records.js; fixes v3 finding 3.1: class_code is always present). */
+  buildResponse(args) {
+    return buildResponseDoc({ student: this.me || {}, studentUid: this.auth?.uid, ...args, timestamp: this.backend.serverTime() });
   }
 
   async saveResponse(doc) {
@@ -301,7 +284,7 @@ class Store {
     const doc = {
       assessment_id: assessment.id, student_uid: this.auth.uid, pseudo_id: this.me.pseudo_id, class_code: this.me.class_code, school_id: this.me.school_id || null,
       answers, behaviour, started_at, submitted_at: this.backend.serverTime(), client_submitted_at: Date.now(), forced, status: 'submitted',
-      question_ids: assessment.questions.map(q => q.id), max_score: assessment.total_marks,
+      question_ids: assessment.questions.map(q => q.id), max_score: assessment.total_marks || 0, is_synthetic: false,
     };
     this._queue('submissions', id, doc);
     await this.flushOutbox();
@@ -325,31 +308,30 @@ class Store {
    * and mirrored by functions/index.js. Idempotent: response IDs are deterministic.
    */
   async scoreSubmission(sub, assessment, keys, { actor = 'teacher' } = {}) {
-    const student = await this.backend.get('users', sub.student_uid) || { class_code: sub.class_code, pseudo_id: sub.pseudo_id };
-    const results = {}; let score = 0, max = 0, pending = 0;
-    const docs = [];
-    for (const q of assessment.questions) {
-      const k = keys.answers?.[q.id] || {};
-      const full = joinKey(q, k);
-      const ans = sub.answers?.[q.id];
-      let r = await markResponse(full, ans);
-      const manual = sub.manual_marks?.[q.id];
-      if (manual !== undefined && manual !== null) r = { ...r, score: Math.min(Number(manual), r.max), correct: Number(manual) >= r.max ? true : Number(manual) <= 0 ? false : null, needs_manual: false, detail: { ...(r.detail || {}), manual: true } };
-      if (r.needs_manual) pending++;
-      score += r.score || 0; max += r.max;
-      results[q.id] = clean({ score: r.score, max: r.max, correct: r.correct, needs_manual: r.needs_manual, explanation: k.explanation || '', correct_answer: q.type === 'coding' || q.type === 'structured' ? null : (k.answer ?? null) });
-      const doc = this.buildResponse({ session_id: null, submission_id: sub.id, assessment_id: sub.assessment_id, question: full, answer: ans, result: { ...r, scored_by: actor }, behaviour: sub.behaviour?.[q.id] || {}, mode: 'assessment', student, studentUid: sub.student_uid });
-      doc.recorded_at = sub.submitted_at || this.backend.serverTime();
-      docs.push({ type: 'set', col: 'responses', id: `${sub.id}__${q.id}__1`, data: doc });
-    }
-    await this.backend.batch(docs);
-    const release = (assessment.release_feedback || 'on_scoring') === 'on_scoring';
-    await this.backend.set('submissions', sub.id, { status: pending ? 'needs_marking' : 'scored', score, max_score: max, pending_marking: pending, results, feedback_released: release || !!sub.feedback_released, scored_at: this.backend.serverTime(), scored_by: actor }, { merge: true });
-    return { score, max, pending };
+    const [student, prevResult] = await Promise.all([
+      this.backend.get('users', sub.student_uid).catch(() => null),
+      this.backend.get('submission_results', sub.id).catch(() => null),
+    ]);
+    const out = await scoreSubmissionRecords(sub, assessment, keys, { prevResult, student, actor, timestamp: this.backend.serverTime() });
+    // Scores and feedback live in submission_results, which a student can read only once released
+    // (enforced by firestore.rules, not only hidden in the interface).
+    await this.backend.batch([
+      ...out.responses.map(r => ({ type: 'set', col: 'responses', id: r.id, data: r.data })),
+      { type: 'set', col: 'submission_results', id: sub.id, data: out.result },
+      { type: 'set', col: 'submissions', id: sub.id, data: out.submissionPatch, merge: true },
+    ]);
+    return { score: out.result.score, max: out.result.max_score, pending: out.result.pending_marking, released: out.result.released };
   }
 
+  async releaseResults(subIds, released = true) {
+    for (const id of subIds) await this.backend.set('submission_results', id, { released, released_at: this.backend.serverTime(), released_by: this.auth.uid }, { merge: true });
+    await this.audit(released ? 'results.release' : 'results.withhold', 'submission_results', { count: subIds.length });
+  }
+  getMyResult(subId) { return this.backend.get('submission_results', subId).catch(() => null); }
+  listResults(classCodes) { const c = [].concat(classCodes || []).filter(Boolean); return c.length ? this.backend.query('submission_results', [['class_code', 'in', c]]) : Promise.resolve([]); }
+
   async setManualMark(subId, qid, marks) {
-    await this.backend.set('submissions', subId, { manual_marks: { [qid]: Number(marks) } }, { merge: true });
+    await this.backend.set('submission_results', subId, { manual_marks: { [qid]: Number(marks) } }, { merge: true });
     await this.audit('submission.manual_mark', 'submissions/' + subId, { question_id: qid, marks });
   }
 
@@ -385,6 +367,39 @@ class Store {
     await this.audit(isNew ? 'intervention.create' : 'intervention.update', 'interventions/' + id, { status: i.status, action_type: i.action_type });
     return id;
   }
+  /** Record an evaluated outcome as immutable evidence and update the intervention. */
+  async recordOutcome(intervention, evaluation, { note = '', close = false } = {}) {
+    const id = randomId('ivo_', 12);
+    await this.backend.set('intervention_outcomes', id, clean({ intervention_id: intervention.id, student_uid: intervention.student_uid, class_code: intervention.class_code,
+      target: intervention.target, action_type: intervention.action_type, evaluation, note, recorded_by: this.auth.uid, recorded_at: this.backend.serverTime() }));
+    await this.backend.set('interventions', intervention.id, clean({ latest_outcome: { outcome: evaluation.outcome, summary: evaluation.summary, outcome_id: id, evaluated_at: evaluation.evaluated_at },
+      ...(close ? { status: 'completed', completed_at: this.backend.serverTime() } : {}), updated_at: this.backend.serverTime(), class_code: intervention.class_code }), { merge: true });
+    await this.audit('intervention.outcome', 'interventions/' + intervention.id, { outcome: evaluation.outcome, close });
+    return id;
+  }
+  listOutcomes(classCodes) { const c = [].concat(classCodes || []).filter(Boolean); return c.length ? this.backend.query('intervention_outcomes', [['class_code', 'in', c]]) : Promise.resolve([]); }
+
+  /** Save predictions computed in the browser from a registered logistic model (teacher action). */
+  async savePredictions(list, model) {
+    const ops = list.map(p => ({ type: 'set', col: 'predictions', id: `${p.student_uid}__${model.model_version}__${new Date().toISOString().slice(0, 10)}`,
+      data: clean({ ...p, model_version: model.model_version, prediction_status: model.status === 'production' && model.validated_on_real_data ? 'validated' : 'demonstration',
+        is_synthetic_model: !model.validated_on_real_data, predicted_at: new Date().toISOString(), predicted_by: this.auth.uid, source: 'in_app_logistic' }) }));
+    await this.backend.batch(ops);
+    await this.audit('predictions.score', 'predictions', { count: ops.length, model_version: model.model_version });
+    return ops.length;
+  }
+
+  /** Teacher creates a roster account for a student without email (random password shown once; never stored). */
+  async createRosterStudent({ displayName, classCode }) {
+    const cls = await this.checkJoinCode(classCode);
+    const password = randomId('', 4).toUpperCase() + '-' + randomId('', 4).toUpperCase() + '-' + randomId('', 4).toUpperCase();
+    const login = `${cls.id.toLowerCase()}.${randomId('', 8)}@students.cslifeline.app`;
+    const uid = await this.backend.createUserSecondary(login, password, displayName, clean({ display_name: String(displayName).trim().slice(0, 60), email: '', role: 'student', status: 'active',
+      class_code: cls.id, school_id: cls.school_id || null, grade: cls.grade || null, pseudo_id: newPseudoId(), consent: { research_use: 'not_recorded' }, roster_created_by: this.auth.uid, is_synthetic: false }));
+    await this.audit('student.roster_create', 'users/' + uid, { class_code: cls.id });
+    return { uid, login, password };
+  }
+
   listMyAssignments() { return this.backend.query('practice_assignments', [['student_uid', '==', this.auth.uid]]); }
   completeAssignment(id) { return this.backend.set('practice_assignments', id, { status: 'completed', completed_at: this.backend.serverTime() }, { merge: true }); }
   listAssignments(classCodes) { const c = [].concat(classCodes || []).filter(Boolean); return c.length ? this.backend.query('practice_assignments', [['class_code', 'in', c]]) : Promise.resolve([]); }
@@ -425,9 +440,9 @@ class Store {
     return batchId;
   }
   listIdentityMap() { return this.backend.query('learner_identity_map'); }
-  async saveIdentityLink({ source_platform, source_learner_id, student_uid, pseudo_id, status, evidence }) {
+  async saveIdentityLink({ source_platform, source_learner_id, student_uid, pseudo_id, class_code = null, status, evidence }) {
     const id = `${source_platform}__${source_learner_id}`.replace(/[/]/g, '_');
-    await this.backend.set('learner_identity_map', id, { source_platform, source_learner_id, student_uid, pseudo_id, status, evidence: evidence || '', verified_by: this.auth.uid, verified_at: this.backend.serverTime() });
+    await this.backend.set('learner_identity_map', id, { source_platform, source_learner_id, student_uid, pseudo_id, class_code, status, evidence: evidence || '', verified_by: this.auth.uid, verified_at: this.backend.serverTime() });
     await this.audit('identity.' + status, 'learner_identity_map/' + id, { source_platform, evidence });
   }
 

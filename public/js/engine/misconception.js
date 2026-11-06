@@ -29,6 +29,7 @@ export const STATUS = {
   knowledge_gap: { label: 'Knowledge gap', rank: 3, tone: 'info' },
   isolated_error: { label: 'Isolated error', rank: 2, tone: 'muted' },
   insufficient_evidence: { label: 'Insufficient evidence', rank: 1, tone: 'muted' },
+  not_misconception: { label: 'Not a misconception (teacher review)', rank: 0, tone: 'muted' }, // only ever set by a teacher review
 };
 
 const DEFAULT_EVIDENCE = { min_opportunities: 3, min_errors: 2, min_distinct_questions: 2 };

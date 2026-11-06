@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CS Lifeline — Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/main.css">
+<!-- CodeMirror 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* CodeMirror custom theme */
+.CodeMirror {
+  background: #0D1117 !important;
+  color: #E2E8F0 !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: .875rem !important;
+  min-height: 180px;
+  height: auto;
+}
+.CodeMirror-scroll { min-height: 180px; }
+.CodeMirror-gutters { background: #0D1117 !important; border-right: 1px solid rgba(255,255,255,.06) !important; }
+.CodeMirror-linenumber { color: #475569 !important; }
+.CodeMirror-cursor { border-left: 2px solid #00D4AA !important; }
+.CodeMirror-selected, .CodeMirror-focused .CodeMirror-selected { background: rgba(0,212,170,.15) !important; }
+
+/* Layout overrides for student page */
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.6rem;margin-bottom:1.5rem}
+.topic-btn{padding:.65rem .8rem;border-radius:var(--r);border:1px solid var(--glass-b);background:var(--glass);cursor:pointer;transition:all .14s;text-align:left}
+.topic-btn:hover{border-color:var(--teal-border);background:var(--teal-ghost)}
+.topic-btn.active{border-color:var(--teal);background:var(--teal-ghost)}
+.topic-btn .t-paper{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.25rem}
+.topic-btn .t-name{font-size:.78rem;font-weight:600;color:var(--text);line-height:1.3}
+.topic-btn .t-count{font-size:.66rem;color:var(--text-3);margin-top:.2rem}
+
+/* Input modal for pseudocode */
+.input-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+.input-modal.open{display:flex}
+.input-box{background:var(--midnight-2);border:1px solid var(--glass-b);border-radius:var(--r2);padding:1.5rem;max-width:380px;width:calc(100% - 2rem)}
+.input-box h4{font-family:var(--font-d);margin-bottom:.75rem;font-size:.95rem}
+.input-box input{width:100%;padding:.65rem 1rem;background:rgba(255,255,255,.06);border:1px solid var(--teal-border);border-radius:var(--r);font-family:var(--font-m);font-size:.9rem;color:var(--text);outline:none;margin-bottom:1rem}
+.input-box input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,212,170,.12)}
+
+/* Progress radar */
+.progress-section{max-width:780px}
+.p1-p2-tabs{display:flex;gap:.4rem;margin-bottom:1.25rem}
+.p1-p2-tab{flex:1;padding:.55rem;border:1px solid var(--glass-b);border-radius:var(--r);background:var(--glass);color:var(--text-2);font-size:.82rem;font-weight:600;cursor:pointer;text-align:center;transition:all .14s}
+.p1-p2-tab.active{border-color:var(--teal);background:var(--teal-ghost);color:var(--teal)}
+
+.chapter-bars{display:flex;flex-direction:column;gap:.5rem}
+.ch-bar-row{display:flex;align-items:center;gap:.75rem}
+.ch-bar-name{width:180px;flex-shrink:0;font-size:.76rem;color:var(--text-2)}
+.ch-bar-track{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.ch-bar-fill{height:100%;border-radius:3px;transition:width .6s var(--ease)}
+.ch-bar-pct{width:36px;text-align:right;font-family:var(--font-m);font-size:.73rem;font-weight:600}
+</style>
+</head>
+<body class="page-bg">
+
+<!-- Navbar -->
+
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+<nav class="navbar">
+  <button class="sb-toggle" onclick="toggleSidebar()" aria-label="Toggle menu" id="sb-toggle-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+    </button>
+  <div class="brand">
+    <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg></div>
+    CS Lifeline<span style="color:var(--teal)">.</span>
+    <div class="brand-badge">Student</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" onclick="showSec('practice')" href="#" id="nl-practice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Practice
+    </a>
+    <a class="nav-link" onclick="showSec('editor')" href="#" id="nl-editor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Pseudocode
+    </a>
+    <a class="nav-link" onclick="showSec('progress')" href="#" id="nl-progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>My Progress
+    </a>
+    <a class="nav-link" onclick="startChallenge('daily')" href="#" style="color:var(--crimson)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>Daily
+    </a>
+    <a class="nav-link" onclick="startChallenge('weekly')" href="#" style="color:#818CF8">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Weekly
+    </a>
+  </div>
+  <div class="nav-end">
+    <div class="avatar" id="nav-av">?</div>
+    <span style="font-size:.82rem;color:var(--text-2)" id="nav-name">Loading…</span>
+    <button class="btn btn-ghost btn-sm" onclick="signOutUser()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>Sign out
+    </button>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div style="padding:0 .5rem">
+      <div class="sb-label">Paper 1 — Theory</div>
+      <a class="sb-link" onclick="filterChapter('T01')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Data Representation
+      </a>
+      <a class="sb-link" onclick="filterChapter('T02')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/></svg>Data Transmission
+      </a>
+      <a class="sb-link" onclick="filterChapter('T03')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M9 2v2M2 15h2M2 9h2M22 15h-2M22 9h-2M15 22v-2M9 22v-2"/></svg>Hardware
+      </a>
+      <a class="sb-link" onclick="filterChapter('T04')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Software
+      </a>
+      <a class="sb-link" onclick="filterChapter('T05')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Internet & Uses
+      </a>
+      <a class="sb-link" onclick="filterChapter('T06')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>Emerging Tech
+      </a>
+
+      <div class="sb-div"></div>
+      <div class="sb-label">Paper 2 — Programming</div>
+      <a class="sb-link" onclick="filterChapter('T07')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Algorithm Design
+      </a>
+      <a class="sb-link" onclick="filterChapter('T08')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Programming
+      </a>
+      <a class="sb-link" onclick="filterChapter('T09')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Arrays
+      </a>
+      <a class="sb-link" onclick="filterChapter('T10')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m10 13-2 2 2 2"/><path d="m14 13 2 2-2 2"/></svg>Procedures
+      </a>
+      <a class="sb-link" onclick="filterChapter('T11')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>File Handling
+      </a>
+      <a class="sb-link" onclick="filterChapter('T12')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M3 6h18M7 12h10M11 18h4"/></svg>Searching & Sorting
+      </a>
+      <a class="sb-link" onclick="filterChapter('T13')" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>Boolean Logic
+      </a>
+      <div class="sb-div"></div>
+      <a class="sb-link" onclick="filterChapter(null)" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>All Topics
+      </a>
+      <div class="sb-div"></div>
+      <div class="sb-label">Challenges</div>
+      <a class="sb-link" onclick="startChallenge('daily')" href="#" style="color:var(--crimson)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Daily Challenge
+      </a>
+      <a class="sb-link" onclick="startChallenge('weekly')" href="#" style="color:#818CF8">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Weekly Challenge
+      </a>
+      <div class="sb-div"></div>
+      <div class="sb-label">Modes</div>
+      <a class="sb-link" onclick="startAssessment()" href="#" id="nl-assessment-sb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Assessment
+      </a>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ═══════════ PRACTICE SECTION ═══════════ -->
+    <section id="sec-practice">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800" id="chapter-title">All Topics</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Cambridge IGCSE 0478 · Paper 1 &amp; Paper 2</p>
+        </div>
+        <div style="display:flex;gap:.6rem;align-items:center">
+          <span style="font-family:var(--font-m);font-size:.85rem;color:var(--text-2)" id="q-timer">00:00</span>
+          <button class="btn btn-ghost btn-sm" onclick="loadQuestions()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>New set
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="q-prog">
+        <span class="q-prog-label" id="q-counter">Q 1 / 10</span>
+        <div class="q-prog-track"><div class="q-prog-fill" id="q-prog-fill" style="width:10%"></div></div>
+        <span class="q-prog-label" id="q-score">0 correct</span>
+      </div>
+
+      <!-- Question card -->
+      <div class="card q-card" id="q-card" style="max-width:740px">
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem" id="q-badges"></div>
+        <pre class="q-text" id="q-text" style="font-family:var(--font)">Loading…</pre>
+        <div class="q-options" id="q-options"></div>
+
+        <!-- Coding question panel (shown for type=coding) -->
+        <div id="q-coding" style="display:none">
+          <div class="editor-wrap" style="margin-bottom:.75rem">
+            <div class="editor-toolbar">
+              <span class="editor-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Cambridge Pseudocode Editor
+              </span>
+              <button class="btn btn-primary btn-sm" id="run-btn" onclick="runCode()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="resetCode()">Reset</button>
+              <button class="btn btn-ghost btn-sm" onclick="showSolution()">Solution</button>
+            </div>
+            <div id="cm-editor"></div>
+            <div style="background:#0D1117;border-top:1px solid var(--glass-b);padding:.5rem 1rem;font-size:.7rem;color:var(--text-3);display:flex;gap:1rem">
+              <span>← for assignment</span><span>DECLARE name : TYPE</span><span>FOR I ← 1 TO N</span><span>OUTPUT "text", var</span>
+            </div>
+            <div style="padding:.5rem 1rem;background:#0D1117;border-top:1px solid var(--glass-b);font-size:.74rem;color:var(--text-3)">Output:</div>
+            <div class="editor-output" id="code-output">Run your code to see output here.</div>
+          </div>
+        </div>
+
+        <div class="q-explain" id="q-explain" style="display:none"></div>
+
+        <div style="display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap" id="q-actions">
+          <button class="btn btn-ghost btn-sm" id="hint-btn" onclick="showHint()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>Hint
+          </button>
+          <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+          <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">Next →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ PSEUDOCODE EDITOR SECTION ═══════════ -->
+    <section id="sec-editor" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">Pseudocode Editor</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Write and execute Cambridge IGCSE 0478 pseudocode</p>
+        </div>
+        <div style="display:flex;gap:.6rem">
+          <button class="btn btn-primary" onclick="runFreeCode()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="clearFreeCode()">Clear</button>
+          <button class="btn btn-ghost btn-sm" onclick="insertTemplate()">Templates</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;height:calc(100vh - 200px)">
+        <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+          <div style="padding:.6rem 1rem;background:rgba(0,0,0,.3);border-bottom:1px solid var(--glass-b);display:flex;align-items:center;gap:.5rem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--teal)"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span style="font-size:.8rem;font-weight:700;color:var(--text-2)">Pseudocode</span>
+            <span style="font-size:.68rem;color:var(--text-3);margin-left:auto">Cambridge IGCSE 0478 syntax</span>
+          </div>
+          <div id="free-editor" style="flex:1;overflow:auto"></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div class="card" style="flex:1;padding:0;overflow:hidden;display:flex;flex-direction:column">
+            <div style="padding:.6rem 1rem;background:rgba(0,0,0,.3);border-bottom:1px solid var(--glass-b);display:flex;align-items:center;gap:.5rem">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--emerald)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <span style="font-size:.8rem;font-weight:700;color:var(--text-2)">Output</span>
+              <button onclick="clearFreeOutput()" class="btn btn-ghost btn-sm" style="margin-left:auto;font-size:.7rem;padding:.2rem .6rem">Clear</button>
+            </div>
+            <div id="free-output" style="flex:1;background:#0D1117;padding:.85rem 1rem;font-family:var(--font-m);font-size:.85rem;color:#A3E635;white-space:pre-wrap;overflow-y:auto">Run code to see output…</div>
+          </div>
+
+          <div class="card" style="padding:.85rem 1rem">
+            <div style="font-size:.75rem;font-weight:700;margin-bottom:.6rem;color:var(--text-2)">Quick Reference</div>
+            <div style="font-family:var(--font-m);font-size:.72rem;color:var(--text-3);line-height:2;column-count:2;column-gap:1rem">
+              <div><span style="color:var(--teal)">←</span> assignment</div>
+              <div><span style="color:var(--teal)">DECLARE</span> x : INTEGER</div>
+              <div><span style="color:var(--teal)">INPUT</span> / <span style="color:var(--teal)">OUTPUT</span></div>
+              <div><span style="color:var(--teal)">IF</span> … THEN … <span style="color:var(--teal)">ENDIF</span></div>
+              <div><span style="color:var(--teal)">FOR</span> I ← 1 TO N … <span style="color:var(--teal)">NEXT</span></div>
+              <div><span style="color:var(--teal)">WHILE</span> … <span style="color:var(--teal)">ENDWHILE</span></div>
+              <div><span style="color:var(--teal)">REPEAT</span> … <span style="color:var(--teal)">UNTIL</span></div>
+              <div><span style="color:var(--teal)">PROCEDURE</span> / <span style="color:var(--teal)">FUNCTION</span></div>
+              <div><span style="color:var(--teal)">ARRAY</span>[1:N] OF TYPE</div>
+              <div><span style="color:var(--teal)">MOD</span> / <span style="color:var(--teal)">DIV</span></div>
+              <div><span style="color:var(--teal)">LENGTH</span>() / <span style="color:var(--teal)">MID</span>()</div>
+              <div><span style="color:var(--teal)">UCASE</span>() / <span style="color:var(--teal)">LCASE</span>()</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template modal -->
+      <div class="input-modal" id="template-modal">
+        <div class="input-box" style="max-width:480px">
+          <h4>Choose a template</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
+            <button class="btn btn-ghost btn-sm" onclick="loadTemplate('array1d')">1D Array</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadTemplate('2d')">2D Array</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadTemplate('max')">Find Maximum</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadTemplate('min')">Find Minimum</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadTemplate('bubble')">Bubble Sort</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadTemplate('linear')">Linear Search</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadTemplate('binary')">Binary Search</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadTemplate('average')">Average / Sum</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadTemplate('files')">File Read/Write</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:.75rem;width:100%" onclick="closeTemplates()">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+        <!-- ═══════════ MY PROGRESS SECTION ═══════════ -->
+    <section id="sec-progress" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">My Progress</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Your own learning trajectory — no class comparisons shown</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="loadProgress()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Refresh
+        </button>
+      </div>
+
+      <!-- AI feedback card -->
+      <div id="ai-feedback-card" style="display:none;margin-bottom:1.25rem" class="card card-teal">
+        <div class="card-header">
+          <div class="card-title" style="display:flex;align-items:center;gap:.5rem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            AI Feedback
+          </div>
+          <span style="font-size:.7rem;color:var(--text-3)">From your teacher's ML pipeline</span>
+        </div>
+        <div id="ai-feedback-content"></div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stats-grid" style="margin-bottom:1.5rem">
+        <div class="stat-card teal">
+          <div class="stat-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          <div class="stat-val" id="p-accuracy">—</div>
+          <div class="stat-label">Overall Accuracy</div>
+          <div style="font-size:.68rem;color:var(--teal);margin-top:.2rem" id="p-accuracy-trend"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+          <div class="stat-val" id="p-answered">—</div>
+          <div class="stat-label">Questions Answered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="stat-val" id="p-sessions">—</div>
+          <div class="stat-label">Sessions</div>
+        </div>
+        <div class="stat-card crimson">
+          <div class="stat-icon crimson"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg></div>
+          <div class="stat-val" id="p-errors">—</div>
+          <div class="stat-label">Errors Flagged</div>
+        </div>
+      </div>
+
+      <!-- Radar -->
+      <div class="card" style="margin-bottom:1.25rem">
+        <div class="card-header">
+          <div class="card-title">Topic Radar — 13 Chapters (0–99 scale)</div>
+          <div style="display:flex;gap:.35rem">
+            <button class="btn btn-ghost btn-sm" id="radar-all-btn" onclick="setRadarView('all')" style="background:var(--teal-ghost);color:var(--teal);border-color:var(--teal-border)">All time</button>
+            <button class="btn btn-ghost btn-sm" id="radar-week-btn" onclick="setRadarView('week')">Week</button>
+            <button class="btn btn-ghost btn-sm" id="radar-session-btn" onclick="setRadarView('session')">Session</button>
+          </div>
+        </div>
+        <div style="max-width:420px;margin:0 auto"><canvas id="radar-chart"></canvas></div>
+        <p style="text-align:center;font-size:.68rem;color:var(--text-3);margin-top:.5rem" id="radar-period-label">All sessions · Your data only · No class comparisons</p>
+      </div>
+
+      <!-- Chapter bars -->
+      <div class="card" style="margin-bottom:1.25rem">
+        <div class="card-header">
+          <div class="card-title">Accuracy by Chapter</div>
+          <div style="display:flex;gap:.4rem">
+            <button class="p1-p2-tab active" onclick="showChapterTab('P1')" id="ptab-P1">Paper 1 — Theory</button>
+            <button class="p1-p2-tab" onclick="showChapterTab('P2')" id="ptab-P2">Paper 2 — Programming</button>
+          </div>
+        </div>
+        <div class="chapter-bars" id="chapter-bars">
+          <p style="font-size:.82rem;color:var(--text-3)">Answer questions to see chapter breakdown.</p>
+        </div>
+      </div>
+
+      <!-- Behavioral signals + wrong answers -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem">
+        <div class="card">
+          <div class="card-header"><div class="card-title" style="font-size:.85rem">Your Behavioral Signals</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+            <div style="background:rgba(255,77,106,.06);border:1px solid rgba(255,77,106,.2);border-radius:var(--r);padding:.75rem;text-align:center">
+              <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:800;color:var(--crimson)" id="sig-avoid-val">—</div>
+              <div style="font-size:.68rem;color:var(--text-3);margin-top:.15rem">Avoidance</div>
+            </div>
+            <div style="background:rgba(255,181,71,.06);border:1px solid rgba(255,181,71,.2);border-radius:var(--r);padding:.75rem;text-align:center">
+              <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:800;color:var(--amber)" id="sig-uncert-val">—</div>
+              <div style="font-size:.68rem;color:var(--text-3);margin-top:.15rem">Uncertainty</div>
+            </div>
+            <div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.2);border-radius:var(--r);padding:.75rem;text-align:center">
+              <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:800;color:var(--teal)" id="sig-false-val">—</div>
+              <div style="font-size:.68rem;color:var(--text-3);margin-top:.15rem">False Mastery</div>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid var(--glass-b);border-radius:var(--r);padding:.75rem;text-align:center">
+              <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:800;color:var(--text-2)" id="sig-tabs-val">—</div>
+              <div style="font-size:.68rem;color:var(--text-3);margin-top:.15rem">Tab Switches</div>
+            </div>
+          </div>
+          <p style="font-size:.68rem;color:var(--text-3);margin-top:.75rem;line-height:1.6">Used only to help your teacher support you — never for discipline.</p>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title" style="font-size:.85rem">Recent Incorrect Answers</div></div>
+          <div id="wrong-answers"><p style="font-size:.82rem;color:var(--text-3)">No errors yet!</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ LIVE ASSESSMENTS SECTION ═══════════ -->
+    <section id="sec-live-assessment" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">Assessments</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Set by your teacher · Complete before the deadline</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="loadLiveAssessments()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Refresh
+        </button>
+      </div>
+      <div id="live-assessments-list">
+        <div style="text-align:center;padding:2rem"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ ACTIVE ASSESSMENT RUNNER ═══════════ -->
+    <section id="sec-running-assessment" style="display:none">
+      <!-- Timer bar -->
+      <div id="assessment-timer-bar" style="position:sticky;top:60px;z-index:50;background:rgba(10,15,30,.95);border-bottom:1px solid var(--glass-b);padding:.6rem 1.5rem;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px)">
+        <div style="font-family:var(--font-d);font-size:.9rem;font-weight:700" id="running-title">Assessment</div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="display:flex;align-items:center;gap:.4rem;font-family:var(--font-m);font-size:.9rem" id="countdown-display">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="countdown-text" style="font-weight:700">--:--</span>
+          </div>
+          <div style="font-size:.75rem;color:var(--text-2)" id="running-progress">0 / 0 answered</div>
+        </div>
+      </div>
+      <div id="running-assessment-content" style="padding:1.5rem;max-width:760px"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Input modal -->
+<div class="input-modal" id="input-modal">
+  <div class="input-box">
+    <h4>Program Input Needed</h4>
+    <p style="font-size:.82rem;color:var(--text-2);margin-bottom:.65rem" id="input-prompt">Enter value:</p>
+    <input type="text" id="input-value" placeholder="Type your input and press Enter" onkeydown="if(event.key==='Enter')submitInput()">
+    <button class="btn btn-primary" style="width:100%" onclick="submitInput()">Submit →</button>
+  </div>
+</div>
+<div id="toast-root"></div>
+
+<script type="module">
+import { requireRole, signOutUser as _so, auth, onAuthStateChanged } from "/js/auth.js";
+import { db } from "/js/firebase-config.js";
+import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { BehavioralCapture } from "/js/behavioral.js";
+import { startSession, endSession, saveResponse, listenResponses, listenPrediction, pushBehavioralSignal, clearLiveSignal } from "/js/sync.js";
+import { QUESTIONS, CHAPTERS } from "/data/questions.js";
+import { PseudocodeInterpreter } from "/js/interpreter.js";
+
+// ── State ─────────────────────────────────────────────────────
+let uid, classCode, sessionId, sessionStart;
+let questions = [], currentIdx = 0;
+let sessionCorrect = 0, sessionTotal = 0;
+let capture = new BehavioralCapture();
+let cmEditor = null, freeEditor = null;
+let currentChapter = null;
+let allResponses = [], chapterPaper = 'P1';
+let radarChart = null, currentRadarView = 'all';
+let inputResolve = null, liveSignalInterval = null;
+let assessmentMode = false;  // Standard Assessment Mode
+let challengeMode  = false;  // Daily/Weekly Challenge Mode
+let challengeType  = null;   // 'daily' | 'weekly'
+let isShadowBanned = false;  // Set by Firestore — student doesn't know
+
+// ── Interpreter ────────────────────────────────────────────────
+const interp = new PseudocodeInterpreter(line => {
+  const el = document.getElementById('code-output') || document.getElementById('free-output');
+  if (!el) return;
+  if (el.textContent.startsWith('Run your') || el.textContent.startsWith('Run code') || el.textContent.startsWith('(Program')) el.textContent = '';
+  el.textContent += line + '\n';
+});
+interp.input = async varName => new Promise(resolve => {
+  inputResolve = resolve;
+  const p = document.getElementById('input-prompt'), v = document.getElementById('input-value'), m = document.getElementById('input-modal');
+  if (p) p.textContent = `Enter value for: ${varName}`;
+  if (v) v.value = '';
+  if (m) m.classList.add('open');
+  setTimeout(() => v?.focus(), 50);
+});
+
+// ══════════════════════════════════════════════════════════════
+// window.* ASSIGNMENTS — all before any await
+// ══════════════════════════════════════════════════════════════
+window.signOutUser = _so;
+window.submitInput = () => { const val = document.getElementById('input-value')?.value||''; document.getElementById('input-modal')?.classList.remove('open'); if(inputResolve){inputResolve(val);inputResolve=null;} };
+
+window.showSec = name => {
+  if (window.innerWidth <= 900) closeSidebar();
+  ['practice','editor','progress','live-assessment'].forEach(s => {
+    const sec = document.getElementById('sec-'+s), nl = document.getElementById('nl-'+s);
+    if (sec) sec.style.display = s===name?'':'none';
+    if (nl)  nl.classList.toggle('active', s===name);
+  });
+  if (name === 'progress')        loadProgress();
+  if (name === 'editor' && !freeEditor) initFreeEditor();
+  if (name === 'assessment')      startAssessment();
+  if (name === 'live-assessment') loadLiveAssessments();
+};
+
+window.filterChapter = ch => {
+  if (window.innerWidth <= 900) closeSidebar();
+  assessmentMode = false;
+  currentChapter = ch;
+  const t = document.getElementById('chapter-title');
+  if (t) t.textContent = ch ? (CHAPTERS[ch]?.title||ch) : 'All Topics';
+  window.showSec('practice');
+  window.loadQuestions();
+};
+
+window.loadQuestions = () => {
+  assessmentMode = false;
+  challengeMode  = false;
+  challengeType  = null;
+  let pool = [...QUESTIONS];
+  if (currentChapter) pool = pool.filter(q => q.chapter_id === currentChapter);
+  questions = pool.sort(() => Math.random()-0.5).slice(0,10);
+  currentIdx = 0; sessionCorrect = 0; sessionTotal = 0;
+  // Rebuild q-card if endSession_ replaced it
+  const card = document.getElementById('q-card');
+  if (card && !card.querySelector('#q-text')) {
+    card.innerHTML = `
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem" id="q-badges"></div>
+      <pre class="q-text" id="q-text" style="font-family:var(--font)">Loading…</pre>
+      <div class="q-options" id="q-options"></div>
+      <div id="q-coding" style="display:none"></div>
+      <div class="q-explain" id="q-explain" style="display:none"></div>
+      <div style="display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap" id="q-actions">
+        <button class="btn btn-ghost btn-sm" id="hint-btn" onclick="showHint()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>Hint</button>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+        <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">Next →</button>
+      </div>`;
+    cmEditor = null;
+  }
+  renderQuestion();
+};
+
+window.onSelect = idx => {
+  const q = questions[currentIdx]; if (!q) return;
+  capture.recordAnswer(idx, idx === q.correct);
+  const sb = document.getElementById('submit-btn'); if(sb) sb.disabled = false;
+  document.querySelectorAll('.q-opt').forEach((el,i) => el.classList.toggle('selected', i===idx));
+};
+
+window.showHint = () => {
+  if (assessmentMode) return; // no hints in assessment mode
+  capture.recordHint();
+  const h = questions[currentIdx]?.hint;
+  if (h) toast(h,'info');
+};
+
+window.submitAnswer = async () => {
+  const q = questions[currentIdx]; if (!q) return;
+  let correct = false, chosenIdx = -1;
+  if (q.type !== 'coding') {
+    const sel = document.querySelector('input[name="qa"]:checked'); if (!sel) return;
+    chosenIdx = parseInt(sel.value); correct = chosenIdx === q.correct;
+  } else { await window.runCode(); correct = true; }
+  const sigs = capture.signals(correct);
+  if (correct) sessionCorrect++;
+  sessionTotal++;
+  const scoreEl = document.getElementById('q-score'); if(scoreEl) scoreEl.textContent = `${sessionCorrect} correct`;
+  if (q.type !== 'coding') {
+    document.querySelectorAll('.q-opt').forEach((el,i) => {
+      if (i===q.correct) el.classList.add('correct');
+      else if (i===chosenIdx && !correct) el.classList.add('wrong');
+      const inp = el.querySelector('input'); if(inp) inp.disabled = true;
+    });
+  }
+  const expEl = document.getElementById('q-explain');
+  if (expEl && !assessmentMode) {
+    expEl.style.display = 'block';
+    expEl.className = 'q-explain '+(correct?'correct-explain':'wrong-explain');
+    expEl.innerHTML = `<strong>${correct?'✓ Correct!':'✗ Not quite.'}</strong> ${q.explanation}${q.wrong_example?`<br><br><em>Common error:</em> ${q.wrong_example}`:''}`;
+  } else if (expEl && assessmentMode) {
+    expEl.style.display = 'block';
+    expEl.className = 'q-explain '+(correct?'correct-explain':'wrong-explain');
+    expEl.innerHTML = `<strong>${correct?'✓':'✗'}</strong> ${correct?'Correct.':'Incorrect — review this topic after the assessment.'}`;
+  }
+  ['submit-btn','hint-btn'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  const nb = document.getElementById('next-btn'); if(nb) nb.style.display='inline-flex';
+  if (sessionId && uid) {
+    pushBehavioralSignal(uid, sessionId, classCode, q.chapter_id, sigs).catch(()=>{});
+    // Analytics always fire regardless of mode — behavioural signals collected in all modes
+    const modeTag = assessmentMode ? 'assessment' : challengeMode ? 'challenge' : 'practice';
+    saveResponse(sessionId, uid, q.id, q.misconception_tag, q.chapter_id, q.paper, correct,
+      { ...sigs, mode: modeTag }).catch(console.error);
+  }
+};
+
+window.nextQuestion = () => { currentIdx++; document.querySelectorAll('input[name="qa"]').forEach(r=>r.checked=false); renderQuestion(); };
+
+window.runCode = async () => {
+  if (!cmEditor) return;
+  const outEl = document.getElementById('code-output');
+  if (outEl) { outEl.textContent = ''; outEl.className = 'editor-output'; outEl.style.color='#A3E635'; }
+  const btn = document.getElementById('run-btn');
+  if (btn) { btn.disabled=true; btn.textContent='Running…'; }
+  try {
+    let code = cmEditor.getValue();
+    const hasFn   = /^FUNCTION\s+\w+/im.test(code);
+    const hasProc = /^PROCEDURE\s+\w+/im.test(code);
+    const hasOut  = /^OUTPUT\s/im.test(code);
+    const hasCall = /^CALL\s/im.test(code);
+    const onlyDefs = (hasFn||hasProc) && !hasOut && !hasCall;
+    if (onlyDefs) {
+      const fnM   = code.match(/^FUNCTION\s+(\w+)\s*\(([^)]*)\)/im);
+      const prM   = code.match(/^PROCEDURE\s+(\w+)\s*\(([^)]*)\)/im);
+      const match = fnM||prM; const name = match?.[1];
+      if (name) {
+        const params = (match[2]||'').split(',').filter(p=>p.trim()).length;
+        const args   = Array.from({length:params},(_,i)=>[5,10,3,7,2,8][i]??1).join(', ');
+        code += fnM ? `\n\n// Auto test:\nOUTPUT ${name}(${args})` : `\n\n// Auto test:\nCALL ${name}(${args})`;
+      }
+    }
+    await interp.run(code);
+    if (outEl && !outEl.textContent.trim()) { outEl.textContent='(Program ran — no OUTPUT produced)'; outEl.style.color='#64748B'; }
+  } catch(e) { if(outEl){outEl.classList.add('error');outEl.style.color='var(--crimson)';outEl.textContent='Error: '+e.message;} }
+  finally { if(btn){btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run';} }
+};
+
+window.runFreeCode = async () => {
+  if (!freeEditor) return;
+  const outEl = document.getElementById('free-output');
+  if (outEl) { outEl.textContent=''; outEl.style.color='#A3E635'; }
+  const interp2 = new PseudocodeInterpreter(line => { if(outEl) outEl.textContent+=line+'\n'; });
+  interp2.input = async varName => new Promise(resolve => {
+    inputResolve = resolve;
+    const p=document.getElementById('input-prompt'),v=document.getElementById('input-value'),m=document.getElementById('input-modal');
+    if(p)p.textContent=`Enter value for: ${varName}`;if(v)v.value='';if(m)m.classList.add('open');setTimeout(()=>v?.focus(),50);
+  });
+  try {
+    const result = await interp2.run(freeEditor.getValue());
+    if (result.errors.length && outEl) outEl.style.color='var(--crimson)';
+    if (outEl && !outEl.textContent.trim()) { outEl.textContent='(Program ran — no OUTPUT produced)'; outEl.style.color='#64748B'; }
+  } catch(e){ if(outEl){outEl.style.color='var(--crimson)';outEl.textContent='Error: '+e.message;} }
+};
+window.clearFreeCode   = () => { if(freeEditor) freeEditor.setValue(''); };
+window.clearFreeOutput = () => { const el=document.getElementById('free-output'); if(el){el.textContent='Run code to see output…';el.style.color='#A3E635';} };
+window.resetCode       = () => { const q=questions[currentIdx]; if(cmEditor&&q?.starter) cmEditor.setValue(q.starter); };
+window.showSolution    = () => { const q=questions[currentIdx]; if(q?.solution&&cmEditor){cmEditor.setValue(q.solution);toast('Solution loaded — study it, then reset and try yourself!','info');} };
+window.insertTemplate  = () => document.getElementById('template-modal')?.classList.add('open');
+window.closeTemplates  = () => document.getElementById('template-modal')?.classList.remove('open');
+window.loadTemplate    = name => { if(!freeEditor) initFreeEditor(); const t=TEMPLATES[name]; if(t){freeEditor.setValue(t);window.closeTemplates();window.showSec('editor');} };
+
+// ── Standard Assessment Mode ────────────────────────────────────
+function startAssessment() {
+  assessmentMode = true;
+  // Only include chapters where student has ≥50% accuracy OR no data yet (adaptive)
+  let pool;
+  if (allResponses.length < 5) {
+    // Not enough data — use all questions
+    pool = [...QUESTIONS];
+    toast('Assessment mode: all topics (answer more questions first for adaptive selection)','info');
+  } else {
+    // Find comfortable chapters (≥50% accuracy)
+    const comfortable = Object.keys(CHAPTERS).filter(ch => {
+      const r = allResponses.filter(x => x.chapter_id===ch);
+      return r.length === 0 || (r.filter(x=>x.correct).length/r.length >= 0.5);
+    });
+    pool = QUESTIONS.filter(q => comfortable.includes(q.chapter_id));
+    if (pool.length < 5) pool = [...QUESTIONS]; // fallback
+    toast(`Assessment: ${comfortable.length} chapters · No hints · Timed · ${Math.min(pool.length,15)} questions`,'info');
+  }
+  questions = pool.sort(() => Math.random()-0.5).slice(0,15);
+  currentIdx = 0; sessionCorrect = 0; sessionTotal = 0;
+  // Show the practice section layout but with assessment styling
+  window.showSec('practice');
+  const title = document.getElementById('chapter-title');
+  if (title) title.textContent = 'Standard Assessment';
+  // Hide hint button during assessment
+  const hintBtn = document.getElementById('hint-btn');
+  if (hintBtn) hintBtn.style.display = 'none';
+  renderQuestion();
+}
+
+// ── Progress ────────────────────────────────────────────────────
+window.loadProgress = () => {
+  const responses = allResponses;
+  if (!responses.length) { document.getElementById('p-accuracy').textContent='—'; return; }
+  const total   = responses.length;
+  const correct = responses.filter(r=>r.correct).length;
+  const acc     = Math.round(correct/total*100);
+  const errors  = responses.filter(r=>!r.correct&&r.misconception_tag).length;
+  const sessions = new Set(responses.map(r=>r.session_id)).size;
+  setText('p-accuracy', acc+'%');
+  setText('p-answered', total);
+  setText('p-sessions', sessions);
+  setText('p-errors',   errors);
+  // Trend vs previous session
+  const sessionIds = [...new Set(responses.map(r=>r.session_id))];
+  if (sessionIds.length >= 2) {
+    const prevR   = responses.filter(r=>r.session_id===sessionIds[1]);
+    const prevAcc = prevR.length ? Math.round(prevR.filter(r=>r.correct).length/prevR.length*100) : 0;
+    const delta   = acc - prevAcc;
+    const trendEl = document.getElementById('p-accuracy-trend');
+    if (trendEl) trendEl.textContent = delta>0?`▲ +${delta}% vs last session`:delta<0?`▼ ${delta}% vs last session`:'→ same as last session';
+  }
+  // Behavioral signals
+  setText('sig-avoid-val',  responses.filter(r=>r.signal_avoidance).length);
+  setText('sig-uncert-val', responses.filter(r=>r.signal_uncertainty).length);
+  setText('sig-false-val',  responses.filter(r=>r.signal_false_mastery).length);
+  setText('sig-tabs-val',   responses.reduce((a,r)=>a+(r.tab_switch_count||0),0));
+  window.setRadarView(currentRadarView);
+  buildChapterBars(responses, chapterPaper);
+  // Wrong answers
+  const wrong = responses.filter(r=>!r.correct).slice(0,6);
+  const wEl   = document.getElementById('wrong-answers');
+  if (wEl) wEl.innerHTML = wrong.length
+    ? wrong.map(r=>`<div style="padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:.8rem;font-weight:600;color:var(--text)">${r.question_id||r.id||'—'}</div><div style="font-size:.7rem;color:var(--text-3)">${r.chapter_id} · ${(r.misconception_tag||'').replace(/_/g,' ')}</div></div><span class="badge badge-crimson">✗</span></div>`).join('')
+    : '<p style="font-size:.82rem;color:var(--text-3)">No errors yet!</p>';
+};
+
+window.setRadarView = view => {
+  currentRadarView = view;
+  ['all','week','session'].forEach(v => {
+    const b = document.getElementById('radar-'+v+'-btn');
+    if (b) { b.style.background=v===view?'var(--teal-ghost)':''; b.style.color=v===view?'var(--teal)':''; b.style.borderColor=v===view?'var(--teal-border)':''; }
+  });
+  const now = Date.now();
+  let filtered = allResponses, label = 'All sessions';
+  if (view==='week') {
+    filtered = allResponses.filter(r=>{const ts=r.recorded_at?.seconds?r.recorded_at.seconds*1000:now;return ts>=now-7*24*60*60*1000;});
+    label='Last 7 days';
+  } else if (view==='session') {
+    const latest = [...new Set(allResponses.map(r=>r.session_id))][0];
+    filtered = allResponses.filter(r=>r.session_id===latest);
+    label='This session';
+  }
+  const lEl = document.getElementById('radar-period-label');
+  if (lEl) lEl.textContent = label+' · Your data only · No class comparisons';
+  buildRadar(filtered);
+};
+
+window.showChapterTab = paper => {
+  chapterPaper = paper;
+  ['P1','P2'].forEach(p=>{const el=document.getElementById('ptab-'+p);if(el)el.classList.toggle('active',p===paper);});
+  buildChapterBars(allResponses, paper);
+};
+
+// 0-99 scale: accuracy(60%) + consistency(25%) + trend(15%), floor 15 for answered chapters
+function toRating(accuracy, sessions, trend) {
+  const base = accuracy*0.60 + (1-Math.min(sessions*0.1,0.5))*0.25 + (Math.max(trend+0.5,0))*0.15;
+  return Math.min(99, Math.max(sessions>0?15:0, Math.round(base*99)));
+}
+
+function buildRadar(responses) {
+  const ctx = document.getElementById('radar-chart');
+  if (!ctx || !window.Chart) return;
+  const topics = Object.keys(CHAPTERS);
+  const labels = topics.map(t => CHAPTERS[t].title.split(' ').slice(0,2).join('\n'));
+  const data   = topics.map(t => {
+    const tr = responses.filter(r=>r.chapter_id===t);
+    if (!tr.length) return 0;
+    const acc = tr.filter(r=>r.correct).length/tr.length;
+    return toRating(acc, tr.length, 0);
+  });
+  if (radarChart) { radarChart.destroy(); radarChart=null; }
+  radarChart = new Chart(ctx.getContext('2d'),{
+    type:'radar',
+    data:{labels,datasets:[{
+      label:'Rating',data,
+      borderColor:'rgba(0,212,170,.9)',backgroundColor:'rgba(0,212,170,.15)',
+      pointBackgroundColor:'#00D4AA',pointRadius:4,pointHoverRadius:6,
+      borderWidth:2
+    }]},
+    options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Rating: ${ctx.raw}/99`}}},
+      scales:{r:{min:0,max:99,ticks:{stepSize:33,color:'#475569',backdropColor:'transparent',font:{size:9},callback:v=>['','33','66','99'][Math.round(v/33)]||''},
+        grid:{color:'rgba(255,255,255,.06)'},angleLines:{color:'rgba(255,255,255,.06)'},
+        pointLabels:{color:'#94A3B8',font:{size:9}}}}}
+  });
+}
+
+function buildChapterBars(responses, paper) {
+  const chapters = Object.entries(CHAPTERS).filter(([,v])=>v.paper===paper);
+  const el = document.getElementById('chapter-bars'); if (!el) return;
+  el.innerHTML = chapters.map(([id,ch])=>{
+    const r   = responses.filter(x=>x.chapter_id===id);
+    const pct = r.length ? Math.round(r.filter(x=>x.correct).length/r.length*100) : null;
+    const rtg = r.length ? toRating(pct/100, r.length, 0) : null;
+    const col = pct===null?'rgba(255,255,255,.15)':pct>=70?'var(--emerald)':pct>=50?'var(--amber)':'var(--crimson)';
+    return `<div class="ch-bar-row">
+      <div class="ch-bar-name">${ch.title}</div>
+      <div class="ch-bar-track"><div class="ch-bar-fill" style="width:${pct||0}%;background:${col}"></div></div>
+      <div style="display:flex;gap:.4rem;align-items:center;width:80px;justify-content:flex-end">
+        <div class="ch-bar-pct" style="color:${col}">${pct!==null?pct+'%':'—'}</div>
+        ${rtg!==null?`<span style="font-family:var(--font-m);font-size:.68rem;color:${col};font-weight:700">${rtg}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPrediction(pred) {
+  if (!pred) return;
+  const card = document.getElementById('ai-feedback-card'); if(card) card.style.display='';
+  const cont = document.getElementById('ai-feedback-content'); if(!cont) return;
+  const riskColor=pred.risk_category==='high'?'var(--crimson)':pred.risk_category==='borderline'?'var(--amber)':'var(--emerald)';
+  cont.innerHTML=`<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem"><div class="risk-pill risk-${pred.risk_category||'low'}"><div class="risk-dot"></div>${(pred.risk_category||'low').toUpperCase()}</div><span style="font-size:.78rem;color:var(--text-2)">${Math.round((pred.risk_probability||0)*100)}% probability</span></div><p style="font-size:.875rem;line-height:1.75;color:var(--text-2);margin-bottom:.75rem">${pred.shap_narrative||'No narrative yet.'}</p>${pred.misconception_flags?.length?'<div style="display:flex;gap:.4rem;flex-wrap:wrap">'+pred.misconception_flags.map(f=>`<span class="badge badge-amber">${f.replace(/_/g,' ')}</span>`).join('')+'</div>':''}`;
+}
+
+// ── Live signal push ────────────────────────────────────────────
+function startLiveSignalPush() {
+  document.addEventListener('visibilitychange', () => { if(uid&&sessionId&&!sessionId.startsWith('local-')) scheduleLivePush(); });
+  liveSignalInterval = setInterval(() => { if(uid&&sessionId&&!sessionId.startsWith('local-')&&questions[currentIdx]) scheduleLivePush(); }, 8000);
+}
+function scheduleLivePush() {
+  const q=questions[currentIdx]; if(!uid||!q) return;
+  pushBehavioralSignal(uid,sessionId,classCode,q.chapter_id,capture.signals(false)).catch(()=>{});
+}
+function stopLiveSignalPush() {
+  if(liveSignalInterval) clearInterval(liveSignalInterval);
+  clearLiveSignal(uid).catch(()=>{});
+}
+
+// ── Timer ───────────────────────────────────────────────────────
+let timerInterval;
+function startTimer() {
+  timerInterval = setInterval(()=>{
+    if(!sessionStart) return;
+    const s=Math.floor((Date.now()-sessionStart)/1000);
+    const el=document.getElementById('q-timer');
+    if(el) el.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  },1000);
+}
+
+// ── Render question ─────────────────────────────────────────────
+function renderQuestion() {
+  if (currentIdx >= questions.length) { endSession_(); return; }
+  const q = questions[currentIdx];
+  capture = new BehavioralCapture();
+  const total=questions.length;
+  setText2('q-counter',`Q ${currentIdx+1} / ${total}`);
+  const fp=document.getElementById('q-prog-fill'); if(fp) fp.style.width=`${(currentIdx+1)/total*100}%`;
+  setText2('q-score',`${sessionCorrect} correct`);
+  const ch=CHAPTERS[q.chapter_id]||{};
+  const badgesEl=document.getElementById('q-badges');
+  if(badgesEl) badgesEl.innerHTML=`<span class="badge badge-teal">${ch.paper||''}</span><span class="badge badge-muted">${ch.title||q.chapter_id}</span><span class="badge badge-muted">${q.type}</span><span class="badge badge-muted">${['Foundation','Core','Extended'][q.difficulty-1]||''}</span>${assessmentMode?'<span class="badge badge-amber" style="display:inline-flex;align-items:center;gap:.25rem"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>Assessment</span>':''}`;
+  const textEl=document.getElementById('q-text'); if(textEl) textEl.textContent=q.text;
+  const expEl=document.getElementById('q-explain'); if(expEl){expEl.style.display='none';expEl.className='q-explain';}
+  ['submit-btn','hint-btn'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='inline-flex';if(id==='submit-btn')el.disabled=true;if(id==='hint-btn'&&assessmentMode)el.style.display='none';}});
+  const nb=document.getElementById('next-btn'); if(nb) nb.style.display='none';
+  const isCoding=q.type==='coding';
+  const optsEl=document.getElementById('q-options'),codeEl=document.getElementById('q-coding');
+  if(optsEl) optsEl.style.display=isCoding?'none':'';
+  if(codeEl) codeEl.style.display=isCoding?'':'none';
+  if(isCoding){initCodeMirror();if(cmEditor){cmEditor.setValue(q.starter||'');const out=document.getElementById('code-output');if(out)out.textContent='Run your code to see output here.';const sb=document.getElementById('submit-btn');if(sb)sb.disabled=false;}}
+  else if(optsEl){
+    optsEl.innerHTML='';
+    (q.options||[]).forEach((opt,i)=>{
+      const label=document.createElement('label');label.className='q-opt';
+      label.innerHTML=`<input type="radio" name="qa" value="${i}" onchange="onSelect(${i})"><div class="q-radio"></div><span>${opt}</span>`;
+      optsEl.appendChild(label);
+    });
+  }
+}
+
+async function endSession_() {
+  const acc=sessionTotal?Math.round(sessionCorrect/sessionTotal*100):0;
+  stopLiveSignalPush();
+  if(sessionId&&uid) endSession(sessionId,{question_count:sessionTotal,correct_count:sessionCorrect,accuracy_pct:acc,mode:assessmentMode?'assessment':challengeMode?challengeType:'practice'}).catch(console.error);
+  clearInterval(timerInterval);
+
+  // Remove challenge banner
+  document.getElementById('challenge-banner')?.remove();
+
+  // Save challenge score to Firestore for leaderboard
+  let leaderboardHTML = '';
+  if (challengeMode && uid && !isShadowBanned) {
+    try {
+      const { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, limit } =
+        await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const today = new Date();
+      const periodKey = challengeType==='daily'
+        ? `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`
+        : `${today.getFullYear()}-W${String(getWeekNumber(today)).padStart(2,'0')}`;
+      // Save score
+      await addDoc(collection(db,'challenge_scores'),{
+        student_uid: uid, class_code: classCode,
+        display_name: localStorage.getItem('csl_name')||'Student',
+        challenge_type: challengeType, period_key: periodKey,
+        score: sessionCorrect, total: sessionTotal,
+        accuracy_pct: acc, completed_at: serverTimestamp()
+      });
+      // Fetch top 5 for leaderboard
+      const snap = await getDocs(query(collection(db,'challenge_scores'),
+        where('class_code','==',classCode),
+        where('challenge_type','==',challengeType),
+        where('period_key','==',periodKey),
+        orderBy('score','desc'), limit(5)));
+      const top5 = snap.docs.map(d=>d.data());
+      leaderboardHTML = `<div style="margin:1.25rem 0;padding:1rem;background:rgba(255,255,255,.04);border-radius:var(--r2);border:1px solid var(--glass-b);text-align:left">
+        <div style="font-size:.78rem;font-weight:700;color:var(--text-2);margin-bottom:.65rem;text-transform:uppercase;letter-spacing:.06em">Class Leaderboard — ${challengeType==='daily'?'Today':'This Week'}</div>
+        ${top5.map((s,i)=>`<div style="display:flex;align-items:center;gap:.75rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04)">
+          <span style="font-family:var(--font-m);font-size:.85rem;font-weight:800;color:${i===0?'var(--amber)':i===1?'#94A3B8':i===2?'#78716C':'var(--text-3)'};width:20px">${['🥇','🥈','🥉','4','5'][i]}</span>
+          <span style="flex:1;font-size:.82rem;color:${s.student_uid===uid?'var(--teal)':'var(--text-2)'};font-weight:${s.student_uid===uid?700:400}">${s.display_name}${s.student_uid===uid?' (you)':''}</span>
+          <span style="font-family:var(--font-m);font-size:.82rem;font-weight:700;color:var(--text)">${s.score}/${s.total}</span>
+        </div>`).join('')}
+      </div>`;
+    } catch(e) { console.warn('Leaderboard error:',e); }
+  }
+
+  const emoji = challengeMode ? (challengeType==='daily'?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`) : acc>=70?'🎉':'💪';
+  const title = challengeMode ? `${challengeType==='daily'?'Daily':'Weekly'} Challenge Complete!` : assessmentMode?'Assessment Complete!':'Session Complete!';
+  const card=document.getElementById('q-card');
+  if(card) card.innerHTML=`<div style="text-align:center;padding:2.5rem">
+    <div style="font-size:3rem;margin-bottom:1rem">${emoji}</div>
+    <h3 style="font-family:var(--font-d);font-size:1.3rem;margin-bottom:.5rem">${title}</h3>
+    <p style="color:var(--text-2);margin-bottom:.75rem">You got <strong>${sessionCorrect} of ${sessionTotal}</strong> correct (${acc}%).</p>
+    ${leaderboardHTML}
+    <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1rem">
+      <button class="btn btn-primary" onclick="loadQuestions()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Practice
+      </button>
+      ${!assessmentMode&&!challengeMode?`<button class="btn btn-ghost" onclick="showSec('assessment')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> Assessment</button>`:''}
+      <button class="btn btn-ghost" onclick="startChallenge('daily')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg> Daily</button>
+      <button class="btn btn-ghost" onclick="startChallenge('weekly')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> Weekly</button>
+    </div>
+  </div>`;
+  challengeMode = false; challengeType = null; assessmentMode = false;
+}
+
+function setText2(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function setText(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+
+// ── CodeMirror ──────────────────────────────────────────────────
+function initCodeMirror() {
+  const el=document.getElementById('cm-editor');
+  if(!el||!window.CodeMirror) return;
+  if(!cmEditor){
+    cmEditor=CodeMirror(el,{value:'',mode:null,lineNumbers:true,indentUnit:3,tabSize:3,lineWrapping:true,extraKeys:{Tab:cm=>cm.replaceSelection('   ')}});
+  }
+  setTimeout(()=>{if(cmEditor)cmEditor.refresh();},50);
+}
+function initFreeEditor() {
+  const el=document.getElementById('free-editor');
+  if(!el||!window.CodeMirror||freeEditor) return;
+  freeEditor=CodeMirror(el,{value:`// Cambridge IGCSE Pseudocode\nDECLARE X : INTEGER\nX ← 42\nOUTPUT "Answer: ", X`,mode:null,lineNumbers:true,indentUnit:3,tabSize:3,lineWrapping:true,extraKeys:{Tab:cm=>cm.replaceSelection('   ')}});
+}
+
+// ── Templates ───────────────────────────────────────────────────
+const TEMPLATES={
+  bubble:`// Bubble Sort\nDECLARE A : ARRAY[1:5] OF INTEGER\nA[1]←64  A[2]←34  A[3]←25  A[4]←12  A[5]←11\nDECLARE Temp,I,J : INTEGER\nFOR I ← 1 TO 4\n   FOR J ← 1 TO 5-I\n      IF A[J] > A[J+1] THEN\n         Temp←A[J]  A[J]←A[J+1]  A[J+1]←Temp\n      ENDIF\n   NEXT J\nNEXT I\nFOR I ← 1 TO 5\n   OUTPUT A[I]\nNEXT I`,
+  linear:`// Linear Search\nDECLARE Name : ARRAY[1:5] OF STRING\nName[1]←"Alice"  Name[2]←"Bob"  Name[3]←"Charlie"  Name[4]←"Diana"  Name[5]←"Eve"\nDECLARE Target:STRING  Found:BOOLEAN  Pos:INTEGER\nFound←FALSE  Pos←1\nINPUT Target\nWHILE Pos<=5 AND NOT Found\n   IF Name[Pos]=Target THEN\n      Found←TRUE\n   ELSE\n      Pos←Pos+1\n   ENDIF\nENDWHILE\nIF Found THEN\n   OUTPUT Target," found at position ",Pos\nELSE\n   OUTPUT "Not found"\nENDIF`,
+  binary:`// Binary Search\nDECLARE A:ARRAY[1:7] OF INTEGER\nA[1]←10  A[2]←20  A[3]←30  A[4]←40  A[5]←50  A[6]←60  A[7]←70\nDECLARE Target,Low,High,Mid:INTEGER\nINPUT Target  Low←1  High←7\nWHILE Low<=High\n   Mid←(Low+High) DIV 2\n   IF A[Mid]=Target THEN\n      OUTPUT "Found at position ",Mid\n      Low←High+1\n   ELSE IF Target<A[Mid] THEN\n      High←Mid-1\n   ELSE\n      Low←Mid+1\n   ENDIF\nENDWHILE`,
+  average:`// Average of N numbers\nDECLARE N,I:INTEGER  Num,Total,Average:REAL\nTotal←0\nINPUT N\nFOR I←1 TO N\n   INPUT Num\n   Total←Total+Num\nNEXT I\nAverage←Total/N\nOUTPUT "Average: ",Average`,
+  files:`// File handling\nOPENFILE "data.txt" FOR WRITE\nWRITEFILE "data.txt","Line one"\nWRITEFILE "data.txt","Line two"\nCLOSEFILE "data.txt"\nDECLARE Line:STRING\nOPENFILE "data.txt" FOR READ\nWHILE NOT EOF("data.txt")\n   READFILE "data.txt",Line\n   OUTPUT Line\nENDWHILE\nCLOSEFILE "data.txt"`,
+  max:`// Find Maximum in array
+DECLARE A : ARRAY[1:6] OF INTEGER
+DECLARE Max : INTEGER
+DECLARE I : INTEGER
+A[1]←34  A[2]←67  A[3]←12  A[4]←89  A[5]←45  A[6]←23
+Max ← A[1]
+FOR I ← 2 TO 6
+   IF A[I] > Max THEN
+      Max ← A[I]
+   ENDIF
+NEXT I
+OUTPUT "Maximum value: ", Max`,
+  min:`// Find Minimum in array
+DECLARE A : ARRAY[1:6] OF INTEGER
+DECLARE Min : INTEGER
+DECLARE I : INTEGER
+A[1]←34  A[2]←67  A[3]←12  A[4]←89  A[5]←45  A[6]←23
+Min ← A[1]
+FOR I ← 2 TO 6
+   IF A[I] < Min THEN
+      Min ← A[I]
+   ENDIF
+NEXT I
+OUTPUT "Minimum value: ", Min`,
+  array1d:`// 1D Array — input, store, output
+DECLARE Scores : ARRAY[1:5] OF INTEGER
+DECLARE I : INTEGER
+OUTPUT "Enter 5 scores:"
+FOR I ← 1 TO 5
+   OUTPUT "Score ", I, ": "
+   INPUT Scores[I]
+NEXT I
+OUTPUT "You entered:"
+FOR I ← 1 TO 5
+   OUTPUT "Scores[", I, "] = ", Scores[I]
+NEXT I`,
+  '2d':`// 2D array\nDECLARE Table:ARRAY[1:3,1:3] OF INTEGER\nDECLARE I,J:INTEGER\nFOR I←1 TO 3\n   FOR J←1 TO 3\n      Table[I,J]←I*J\n   NEXT J\nNEXT I\nFOR I←1 TO 3\n   FOR J←1 TO 3\n      OUTPUT Table[I,J]," "\n   NEXT J\nNEXT I`
+};
+
+// ── Toast ───────────────────────────────────────────────────────
+function toast(msg,type='info'){
+  const c=document.getElementById('toast-root');if(!c)return;
+  const ic={info:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/></svg>',success:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',error:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/></svg>'};
+  const t=document.createElement('div');t.className='toast '+type;t.innerHTML=(ic[type]||ic.info)+'<span>'+msg+'</span>';c.appendChild(t);
+  setTimeout(()=>{t.style.transition='.2s';t.style.opacity='0';t.style.transform='translateX(110%)';setTimeout(()=>t.remove(),200);},4500);
+}
+window.toast = toast;
+
+// ── Shadow ban ─────────────────────────────────────────────────
+function activateShadowBan() {
+  // Student sees normal UI but all actions silently fail
+  // Mimics being offline — no error messages shown
+  window.submitAnswer  = async () => { await fakeDelay(); };
+  window.loadQuestions = () => { fakeLoadQuestions(); };
+  window.runCode       = async () => { await fakeDelay(); };
+  fakeLoadQuestions();
+  startTimer(); // timer runs to appear normal
+}
+function fakeDelay() { return new Promise(r => setTimeout(r, 600 + Math.random()*800)); }
+function fakeLoadQuestions() {
+  // Load questions normally so UI looks fine — just submission is blocked
+  let pool = [...QUESTIONS];
+  if (currentChapter) pool = pool.filter(q => q.chapter_id === currentChapter);
+  questions = pool.sort(() => Math.random()-0.5).slice(0,10);
+  currentIdx = 0; sessionCorrect = 0; sessionTotal = 0;
+  renderQuestion();
+}
+
+// ── Daily / Weekly Challenge ────────────────────────────────────
+// ── Challenge question selection logic ─────────────────────────
+// Daily:  5 questions — seeded shared (P1, P2, difficulty mix) + 1 personalised weak chapter
+// Weekly: 10 questions — Cambridge paper balance + 2 personalised weak chapters
+// Seeded questions are SAME for all students on same day/week (comparable)
+// Personalised questions differ per student based on their weakest chapters
+
+function getWeakestChapters(n) {
+  // Returns up to n chapter IDs with lowest accuracy (min 1 attempt)
+  const chapters = Object.keys(CHAPTERS);
+  const scored   = chapters
+    .map(ch => {
+      const r = allResponses.filter(x => x.chapter_id === ch);
+      if (!r.length) return null;
+      return { ch, acc: r.filter(x=>x.correct).length / r.length, count: r.length };
+    })
+    .filter(Boolean)
+    .sort((a,b) => a.acc - b.acc);   // ascending — worst first
+  return scored.slice(0, n).map(x => x.ch);
+}
+
+function pickSeeded(pool, seed, n) {
+  // Deterministic pick of n questions from pool using seed
+  return seededShuffle([...pool], seed).slice(0, n);
+}
+
+function pickFromChapter(ch, excludeIds, seed, offset=0) {
+  // Pick 1 question from a specific chapter, avoiding already-selected IDs
+  const pool = QUESTIONS.filter(q => q.chapter_id === ch && !excludeIds.has(q.id));
+  if (!pool.length) return null;
+  return seededShuffle(pool, seed + offset)[0];
+}
+
+function pickByDifficulty(diff, excludeIds, seed, offset=0) {
+  const pool = QUESTIONS.filter(q => q.difficulty === diff && !excludeIds.has(q.id));
+  if (!pool.length) return null;
+  return seededShuffle(pool, seed + offset)[0];
+}
+
+function pickByPaper(paper, excludeIds, seed, offset=0) {
+  const pool = QUESTIONS.filter(q => q.paper === paper && !excludeIds.has(q.id));
+  if (!pool.length) return null;
+  return seededShuffle(pool, seed + offset)[0];
+}
+
+function buildDailySet(seed) {
+  // 5 questions:
+  // Q1 — Paper 1, seeded (shared with class)
+  // Q2 — Paper 2, seeded (shared with class)
+  // Q3 — Student's weakest chapter (personalised)
+  // Q4 — Difficulty 2 Core, seeded (shared with class)
+  // Q5 — Difficulty 3 Extended, seeded (shared with class)
+  const selected  = [];
+  const usedIds   = new Set();
+  const weakChaps = getWeakestChapters(2);
+
+  const add = (q, tag) => { if (q) { q._challengeTag = tag; selected.push(q); usedIds.add(q.id); } };
+
+  add(pickByPaper('P1', usedIds, seed, 0),        'Paper 1');
+  add(pickByPaper('P2', usedIds, seed, 1),        'Paper 2');
+  // Personalised: weakest chapter (fallback to seeded if no history)
+  const weakCh = weakChaps[0];
+  if (weakCh) {
+    add(pickFromChapter(weakCh, usedIds, seed, 2), '📍 Your Weak Topic');
+  } else {
+    add(pickByPaper('P2', usedIds, seed, 2),       'Paper 2');
+  }
+  add(pickByDifficulty(2, usedIds, seed, 3),      'Core');
+  add(pickByDifficulty(3, usedIds, seed, 4),      'Extended');
+
+  // Fill gaps if any pick returned null
+  const remaining = QUESTIONS.filter(q => !usedIds.has(q.id));
+  const filler    = seededShuffle(remaining, seed + 99);
+  while (selected.length < 5 && filler.length) {
+    const q = filler.shift();
+    q._challengeTag = 'Bonus';
+    selected.push(q);
+  }
+  return selected;
+}
+
+function buildWeeklySet(seed) {
+  // 10 questions mirroring Cambridge paper balance:
+  // 3 × Paper 1 — Data cluster (T01-T02), Hardware/Software cluster (T03-T04), Internet/Tech cluster (T05-T06)
+  // 4 × Paper 2 — Algorithms (T07), Programming (T08), Data Structures (T09-T10), Logic/Search (T12-T13)
+  // 2 × Personalised weakest chapters
+  // 1 × Difficulty 3 Extended stretch
+  const selected  = [];
+  const usedIds   = new Set();
+  const weakChaps = getWeakestChapters(3);
+
+  const add = (q, tag) => { if (q) { q._challengeTag = tag; selected.push(q); usedIds.add(q.id); } };
+
+  // Paper 1 clusters
+  const p1Clusters = [['T01','T02'],['T03','T04'],['T05','T06']];
+  p1Clusters.forEach((cluster, i) => {
+    const pool = QUESTIONS.filter(q => cluster.includes(q.chapter_id) && !usedIds.has(q.id));
+    const q    = seededShuffle(pool, seed + i)[0];
+    add(q, `P1: ${cluster.map(c => CHAPTERS[c]?.title.split(' ')[0]).join('/')}`);
+  });
+
+  // Paper 2 clusters
+  const p2Picks = [
+    { chs:['T07'],      tag:'Algorithms' },
+    { chs:['T08'],      tag:'Programming' },
+    { chs:['T09','T10'],tag:'Data Structures' },
+    { chs:['T12','T13'],tag:'Logic & Search' },
+  ];
+  p2Picks.forEach((item, i) => {
+    const pool = QUESTIONS.filter(q => item.chs.includes(q.chapter_id) && !usedIds.has(q.id));
+    const q    = seededShuffle(pool, seed + 10 + i)[0];
+    add(q, `P2: ${item.tag}`);
+  });
+
+  // 2 personalised weak chapters
+  weakChaps.slice(0, 2).forEach((ch, i) => {
+    add(pickFromChapter(ch, usedIds, seed, 20 + i), '📍 Your Weak Topic');
+  });
+  // Fallback if no weak chapter history
+  while (selected.length < 9) {
+    add(pickByPaper('P2', usedIds, seed, 30 + selected.length), 'Practice');
+  }
+
+  // 1 Extended stretch
+  add(pickByDifficulty(3, usedIds, seed, 50), 'Extended');
+
+  // Fill any remaining gaps
+  const remaining = QUESTIONS.filter(q => !usedIds.has(q.id));
+  const filler    = seededShuffle(remaining, seed + 199);
+  while (selected.length < 10 && filler.length) {
+    const q = filler.shift();
+    q._challengeTag = 'Bonus';
+    selected.push(q);
+  }
+  return selected;
+}
+
+function startChallenge(type) {
+  challengeMode = true;
+  challengeType = type;
+  assessmentMode = false;
+
+  const today = new Date();
+  const seed  = type === 'daily'
+    ? today.getFullYear()*10000 + (today.getMonth()+1)*100 + today.getDate()
+    : today.getFullYear()*100 + getWeekNumber(today);
+
+  questions  = type === 'daily' ? buildDailySet(seed) : buildWeeklySet(seed);
+  currentIdx = 0; sessionCorrect = 0; sessionTotal = 0;
+
+  // Rebuild q-card to original structure in case endSession_ replaced it
+  const card = document.getElementById('q-card');
+  if (card && !card.querySelector('#q-text')) {
+    card.innerHTML = `
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem" id="q-badges"></div>
+      <pre class="q-text" id="q-text" style="font-family:var(--font)">Loading…</pre>
+      <div class="q-options" id="q-options"></div>
+      <div id="q-coding" style="display:none">
+        <div class="editor-wrap" style="margin-bottom:.75rem">
+          <div class="editor-toolbar">
+            <span class="editor-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Cambridge Pseudocode Editor</span>
+            <button class="btn btn-primary btn-sm" id="run-btn" onclick="runCode()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run</button>
+            <button class="btn btn-ghost btn-sm" onclick="resetCode()">Reset</button>
+            <button class="btn btn-ghost btn-sm" onclick="showSolution()">Solution</button>
+          </div>
+          <div id="cm-editor"></div>
+          <div style="background:#0D1117;border-top:1px solid var(--glass-b);padding:.5rem 1rem;font-size:.7rem;color:var(--text-3);display:flex;gap:1rem">
+            <span>← for assignment</span><span>DECLARE name : TYPE</span><span>FOR I ← 1 TO N</span><span>OUTPUT "text", var</span>
+          </div>
+          <div style="padding:.5rem 1rem;background:#0D1117;border-top:1px solid var(--glass-b);font-size:.74rem;color:var(--text-3)">Output:</div>
+          <div class="editor-output" id="code-output">Run your code to see output here.</div>
+        </div>
+      </div>
+      <div class="q-explain" id="q-explain" style="display:none"></div>
+      <div style="display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap" id="q-actions">
+        <button class="btn btn-ghost btn-sm" id="hint-btn" onclick="showHint()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>Hint
+        </button>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+        <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">Next →</button>
+      </div>`;
+    cmEditor = null; // force CodeMirror re-init
+  }
+
+  window.showSec('practice');
+  const title = document.getElementById('chapter-title');
+  if (title) title.textContent = type === 'daily' ? 'Daily Challenge' : 'Weekly Challenge';
+
+  showChallengeHeader(type, questions.length);
+  renderQuestion();
+
+  // Show breakdown toast
+  const personalised = questions.filter(q => q._challengeTag?.includes('📍')).length;
+  const shared       = questions.length - personalised;
+  toast(
+    `${type==='daily'?'Daily':'Weekly'} Challenge · ${questions.length} questions · ${shared} shared with class${personalised ? ` · ${personalised} personalised to your weak topics` : ''}`,
+    'info'
+  );
+}
+
+function showChallengeHeader(type, count) {
+  // Insert a challenge banner above the question card
+  const existing = document.getElementById('challenge-banner');
+  if (existing) existing.remove();
+  const banner = document.createElement('div');
+  banner.id = 'challenge-banner';
+  banner.style.cssText = `margin-bottom:1rem;padding:.85rem 1.1rem;border-radius:var(--r2);display:flex;align-items:center;justify-content:space-between;gap:.75rem;background:${type==='daily'?'rgba(239,68,68,.08)':'rgba(99,102,241,.08)'};border:1px solid ${type==='daily'?'rgba(239,68,68,.25)':'rgba(99,102,241,.25)'}`;
+  banner.innerHTML = `<div style="display:flex;align-items:center;gap:.75rem">
+    <span style="font-size:1.4rem"</span>
+    <div>
+      <div style="font-family:var(--font-d);font-weight:800;color:${type==='daily'?'var(--crimson)':'#818CF8'}">${type==='daily'?'Daily Challenge':'Weekly Challenge'}</div>
+      <div style="font-size:.74rem;color:var(--text-3)">${count} questions · Same for all students today${type==='weekly'?' this week':''}</div>
+    </div>
+  </div>
+  <div id="challenge-progress-text" style="font-family:var(--font-m);font-size:.85rem;font-weight:700;color:var(--text-2)">0 / ${count}</div>`;
+  const qCard = document.getElementById('q-card');
+  if (qCard?.parentNode) qCard.parentNode.insertBefore(banner, qCard);
+}
+
+function updateChallengeProgress() {
+  if (!challengeMode) return;
+  const el = document.getElementById('challenge-progress-text');
+  if (el) el.textContent = `${sessionCorrect} / ${questions.length}`;
+}
+
+function getWeekNumber(d) {
+  const onejan = new Date(d.getFullYear(),0,1);
+  return Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7);
+}
+
+function seededShuffle(arr, seed) {
+  let s = seed;
+  const rand = () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+  const a = [...arr];
+  for (let i=a.length-1; i>0; i--) { const j=Math.floor(rand()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+window.startChallenge = startChallenge;
+
+// ══════════════════════════════════════════════════════════════
+// BOOT — load questions immediately, auth in background
+// ══════════════════════════════════════════════════════════════
+
+// Step 1: Load questions RIGHT AWAY — never show a blank screen
+// Use cached name from localStorage for instant display
+const cachedName = localStorage.getItem('csl_name') || 'Student';
+setText('nav-name', cachedName);
+setText('nav-av', cachedName[0]?.toUpperCase() || 'S');
+window.loadQuestions();  // renders questions immediately, no auth needed
+startTimer();
+
+// Step 2: Auth + Firestore in background
+(async () => {
+  try {
+    const { user } = await requireRole('student');
+    uid = user.uid;
+
+    const snap    = await getDoc(doc(db, 'users', uid));
+    const profile = snap.exists() ? snap.data() : {};
+    classCode     = profile.classCode || localStorage.getItem('csl_class') || '';
+
+    const name = localStorage.getItem('csl_name') || profile.displayName || user.displayName || 'Student';
+    setText('nav-name', name);
+    setText('nav-av', name[0]?.toUpperCase() || 'S');
+
+    // Shadow ban check — silently degrades to offline-like state
+    if (profile.shadowBanned === true) {
+      isShadowBanned = true;
+      activateShadowBan();
+      return;
+    }
+
+    // Start session
+    try { sessionId = await startSession(uid, classCode, 'mixed'); }
+    catch(e) { console.warn('Session start:', e.message); sessionId = 'local-' + Date.now(); }
+
+    sessionStart = Date.now(); // reset timer with correct start
+    startLiveSignalPush();
+
+    // Real-time listeners
+    listenResponses(uid, r => {
+      allResponses = r;
+      const progSec = document.getElementById('sec-progress');
+      if (progSec && progSec.style.display !== 'none') loadProgress();
+      if (typeof updateChallengeProgress === 'function') updateChallengeProgress();
+    });
+    listenPrediction(uid, pred => { if (pred) renderPrediction(pred); });
+
+  } catch(e) {
+    // Auth failed or user not logged in — requireRole already redirected
+    // Only log if it's an unexpected error (not a redirect)
+    if (!e.message?.includes('redirect') && e.message) {
+      console.error('Boot error:', e.message);
+    }
+  }
+})();
+</script>
+
+<script>
+function toggleSidebar(){const sb=document.querySelector('.sidebar,.tut-nav'),ov=document.getElementById('sb-overlay'),btn=document.getElementById('sb-toggle-btn');if(!sb)return;const open=sb.classList.toggle('open');if(ov)ov.classList.toggle('open',open);if(btn)btn.innerHTML=open?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>';}
+function closeSidebar(){const sb=document.querySelector('.sidebar,.tut-nav'),ov=document.getElementById('sb-overlay'),btn=document.getElementById('sb-toggle-btn');if(sb)sb.classList.remove('open');if(ov)ov.classList.remove('open');if(btn)btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>';}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.sb-link,.lesson-link,.eq-link').forEach(el=>el.addEventListener('click',()=>{if(window.innerWidth<=900)closeSidebar();}));
+  let tx=0;
+  document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+  document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(dx<-60)closeSidebar();if(dx>60&&tx<30)toggleSidebar();},{passive:true});
+});
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// LIVE ASSESSMENTS + TEXT OBFUSCATION
+// Added as plain script (no module needed — uses globals from module)
+// ══════════════════════════════════════════════════════════════════
+
+// ── Text obfuscation engine ──────────────────────────────────────
+// Strategy: render question text as a canvas image instead of selectable HTML
+// Google Lens and photo-based search tools can't reliably read:
+//   1. Text rendered at slight random rotation per character
+//   2. Characters with subtle CSS transforms applied per glyph
+//   3. Text split across overlapping spans with zero-width characters
+//
+// Approach used here: CSS canvas rendering + character-level transform noise
+// This is NOT encryption — a determined user can still read it on screen
+// The goal is to defeat automated optical recognition tools
+
+function obfuscateText(text, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // Method: render to canvas with per-character noise
+  // Each character gets a tiny random rotation, color shift, and position offset
+  // The result looks normal to human eyes but defeats OCR-based search
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'max-width:100%;display:block;user-select:none;-webkit-user-select:none';
+  canvas.setAttribute('aria-label', 'Question text (protected)');
+
+  const ctx    = canvas.getContext('2d');
+  const dpr    = window.devicePixelRatio || 1;
+  const font   = '16px "Times New Roman", serif';
+  ctx.font     = font;
+
+  // Measure text to size canvas
+  const lines  = wrapText(ctx, text, 680);
+  const lineH  = 24;
+  canvas.width  = 720 * dpr;
+  canvas.height = (lines.length * lineH + 20) * dpr;
+  canvas.style.width  = '720px';
+  canvas.style.height = (lines.length * lineH + 20) + 'px';
+  ctx.scale(dpr, dpr);
+
+  // Background
+  ctx.fillStyle = 'rgba(17,24,39,0)';
+  ctx.fillRect(0, 0, 720, lines.length * lineH + 20);
+
+  // Render each character with subtle noise
+  ctx.font = font;
+  lines.forEach((line, li) => {
+    let x = 10;
+    const y = 10 + (li + 1) * lineH - 4;
+    for (let ci = 0; ci < line.length; ci++) {
+      const ch    = line[ci];
+      const noise = (Math.random() - 0.5) * 0.8;  // ±0.4° rotation
+      const dy    = (Math.random() - 0.5) * 1.2;  // ±0.6px vertical jitter
+      const alpha = 0.92 + Math.random() * 0.08;  // 92-100% opacity
+
+      ctx.save();
+      ctx.translate(x, y + dy);
+      ctx.rotate(noise * Math.PI / 180);
+      ctx.globalAlpha = alpha;
+      // Slight colour variation — still white/light but with tiny RGB noise
+      const r = 225 + Math.floor(Math.random() * 10);
+      const g = 230 + Math.floor(Math.random() * 10);
+      const b = 235 + Math.floor(Math.random() * 10);
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillText(ch, 0, 0);
+      ctx.restore();
+      x += ctx.measureText(ch).width;
+    }
+  });
+
+  // Add invisible zero-width characters interspersed in any copy attempt
+  container.innerHTML = '';
+  container.appendChild(canvas);
+
+  // Block right-click, drag-select, and screenshot keyboard shortcuts on this element
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  canvas.addEventListener('dragstart',   e => e.preventDefault());
+}
+
+function wrapText(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  const lines = [];
+  let line    = '';
+  words.forEach(word => {
+    const test = line ? line + ' ' + word : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+// Simpler fallback: CSS-based obfuscation for MCQ options
+// Splits each character into individual spans with random micro-transforms
+function obfuscateHTML(text) {
+  if (!text) return '';
+  // Insert zero-width joiners and use CSS transforms to confuse OCR
+  return text.split('').map(ch => {
+    if (ch === ' ') return '<span>&nbsp;</span>';
+    const rot = ((Math.random() - 0.5) * 1.5).toFixed(2);
+    const dy  = ((Math.random() - 0.5) * 1.2).toFixed(2);
+    return `<span style="display:inline-block;transform:rotate(${rot}deg) translateY(${dy}px);will-change:transform">${ch}</span>`;
+  }).join('\u200b'); // zero-width space between every char
+}
+
+// ── Live assessment state ────────────────────────────────────────
+let currentAssessment  = null;
+let assessmentAnswers  = {};  // questionIndex → answer
+let assessmentDeadline = null;
+let assessmentTimeLimit= null;
+let assessmentStarted  = null;
+let countdownInterval  = null;
+let assessmentObfuscate= false;
+
+// ── Load available assessments ────────────────────────────────────
+async function loadLiveAssessments() {
+  const el = document.getElementById('live-assessments-list');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:1.5rem"><div class="spinner"></div></div>';
+
+  try {
+    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, query, where, getDocs } =
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+
+    // Use the already-initialised app
+    const app = getApps()[0];
+    const db2 = getFirestore(app);
+
+    // Get student's class code
+    const myClassCode = localStorage.getItem('csl_class') || '';
+    if (!myClassCode) {
+      el.innerHTML = '<div class="card"><p style="color:var(--text-2)">No class code found. Please sign in again.</p></div>';
+      return;
+    }
+
+    const snap = await getDocs(query(
+      collection(db2, 'published_assessments'),
+      where('class_code',  '==', myClassCode),
+      where('status', '==', 'active')
+    ));
+
+    const now = new Date();
+    const assessments = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(a => {
+        const dl = a.deadline?.toDate ? a.deadline.toDate() : new Date(a.deadline);
+        return dl > now;
+      })
+      .sort((a,b) => {
+        const da = a.deadline?.seconds || 0;
+        const db = b.deadline?.seconds || 0;
+        return da - db; // soonest deadline first
+      });
+
+    if (!assessments.length) {
+      el.innerHTML = `<div class="card" style="text-align:center;padding:2.5rem">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-3);margin:0 auto 1rem"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+        <p style="color:var(--text-2);font-weight:600">No active assessments</p>
+        <p style="font-size:.82rem;color:var(--text-3);margin-top:.4rem">Your teacher hasn't published any assessments yet.</p>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = assessments.map(a => {
+      const deadline  = a.deadline?.toDate ? a.deadline.toDate() : new Date(a.deadline);
+      const timeLeft  = deadline - now;
+      const hoursLeft = Math.floor(timeLeft / 3600000);
+      const minsLeft  = Math.floor((timeLeft % 3600000) / 60000);
+      const urgency   = timeLeft < 3600000 ? 'var(--crimson)' : timeLeft < 86400000 ? 'var(--amber)' : 'var(--teal)';
+
+      return `<div class="card" style="margin-bottom:1rem;border:1px solid ${urgency}30">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+          <div style="flex:1">
+            <div style="font-family:var(--font-d);font-size:1rem;font-weight:700;margin-bottom:.4rem">${a.title}</div>
+            <div style="font-size:.8rem;color:var(--text-2);display:flex;gap:1rem;flex-wrap:wrap">
+              <span>${a.question_count} questions · ${a.total_marks} marks</span>
+              ${a.time_limit_min ? `<span>${a.time_limit_min} min time limit</span>` : '<span>No time limit</span>'}
+            </div>
+            <div style="margin-top:.5rem;display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:${urgency};font-weight:600">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Deadline: ${deadline.toLocaleString()} · ${hoursLeft > 0 ? hoursLeft+'h ' : ''}${minsLeft}m remaining
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="startLiveAssessment('${a.id}')" style="flex-shrink:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Start Assessment
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Live countdown refresh every minute
+    setTimeout(() => {
+      const secEl = document.getElementById('sec-live-assessment');
+      if (secEl && secEl.style.display !== 'none') loadLiveAssessments();
+    }, 60000);
+
+  } catch(e) {
+    el.innerHTML = `<div class="card"><p style="color:var(--crimson)">Error loading assessments: ${e.message}</p></div>`;
+    console.error('loadLiveAssessments:', e);
+  }
+}
+
+// ── Start live assessment ─────────────────────────────────────────
+async function startLiveAssessment(assessmentId) {
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, doc, getDoc } =
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const db2 = getFirestore(getApps()[0]);
+
+    const snap = await getDoc(doc(db2, 'published_assessments', assessmentId));
+    if (!snap.exists()) { window.toast('Assessment not found','error'); return; }
+
+    const a = { id: snap.id, ...snap.data() };
+    const deadline = a.deadline?.toDate ? a.deadline.toDate() : new Date(a.deadline);
+    if (deadline < new Date()) { window.toast('This assessment has expired','error'); return; }
+
+    currentAssessment   = a;
+    assessmentAnswers   = {};
+    assessmentDeadline  = deadline;
+    assessmentTimeLimit = a.time_limit_min ? a.time_limit_min * 60 * 1000 : null;
+    assessmentStarted   = Date.now();
+    assessmentObfuscate = a.obfuscate === true;
+
+    // Show runner section
+    const allSections = ['practice','editor','progress','assessment','live-assessment','running-assessment'];
+    allSections.forEach(s => {
+      const el = document.getElementById('sec-'+s);
+      if (el) el.style.display = 'none';
+    });
+    document.getElementById('sec-running-assessment').style.display = '';
+    document.getElementById('running-title').textContent = a.title;
+
+    renderRunningAssessment();
+    startCountdown();
+
+  } catch(e) {
+    window.toast('Error starting assessment: ' + e.message, 'error');
+    console.error(e);
+  }
+}
+window.startLiveAssessment = startLiveAssessment;
+
+// ── Render running assessment ─────────────────────────────────────
+function renderRunningAssessment() {
+  const a   = currentAssessment;
+  const el  = document.getElementById('running-assessment-content');
+  if (!el || !a) return;
+
+  const answered = Object.keys(assessmentAnswers).length;
+  document.getElementById('running-progress').textContent =
+    `${answered} / ${a.questions.length} answered`;
+
+  el.innerHTML = a.questions.map((q, i) => {
+    const ans   = assessmentAnswers[i];
+    const qId   = `ra-q-${i}`;
+
+    // Base card
+    let html = `<div class="card" style="margin-bottom:1rem" id="ra-card-${i}">
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem">
+        <div style="width:28px;height:28px;border-radius:50%;background:${ans!==undefined?'var(--teal-ghost)':'rgba(255,255,255,.06)'};border:1px solid ${ans!==undefined?'var(--teal-border)':'var(--glass-b)'};display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:.82rem;font-weight:700;color:${ans!==undefined?'var(--teal)':'var(--text-2)'};flex-shrink:0">${i+1}</div>
+        <div style="display:flex;gap:.35rem;flex-wrap:wrap">
+          <span class="badge badge-${q.paper==='P1'?'teal':'muted'}">${q.paper||''}</span>
+          <span class="badge badge-muted">${q.type||''}</span>
+          <span class="badge badge-muted">${['Foundation','Core','Extended'][(q.difficulty||1)-1]||''}</span>
+        </div>
+        <span style="margin-left:auto;font-size:.7rem;color:var(--text-3)">[${q.type==='coding'?4:q.type==='trace_output'?2:1} mark${q.type==='coding'?'s':''}]</span>
+      </div>`;
+
+    // Question text — obfuscated if enabled
+    if (assessmentObfuscate) {
+      html += `<div id="${qId}-text" style="margin-bottom:1rem;min-height:40px"></div>`;
+    } else {
+      html += `<div style="font-size:.95rem;line-height:1.75;margin-bottom:1rem;white-space:pre-wrap;user-select:none">${q.text||''}</div>`;
+    }
+
+    // Answer area by type
+    if (q.type === 'MCQ' || q.type === 'trace_output') {
+      html += '<div class="q-options">';
+      (q.options || []).forEach((opt, oi) => {
+        const sel = ans === oi;
+        html += `<label class="q-opt${sel?' selected':''}">
+          <input type="radio" name="ra-q${i}" value="${oi}" onchange="raAnswer(${i},${oi})" ${sel?'checked':''}>
+          <div class="q-radio"></div>
+          <span>${assessmentObfuscate ? `<span class="obf-opt" data-text="${opt.replace(/"/g,'&quot;')}">${obfuscateHTML(opt)}</span>` : opt}</span>
+        </label>`;
+      });
+      html += '</div>';
+    } else {
+      // Coding / open answer — textarea
+      html += `<div style="margin-top:.5rem">
+        <div style="font-size:.72rem;color:var(--text-3);margin-bottom:.35rem">Write your answer below:</div>`;
+      if (q.starter) {
+        html += `<pre style="background:#0D1117;border:1px solid var(--glass-b);border-radius:var(--r);padding:.75rem 1rem;font-family:var(--font-m);font-size:.82rem;color:#A3E635;white-space:pre-wrap;margin-bottom:.5rem;user-select:none">${q.starter}</pre>`;
+      }
+      html += `<textarea rows="8" style="width:100%;padding:.65rem 1rem;background:rgba(255,255,255,.05);border:1px solid var(--glass-b);border-radius:var(--r);font-family:var(--font-m);font-size:.85rem;color:var(--text);outline:none;resize:vertical;line-height:1.7" placeholder="Write your pseudocode answer here..." onchange="raAnswer(${i}, this.value)" oninput="raAnswer(${i}, this.value)">${ans || ''}</textarea>
+      </div>`;
+    }
+    html += '</div>';
+    return html;
+  }).join('');
+
+  // Submit button
+  el.innerHTML += `<div style="display:flex;justify-content:flex-end;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--glass-b)">
+    <button class="btn btn-primary" onclick="submitLiveAssessment()" style="min-width:160px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Submit Assessment
+    </button>
+  </div>`;
+
+  // Now render obfuscated text onto canvases
+  if (assessmentObfuscate) {
+    a.questions.forEach((q, i) => {
+      const qId = `ra-q-${i}-text`;
+      setTimeout(() => obfuscateText(q.text || '', qId), 50 + i * 20);
+    });
+
+    // Block right-click + text selection on the whole runner
+    const runner = document.getElementById('running-assessment-content');
+    if (runner) {
+      runner.addEventListener('contextmenu', e => e.preventDefault());
+      runner.style.userSelect        = 'none';
+      runner.style.webkitUserSelect  = 'none';
+    }
+  }
+}
+
+// ── Record answer ─────────────────────────────────────────────────
+function raAnswer(qIdx, value) {
+  assessmentAnswers[qIdx] = value;
+  const prog = document.getElementById('running-progress');
+  if (prog) prog.textContent =
+    `${Object.keys(assessmentAnswers).length} / ${currentAssessment.questions.length} answered`;
+  // Update visual
+  const card = document.getElementById(`ra-card-${qIdx}`);
+  const num  = card?.querySelector('[id$="-'+qIdx+'"] div, div[style*="border-radius:50%"]');
+}
+window.raAnswer = raAnswer;
+
+// ── Countdown timer ───────────────────────────────────────────────
+function startCountdown() {
+  if (countdownInterval) clearInterval(countdownInterval);
+  countdownInterval = setInterval(updateCountdown, 1000);
+  updateCountdown();
+}
+
+function updateCountdown() {
+  const now      = Date.now();
+  const el       = document.getElementById('countdown-text');
+  const bar      = document.getElementById('assessment-timer-bar');
+  if (!el) return;
+
+  // Use whichever limit comes first: deadline or time limit
+  let remaining = assessmentDeadline - now;
+  if (assessmentTimeLimit) {
+    const timeLimitRemaining = assessmentTimeLimit - (now - assessmentStarted);
+    remaining = Math.min(remaining, timeLimitRemaining);
+  }
+
+  if (remaining <= 0) {
+    clearInterval(countdownInterval);
+    el.textContent = '00:00';
+    if (bar) bar.style.background = 'rgba(255,77,106,.15)';
+    window.toast('Time is up! Submitting your assessment…', 'error');
+    setTimeout(() => submitLiveAssessment(true), 2000);
+    return;
+  }
+
+  const h = Math.floor(remaining / 3600000);
+  const m = Math.floor((remaining % 3600000) / 60000);
+  const s = Math.floor((remaining % 60000) / 1000);
+
+  if (h > 0) {
+    el.textContent = `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  } else {
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  // Colour urgency
+  const col = remaining < 300000 ? 'var(--crimson)' : remaining < 900000 ? 'var(--amber)' : 'var(--teal)';
+  el.style.color = col;
+  if (bar && remaining < 300000) bar.style.borderBottom = `1px solid ${col}`;
+}
+
+// ── Submit live assessment ────────────────────────────────────────
+async function submitLiveAssessment(forced = false) {
+  if (!forced) {
+    const unanswered = currentAssessment.questions.length - Object.keys(assessmentAnswers).length;
+    if (unanswered > 0 && !confirm(`You have ${unanswered} unanswered question${unanswered>1?'s':''}. Submit anyway?`)) return;
+  }
+
+  clearInterval(countdownInterval);
+
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, addDoc, serverTimestamp } =
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const db2 = getFirestore(getApps()[0]);
+
+    // Score MCQ questions automatically
+    let autoScore = 0;
+    const responses = currentAssessment.questions.map((q, i) => {
+      const ans     = assessmentAnswers[i];
+      const correct = q.type === 'MCQ' || q.type === 'trace_output'
+        ? ans === q.correct : null; // coding = null (teacher marks)
+      if (correct) autoScore++;
+      return {
+        question_index:    i,
+        question_id:       q.id || `q${i}`,
+        answer:            ans ?? null,
+        correct:           correct,
+        chapter_id:        q.chapter_id,
+        misconception_tag: q.misconception_tag,
+        paper:             q.paper,
+      };
+    });
+
+    const uid  = window._uid || localStorage.getItem('csl_uid') || 'unknown';
+    const name = localStorage.getItem('csl_name') || 'Student';
+
+    await addDoc(collection(db2, 'assessment_submissions'), {
+      assessment_id: currentAssessment.id,
+      assessment_title: currentAssessment.title,
+      class_code:    currentAssessment.class_code,
+      student_uid:   uid,
+      student_name:  name,
+      responses,
+      auto_score:    autoScore,
+      total_mcq:     currentAssessment.questions.filter(q=>q.type!=='coding').length,
+      time_taken_ms: Date.now() - assessmentStarted,
+      submitted_at:  serverTimestamp(),
+      forced,
+    });
+
+    // Show result
+    document.getElementById('sec-running-assessment').style.display = 'none';
+    document.getElementById('sec-live-assessment').style.display = '';
+
+    const mcqTotal = currentAssessment.questions.filter(q=>q.type!=='coding').length;
+    const codingQ  = currentAssessment.questions.filter(q=>q.type==='coding').length;
+    window.toast(
+      `Assessment submitted! ${autoScore}/${mcqTotal} MCQ correct${codingQ?` · ${codingQ} coding question${codingQ>1?'s':''} will be marked by your teacher`:''}`,
+      'success'
+    );
+    loadLiveAssessments();
+
+  } catch(e) {
+    window.toast('Error submitting: ' + e.message, 'error');
+    console.error(e);
+  }
+}
+window.submitLiveAssessment = submitLiveAssessment;
+
+// Auto-load on page load if live-assessment section shown
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('sec-live-assessment')?.style.display !== 'none') {
+    loadLiveAssessments();
+  }
+});
+
+// Store uid globally for assessment submission
+(async () => {
+  try {
+    const { getAuth, onAuthStateChanged } =
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const auth2 = getAuth(getApps()[0]);
+    onAuthStateChanged(auth2, u => { if (u) window._uid = u.uid; });
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

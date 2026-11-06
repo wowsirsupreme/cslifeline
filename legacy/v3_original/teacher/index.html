@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CS Lifeline — Teacher Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/main.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script type="module" src="/data/questions.js"></script>
+<style>
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+.export-card{padding:1.1rem;border-radius:var(--r);background:var(--glass);border:1px solid var(--glass-b);transition:border-color .14s}
+.export-card:hover{border-color:var(--teal-border)}
+.export-card-title{font-size:.86rem;font-weight:700;margin-bottom:.25rem}
+.export-card-desc{font-size:.75rem;color:var(--text-3);line-height:1.6;margin-bottom:.75rem}
+.pipe-step{display:flex;align-items:center;gap:.5rem;padding:.5rem .85rem;border-radius:var(--r);background:var(--glass);border:1px solid var(--glass-b);font-size:.78rem;white-space:nowrap}
+.pipe-step svg{width:15px;height:15px;color:var(--teal);flex-shrink:0}
+.pipe-step.active{background:var(--teal-ghost);border-color:var(--teal-border)}
+.pipe-arrow{color:var(--teal);font-size:.9rem;flex-shrink:0;opacity:.6}
+.class-chip{padding:.3rem .75rem;border-radius:100px;border:1px solid var(--glass-b);background:var(--glass);font-size:.78rem;font-weight:600;color:var(--text-2);cursor:pointer;transition:all .14s;display:inline-block;margin:.15rem}
+.class-chip.active{border-color:var(--teal);background:var(--teal-ghost);color:var(--teal)}
+.hmap-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem}
+.hmap-label{width:200px;flex-shrink:0;font-size:.73rem;color:var(--text-2)}
+.hmap-track{flex:1;height:7px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden}
+.hmap-fill{height:100%;border-radius:4px}
+.hmap-pct{width:28px;text-align:right;font-family:var(--font-m);font-size:.7rem;font-weight:600}
+/* Student view modal */
+.sv-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);overflow-y:auto;padding:2rem 1rem}
+.sv-modal.open{display:block}
+.sv-panel{width:100%;max-width:860px;margin:0 auto;background:var(--midnight-2);border:1px solid var(--glass-b);border-radius:var(--r3);overflow:hidden}
+.sv-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--glass-b)}
+.sv-body{padding:1.5rem}
+.sv-stat{padding:.9rem 1rem;border-radius:var(--r);background:var(--glass);border:1px solid var(--glass-b);text-align:center}
+.sv-stat-val{font-family:var(--font-d);font-size:1.5rem;font-weight:800;margin-bottom:.15rem}
+.sv-stat-label{font-size:.7rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+.sv-section-title{font-family:var(--font-d);font-size:.8rem;font-weight:700;margin:1.25rem 0 .6rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--glass-b);padding-bottom:.4rem}
+.ch-bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem}
+.ch-bar-name{width:170px;flex-shrink:0;font-size:.72rem;color:var(--text-2)}
+.ch-bar-track{flex:1;height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.ch-bar-fill{height:100%;border-radius:3px}
+.ch-bar-pct{width:32px;text-align:right;font-family:var(--font-m);font-size:.7rem;font-weight:600}
+@media(max-width:600px){.export-grid{grid-template-columns:1fr}}
+/* Assessment builder */
+.ab-q-card{background:var(--glass);border:1px solid var(--glass-b);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.5rem;display:flex;align-items:flex-start;gap:.75rem;cursor:grab;transition:border-color .14s}
+.ab-q-card:hover{border-color:var(--teal-border)}
+.ab-q-card.selected{border-color:var(--teal);background:var(--teal-ghost)}
+.ab-q-num{width:26px;height:26px;border-radius:50%;border:1px solid var(--glass-b);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:.75rem;font-weight:700;color:var(--text-3);flex-shrink:0;margin-top:.1rem}
+.ab-q-card.selected .ab-q-num{background:var(--teal-ghost);border-color:var(--teal);color:var(--teal)}
+.ab-tag{display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .5rem;border-radius:4px;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);font-size:.68rem;font-weight:600;color:var(--text-3)}
+.ab-selected-item{display:flex;align-items:center;gap:.5rem;padding:.45rem .65rem;background:var(--glass);border:1px solid var(--teal-border);border-radius:var(--r);margin-bottom:.35rem;font-size:.8rem}
+.ab-selected-num{font-family:var(--font-d);font-size:.72rem;font-weight:700;color:var(--teal);width:20px;flex-shrink:0}
+.timer-pill{display:inline-flex;align-items:center;gap:.35rem;padding:.22rem .6rem;border-radius:100px;font-size:.72rem;font-weight:700;font-family:var(--font-m)}
+.timer-pill.active{background:rgba(0,212,170,.12);border:1px solid var(--teal-border);color:var(--teal)}
+.timer-pill.urgent{background:rgba(255,77,106,.12);border:1px solid rgba(255,77,106,.3);color:var(--crimson)}
+.timer-pill.expired{background:rgba(255,255,255,.04);border:1px solid var(--glass-b);color:var(--text-3)}
+/* Print styles */
+@media print{
+  nav,aside,.no-print{display:none!important}
+  .print-only{display:block!important}
+  body{background:white;color:black}
+  .print-paper{padding:2cm;font-family:"Times New Roman",serif;color:black}
+  .print-q{page-break-inside:avoid;margin-bottom:1.5em}
+  .print-option{margin:.3em 0;padding-left:1.5em}
+  .print-work-box{border:1px solid #999;height:60px;margin-top:.5em;width:100%}
+}
+.print-only{display:none}
+</style>
+</head>
+<body class="page-bg">
+
+<nav class="navbar">
+  <div class="brand">
+    <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg></div>
+    CS Lifeline<span style="color:var(--teal)">.</span>
+    <div class="brand-badge">Teacher</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" onclick="showSec('overview')" href="#" id="nl-overview">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>Overview
+    </a>
+    <a class="nav-link" onclick="showSec('students')" href="#" id="nl-students">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Students
+    </a>
+    <a class="nav-link" onclick="showSec('misconceptions')" href="#" id="nl-misconceptions">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>Misconceptions
+    </a>
+    <a class="nav-link" onclick="showSec('predictions')" href="#" id="nl-predictions">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>AI Predictions
+    </a>
+    <a class="nav-link" onclick="showSec('ml')" href="#" id="nl-ml">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>ML Export
+    </a>
+    <a class="nav-link" onclick="showSec('upload')" href="#" id="nl-upload">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="12" x2="12" y1="11" y2="17"/><line x1="9" x2="15" y1="14" y2="14"/></svg>Upload
+    </a>
+    <a class="nav-link" onclick="showSec('assessments')" href="#" id="nl-assessments">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Assessments
+    </a>
+  </div>
+  <div class="nav-end">
+    <div class="avatar" id="nav-av">T</div>
+    <span style="font-size:.82rem;color:var(--text-2)" id="nav-email">—</span>
+    <button class="btn btn-ghost btn-sm" onclick="signOutUser()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>Sign out
+    </button>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div style="padding:0 .5rem">
+      <div class="sb-label">Dashboard</div>
+      <a class="sb-link active" onclick="showSec('overview')" href="#" id="sl-overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>Overview
+      </a>
+      <a class="sb-link" onclick="showSec('students')" href="#" id="sl-students">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Students
+      </a>
+      <a class="sb-link" onclick="showSec('misconceptions')" href="#" id="sl-misconceptions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>Misconceptions
+      </a>
+      <a class="sb-link" onclick="showSec('behavioral')" href="#" id="sl-behavioral">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Behavioral Signals
+      </a>
+      <div class="sb-div"></div>
+      <div class="sb-label">AI Pipeline</div>
+      <a class="sb-link" onclick="showSec('predictions')" href="#" id="sl-predictions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>AI Predictions
+      </a>
+      <a class="sb-link" onclick="showSec('ml')" href="#" id="sl-ml">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>ML Export &amp; Colab
+      </a>
+      <div class="sb-div"></div>
+      <div class="sb-label">Content</div>
+      <a class="sb-link" onclick="showSec('upload')" href="#" id="sl-upload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="12" x2="12" y1="11" y2="17"/><line x1="9" x2="15" y1="14" y2="14"/></svg>Build Assessment
+      </a>
+      <a class="sb-link" onclick="showSec('assessments')" href="#" id="sl-assessments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Published Assessments
+      </a>
+      <div class="sb-div"></div>
+      <div class="sb-label">Class</div>
+      <div style="padding:.25rem .4rem" id="class-chips">
+        <div class="spinner" style="width:18px;height:18px;border-width:2px;margin:.35rem auto"></div>
+      </div>
+      <div style="padding:.2rem .5rem .5rem;display:flex;gap:.3rem">
+        <input id="class-input" placeholder="e.g. 10B"
+          style="flex:1;padding:.38rem .55rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;min-width:0;font-family:var(--font)"
+          onkeydown="if(event.key==='Enter')setManualClass()">
+        <button class="btn btn-ghost btn-sm" onclick="setManualClass()" style="padding:.32rem .55rem;font-size:.73rem">Go</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section id="sec-overview">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">Class Overview</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Real-time from Firebase · <span id="last-updated">—</span></p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="loadOverview()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Refresh
+        </button>
+      </div>
+      <div class="stats-grid" style="margin-bottom:1.5rem">
+        <div class="stat-card teal"><div class="stat-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stat-val" id="ov-students">—</div><div class="stat-label">Students</div></div>
+        <div class="stat-card"><div class="stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="stat-val" id="ov-responses">—</div><div class="stat-label">Total Responses</div></div>
+        <div class="stat-card emerald"><div class="stat-icon emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-val" id="ov-accuracy">—</div><div class="stat-label">Class Accuracy</div></div>
+        <div class="stat-card crimson"><div class="stat-icon crimson"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg></div><div class="stat-val" id="ov-atrisk">—</div><div class="stat-label">At-Risk (AI)</div></div>
+      </div>
+      <div class="card" style="margin-bottom:1.25rem">
+        <div class="card-header">
+          <div class="card-title">Top Misconceptions — Class Wide</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadOverview()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Load</button>
+        </div>
+        <div id="ov-heatmap"><p style="font-size:.82rem;color:var(--text-3)">Click Load to fetch class data.</p></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Recent Responses</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Student ID</th><th>Chapter</th><th>Tag</th><th>Correct</th><th>Think time</th><th>Tab switches</th><th>Signal</th></tr></thead>
+            <tbody id="ov-activity"><tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:1.5rem">Waiting for student responses…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDENTS -->
+    <section id="sec-students" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">Student Risk Rankings</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Click any student to see their full dashboard</p>
+        </div>
+        <div style="display:flex;gap:.6rem">
+          <select class="btn btn-ghost btn-sm" id="risk-filter" onchange="loadStudents()" style="padding:.35rem .8rem">
+            <option value="">All risk levels</option>
+            <option value="high">High risk only</option>
+            <option value="borderline">Borderline only</option>
+            <option value="low">Low risk only</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="loadStudents()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Load</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Student</th><th>Questions</th><th>Accuracy</th><th>Avg tab switches</th><th>Errors</th><th>Risk (AI)</th><th>Top SHAP driver</th></tr></thead>
+            <tbody id="student-table"><tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:1.5rem">Click Load to fetch student data.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- MISCONCEPTIONS -->
+    <section id="sec-misconceptions" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">Misconception Analysis</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Error frequency by tag across both papers</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="loadMisconceptions()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Load</button>
+      </div>
+      <div class="card" style="margin-bottom:1.25rem">
+        <div class="card-header"><div class="card-title">All Misconception Tags — Error Frequency</div></div>
+        <div id="misc-heatmap"><p style="font-size:.82rem;color:var(--text-3)">Click Load to analyse class-wide misconception patterns.</p></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Paper 1 vs Paper 2 Error Split</div></div>
+        <canvas id="paper-chart" height="200"></canvas>
+      </div>
+    </section>
+
+    <!-- BEHAVIORAL -->
+    <section id="sec-behavioral" style="display:none">
+      <div style="margin-bottom:1.5rem">
+        <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">Behavioral Signal Distribution</h2>
+        <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Avoidance · Uncertainty · False Mastery — the three diagnostic signal categories</p>
+      </div>
+      <div class="stats-grid" style="margin-bottom:1.25rem">
+        <div class="stat-card crimson"><div class="stat-icon crimson"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="stat-val" id="sig-avoidance">—</div><div class="stat-label">Avoidance signals</div></div>
+        <div class="stat-card amber"><div class="stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div><div class="stat-val" id="sig-uncertainty">—</div><div class="stat-label">Uncertainty signals</div></div>
+        <div class="stat-card teal"><div class="stat-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-val" id="sig-false-mastery">—</div><div class="stat-label">False mastery signals</div></div>
+        <div class="stat-card"><div class="stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg></div><div class="stat-val" id="sig-tab-switches">—</div><div class="stat-label">Total tab switches</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Signal Distribution by Chapter</div></div>
+        <canvas id="behavioral-chart" height="240"></canvas>
+      </div>
+    </section>
+
+    <!-- PREDICTIONS -->
+    <section id="sec-predictions" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">AI Predictions — Live from Firestore</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Populated automatically when Google Colab writes to /predictions/</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="loadPredictions()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Refresh</button>
+      </div>
+      <div id="predictions-content">
+        <div class="card" style="text-align:center;padding:3rem">
+          <p style="color:var(--text-2);font-weight:600">No predictions yet</p>
+          <p style="font-size:.82rem;color:var(--text-3);margin-top:.4rem">Run the Google Colab notebook to generate AI risk predictions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ML EXPORT -->
+    <section id="sec-ml" style="display:none">
+      <div style="margin-bottom:1.5rem">
+        <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">ML Export &amp; Google Colab Pipeline</h2>
+        <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Export data → run Colab → predictions sync back automatically</p>
+      </div>
+      <div class="card" style="margin-bottom:1.25rem">
+        <div class="card-header"><div class="card-title">Export Data for Colab</div></div>
+        <div class="export-grid">
+          <div class="export-card">
+            <div class="export-card-title">H1 Feature Matrix</div>
+            <div class="export-card-desc">One row per student — all 12 engineered features including behavioral signals. Ready for scikit-learn.</div>
+            <button class="btn btn-primary btn-sm" onclick="exportH1()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Export H1 CSV</button>
+          </div>
+          <div class="export-card">
+            <div class="export-card-title">H2 Misconception Matrix</div>
+            <div class="export-card-desc">Per-student × per-tag frequency matrix. Direct input for Module A multi-label classifier.</div>
+            <button class="btn btn-primary btn-sm" onclick="exportH2()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Export H2 CSV</button>
+          </div>
+          <div class="export-card">
+            <div class="export-card-title">Full Response Data</div>
+            <div class="export-card-desc">Every question attempt with all behavioral signals — 15 schema fields per row.</div>
+            <button class="btn btn-ghost btn-sm" onclick="exportResponses()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Export Responses CSV</button>
+          </div>
+          <div class="export-card">
+            <div class="export-card-title">Student Summary</div>
+            <div class="export-card-desc">One row per student: UUID, accuracy, sessions, misconception count, at-risk flag.</div>
+            <button class="btn btn-ghost btn-sm" onclick="exportStudents()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Export Students CSV</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Download Colab Notebook</div></div>
+        <p style="font-size:.875rem;color:var(--text-2);line-height:1.75;margin-bottom:1rem">The pre-configured notebook loads your exported CSVs, trains LR · DT · RF · GB · BW-RF with 5-fold CV, computes SHAP values, and writes predictions back to Firestore.</p>
+        <a class="btn btn-primary" href="/colab/cslifeline_ml.ipynb" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Download Colab Notebook (.ipynb)</a>
+      </div>
+    </section>
+
+    <!-- ═══════════ UPLOAD / BUILD ASSESSMENT ═══════════ -->
+    <section id="sec-upload" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">Question Bank &amp; Assessment Builder</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">
+            All questions stored in Firestore · select any to build an assessment · upload custom questions
+          </p>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="refreshQuestionBank()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Refresh bank
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="openAddQuestion()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>Add question
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="openUploadPanel()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Upload JSON
+          </button>
+          <a class="btn btn-ghost btn-sm" href="/data/sample_upload.json" download="cslifeline_sample_questions.json">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Sample JSON
+          </a>
+        </div>
+      </div>
+
+      <!-- Tabs: Bank | Builder | Upload -->
+      <div style="display:flex;gap:.35rem;margin-bottom:1rem;border-bottom:1px solid var(--glass-b);padding-bottom:.75rem">
+        <button class="btn btn-ghost btn-sm qb-tab active" id="qbt-bank"    onclick="switchQBTab('bank')"    style="font-size:.78rem">📦 Question Bank</button>
+        <button class="btn btn-ghost btn-sm qb-tab"        id="qbt-builder" onclick="switchQBTab('builder')" style="font-size:.78rem">📋 Assessment Builder</button>
+        <button class="btn btn-ghost btn-sm qb-tab"        id="qbt-upload"  onclick="switchQBTab('upload')"  style="font-size:.78rem">⬆ Upload / Add</button>
+        <span style="margin-left:auto;font-size:.75rem;color:var(--text-3);line-height:2.2" id="qb-bank-count">Loading…</span>
+      </div>
+
+      <!-- ── TAB: BANK ── -->
+      <div id="qb-tab-bank">
+        <!-- Filters -->
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem">
+          <select id="qbf-paper"   class="btn btn-ghost btn-sm" onchange="filterQBank()" style="padding:.3rem .6rem;font-size:.74rem">
+            <option value="">All papers</option>
+            <option value="P1">Paper 1</option>
+            <option value="P2">Paper 2</option>
+          </select>
+          <select id="qbf-chapter" class="btn btn-ghost btn-sm" onchange="filterQBank()" style="padding:.3rem .6rem;font-size:.74rem">
+            <option value="">All chapters</option>
+          </select>
+          <select id="qbf-type"    class="btn btn-ghost btn-sm" onchange="filterQBank()" style="padding:.3rem .6rem;font-size:.74rem">
+            <option value="">All types</option>
+            <option value="MCQ">MCQ</option>
+            <option value="trace_output">Trace/Output</option>
+            <option value="coding">Coding</option>
+          </select>
+          <select id="qbf-diff"    class="btn btn-ghost btn-sm" onchange="filterQBank()" style="padding:.3rem .6rem;font-size:.74rem">
+            <option value="">All levels</option>
+            <option value="1">Foundation</option>
+            <option value="2">Core</option>
+            <option value="3">Extended</option>
+          </select>
+          <select id="qbf-source"  class="btn btn-ghost btn-sm" onchange="filterQBank()" style="padding:.3rem .6rem;font-size:.74rem">
+            <option value="">All sources</option>
+            <option value="builtin">Built-in</option>
+            <option value="custom">Custom uploaded</option>
+          </select>
+          <input id="qbf-search" placeholder="Search…" class="btn btn-ghost btn-sm" oninput="filterQBank()"
+            style="padding:.3rem .65rem;font-size:.74rem;min-width:140px;text-align:left;font-family:var(--font)">
+        </div>
+        <div style="display:flex;gap:.6rem;margin-bottom:.75rem;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="selectAllFiltered()" style="font-size:.73rem">Select all visible</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearBankSelection()" style="font-size:.73rem">Clear selection</button>
+          <span style="margin-left:auto;font-size:.73rem;color:var(--teal);font-weight:700" id="qb-sel-count">0 selected</span>
+          <button class="btn btn-primary btn-sm" onclick="buildFromSelected()" style="font-size:.73rem">Build assessment →</button>
+        </div>
+        <div id="qb-bank-list" style="max-height:540px;overflow-y:auto">
+          <div style="text-align:center;padding:2rem"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- ── TAB: BUILDER ── -->
+      <div id="qb-tab-builder" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:1.25rem;align-items:start">
+          <!-- Left: selected list -->
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+              <div style="font-family:var(--font-d);font-size:.88rem;font-weight:700">Selected Questions <span id="ab-count" style="color:var(--teal)">(0)</span></div>
+              <div style="display:flex;gap:.4rem">
+                <button class="btn btn-ghost btn-sm" onclick="abShuffle()" style="font-size:.72rem">⇄ Shuffle</button>
+                <button class="btn btn-ghost btn-sm" onclick="clearBankSelection()" style="font-size:.72rem">Clear all</button>
+              </div>
+            </div>
+            <div id="ab-selected-list" style="min-height:80px;max-height:400px;overflow-y:auto;margin-bottom:1rem">
+              <p style="font-size:.78rem;color:var(--text-3);padding:.75rem;text-align:center">
+                No questions selected. Go to Question Bank tab to select questions.
+              </p>
+            </div>
+            <div class="card" style="padding:.85rem">
+              <div style="font-size:.78rem;font-weight:700;color:var(--text-2);margin-bottom:.5rem">Quick-add by topic</div>
+              <div style="display:flex;gap:.35rem;flex-wrap:wrap" id="quick-add-chips"></div>
+            </div>
+          </div>
+          <!-- Right: configure -->
+          <div style="position:sticky;top:72px">
+            <div class="card" style="margin-bottom:.85rem;padding:1rem">
+              <div style="font-size:.82rem;font-weight:700;margin-bottom:.75rem">Configure Assessment</div>
+              <div style="margin-bottom:.55rem">
+                <label style="font-size:.73rem;color:var(--text-3);display:block;margin-bottom:.2rem">Title</label>
+                <input id="ab-title" placeholder="e.g. Mid-Term — Data Representation"
+                  style="width:100%;padding:.4rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.78rem;color:var(--text);outline:none;font-family:var(--font)">
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.55rem">
+                <div>
+                  <label style="font-size:.73rem;color:var(--text-3);display:block;margin-bottom:.2rem">Date</label>
+                  <input type="date" id="ab-date"
+                    style="width:100%;padding:.4rem .5rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;font-family:var(--font)">
+                </div>
+                <div>
+                  <label style="font-size:.73rem;color:var(--text-3);display:block;margin-bottom:.2rem">Duration (min)</label>
+                  <input type="number" id="ab-duration" placeholder="45" min="5" max="180"
+                    style="width:100%;padding:.4rem .5rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;font-family:var(--font)">
+                </div>
+              </div>
+              <div style="margin-bottom:.55rem">
+                <label style="font-size:.73rem;color:var(--text-3);display:block;margin-bottom:.2rem">Student name field</label>
+                <select id="ab-namefield"
+                  style="width:100%;padding:.4rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;font-family:var(--font)">
+                  <option value="blank">Blank line (student fills)</option>
+                  <option value="none">None</option>
+                </select>
+              </div>
+              <div style="margin-bottom:.55rem">
+                <label style="font-size:.73rem;color:var(--text-3);display:block;margin-bottom:.2rem">Extra header fields (one per line)</label>
+                <textarea id="ab-extra-fields" rows="2" placeholder="Class:
+Index No.:"
+                  style="width:100%;padding:.4rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;resize:vertical;font-family:var(--font)"></textarea>
+              </div>
+              <div style="margin-bottom:.55rem">
+                <label style="font-size:.73rem;color:var(--text-3);display:block;margin-bottom:.2rem">Instructions</label>
+                <textarea id="ab-instructions" rows="2" placeholder="Answer all questions. Write clearly."
+                  style="width:100%;padding:.4rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;resize:vertical;font-family:var(--font)"></textarea>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:.5rem">
+              <button class="btn btn-ghost btn-sm" onclick="abPrint()" style="justify-content:center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>Print / PDF
+              </button>
+              <button class="btn btn-primary" onclick="abPublish()" style="justify-content:center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Publish to Students
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: UPLOAD / ADD ── -->
+      <div id="qb-tab-upload" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+
+          <!-- Upload JSON -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Upload Questions (JSON)</div>
+              <a class="btn btn-ghost btn-sm" href="/data/sample_upload.json" download="cslifeline_sample_questions.json" style="font-size:.72rem">
+                ⬇ Sample JSON
+              </a>
+            </div>
+            <p style="font-size:.78rem;color:var(--text-2);margin-bottom:.75rem;line-height:1.7">
+              Upload a <code style="font-size:.72rem;background:rgba(255,255,255,.08);padding:.1rem .35rem;border-radius:4px">.json</code> file containing an array of question objects, or paste JSON below. Questions are added permanently to the Firestore bank.
+            </p>
+            <!-- File drop zone -->
+            <div id="json-dropzone"
+              style="border:2px dashed var(--glass-b);border-radius:var(--r2);padding:1.5rem;text-align:center;cursor:pointer;transition:border-color .14s;margin-bottom:.75rem"
+              onclick="document.getElementById('json-file-input').click()"
+              ondragover="event.preventDefault();this.style.borderColor='var(--teal)'"
+              ondragleave="this.style.borderColor=''"
+              ondrop="handleJsonDrop(event)">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-3);margin:0 auto .5rem;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              <p style="font-size:.78rem;color:var(--text-3)">Drop .json file here or click to browse</p>
+              <input type="file" id="json-file-input" accept=".json" style="display:none" onchange="handleJsonFile(this)">
+            </div>
+            <!-- Or paste -->
+            <div style="font-size:.73rem;color:var(--text-3);margin-bottom:.4rem">Or paste JSON array:</div>
+            <textarea id="json-paste" rows="8" placeholder='[{"id":"MY_Q_001","paper":"P1","chapter_id":"T01",...}]'
+              style="width:100%;padding:.5rem .65rem;background:rgba(0,0,0,.3);border:1px solid var(--glass-b);border-radius:var(--r);font-family:var(--font-m);font-size:.72rem;color:var(--text);outline:none;resize:vertical;line-height:1.6"></textarea>
+            <div style="display:flex;gap:.5rem;margin-top:.65rem">
+              <button class="btn btn-ghost btn-sm" onclick="validateJsonPaste()" style="font-size:.73rem">Validate</button>
+              <button class="btn btn-primary" onclick="uploadJsonQuestions()" style="font-size:.73rem">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Upload to Bank
+              </button>
+            </div>
+            <div id="json-feedback" style="margin-top:.6rem;font-size:.75rem"></div>
+          </div>
+
+          <!-- Add single question form -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">Add Single Question</div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem">
+              <div>
+                <label style="font-size:.72rem;color:var(--text-3);display:block;margin-bottom:.2rem">ID (unique)</label>
+                <input id="sq-id" placeholder="e.g. P1_T01_MY_001"
+                  style="width:100%;padding:.38rem .55rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;font-family:var(--font-m)">
+              </div>
+              <div>
+                <label style="font-size:.72rem;color:var(--text-3);display:block;margin-bottom:.2rem">Paper</label>
+                <select id="sq-paper"
+                  style="width:100%;padding:.38rem .55rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;font-family:var(--font)">
+                  <option value="P1">Paper 1 — Theory</option>
+                  <option value="P2">Paper 2 — Programming</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem">
+              <div>
+                <label style="font-size:.72rem;color:var(--text-3);display:block;margin-bottom:.2rem">Chapter</label>
+                <select id="sq-chapter"
+                  style="width:100%;padding:.38rem .55rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;font-family:var(--font)">
+                  <option value="T01">T01 — Data Representation</option>
+                  <option value="T02">T02 — Data Transmission</option>
+                  <option value="T03">T03 — Hardware</option>
+                  <option value="T04">T04 — Software</option>
+                  <option value="T05">T05 — Internet &amp; Uses</option>
+                  <option value="T06">T06 — Emerging Tech</option>
+                  <option value="T07">T07 — Algorithm Design</option>
+                  <option value="T08">T08 — Programming</option>
+                  <option value="T09">T09 — Arrays</option>
+                  <option value="T10">T10 — Procedures &amp; Functions</option>
+                  <option value="T11">T11 — File Handling</option>
+                  <option value="T12">T12 — Searching &amp; Sorting</option>
+                  <option value="T13">T13 — Boolean Logic</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:.72rem;color:var(--text-3);display:block;margin-bottom:.2rem">Type</label>
+                <select id="sq-type" onchange="updateSQTypeFields()"
+                  style="width:100%;padding:.38rem .55rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;font-family:var(--font)">
+                  <option value="MCQ">MCQ</option>
+                  <option value="trace_output">Trace / Output</option>
+                  <option value="coding">Coding / Pseudocode</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem">
+              <div>
+                <label style="font-size:.72rem;color:var(--text-3);display:block;margin-bottom:.2rem">Difficulty</label>
+                <select id="sq-diff"
+                  style="width:100%;padding:.38rem .55rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;font-family:var(--font)">
+                  <option value="1">1 — Foundation</option>
+                  <option value="2" selected>2 — Core</option>
+                  <option value="3">3 — Extended</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:.72rem;color:var(--text-3);display:block;margin-bottom:.2rem">Misconception tag</label>
+                <input id="sq-tag" placeholder="e.g. BINARY_CONVERSION_ERROR"
+                  style="width:100%;padding:.38rem .55rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.72rem;color:var(--text);outline:none;font-family:var(--font-m)">
+              </div>
+            </div>
+            <div style="margin-bottom:.5rem">
+              <label style="font-size:.72rem;color:var(--text-3);display:block;margin-bottom:.2rem">Question text</label>
+              <textarea id="sq-text" rows="3"
+                style="width:100%;padding:.4rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.75rem;color:var(--text);outline:none;resize:vertical;font-family:var(--font);line-height:1.6"></textarea>
+            </div>
+            <div id="sq-mcq-fields">
+              <div style="font-size:.72rem;color:var(--text-3);margin-bottom:.35rem">Options (one per line) &amp; correct answer index (0-3)</div>
+              <textarea id="sq-options" rows="4" placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"
+                style="width:100%;padding:.4rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.74rem;color:var(--text);outline:none;resize:vertical;font-family:var(--font);margin-bottom:.35rem;line-height:1.5"></textarea>
+              <input type="number" id="sq-correct" placeholder="Correct option index (0=A, 1=B...)" min="0" max="3"
+                style="width:100%;padding:.38rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.74rem;color:var(--text);outline:none;font-family:var(--font)">
+            </div>
+            <div id="sq-coding-fields" style="display:none">
+              <label style="font-size:.72rem;color:var(--text-3);display:block;margin:.4rem 0 .2rem">Starter code (optional)</label>
+              <textarea id="sq-starter" rows="3" placeholder="DECLARE ... &#10;// Write your solution here"
+                style="width:100%;padding:.4rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.73rem;color:var(--text);outline:none;resize:vertical;font-family:var(--font-m);line-height:1.6"></textarea>
+            </div>
+            <div style="margin-top:.5rem">
+              <label style="font-size:.72rem;color:var(--text-3);display:block;margin-bottom:.2rem">Hint</label>
+              <input id="sq-hint"
+                style="width:100%;padding:.38rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.74rem;color:var(--text);outline:none;font-family:var(--font)">
+            </div>
+            <button class="btn btn-primary" onclick="saveSingleQuestion()" style="width:100%;justify-content:center;margin-top:.75rem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save to Bank
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="sec-assessments" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h2 style="font-family:var(--font-d);font-size:1.25rem;font-weight:800">Published Assessments</h2>
+          <p style="color:var(--text-2);font-size:.82rem;margin-top:.15rem">Live assessments visible to students · Timers count down in real time</p>
+        </div>
+        <div style="display:flex;gap:.6rem">
+          <button class="btn btn-ghost btn-sm" onclick="loadPublishedAssessments()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Refresh
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="showSec('upload')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>New Assessment
+          </button>
+        </div>
+      </div>
+      <div id="assessments-list">
+        <div style="text-align:center;padding:2rem"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Student View Modal -->
+<div class="sv-modal" id="sv-modal" onclick="if(event.target===this)closeSV()">
+  <div class="sv-panel">
+    <div class="sv-header">
+      <div>
+        <div style="font-family:var(--font-d);font-size:1rem;font-weight:800" id="sv-name">Student</div>
+        <div style="font-size:.75rem;color:var(--text-3);margin-top:.15rem" id="sv-meta">Loading…</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <div id="sv-risk-pill" style="display:none"></div>
+        <button class="btn btn-ghost btn-sm" onclick="closeSV()">✕ Close</button>
+      </div>
+    </div>
+    <div class="sv-body">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:.5rem">
+        <div class="sv-stat"><div class="sv-stat-val teal" id="sv-accuracy">—</div><div class="sv-stat-label">Accuracy</div></div>
+        <div class="sv-stat"><div class="sv-stat-val" id="sv-answered">—</div><div class="sv-stat-label">Questions</div></div>
+        <div class="sv-stat"><div class="sv-stat-val crimson" id="sv-errors">—</div><div class="sv-stat-label">Errors</div></div>
+        <div class="sv-stat"><div class="sv-stat-val" id="sv-tabs">—</div><div class="sv-stat-label">Tab switches</div></div>
+      </div>
+      <div class="sv-section-title">Topic Radar</div>
+      <div style="max-width:380px;margin:0 auto"><canvas id="sv-radar" height="280"></canvas></div>
+      <div class="sv-section-title">Accuracy by Chapter</div>
+      <div style="display:flex;gap:.35rem;margin-bottom:.65rem">
+        <button class="btn btn-ghost btn-sm sv-ptab active" onclick="svPaper('P1',this)" style="font-size:.72rem">Paper 1</button>
+        <button class="btn btn-ghost btn-sm sv-ptab" onclick="svPaper('P2',this)" style="font-size:.72rem">Paper 2</button>
+      </div>
+      <div id="sv-chapter-bars"></div>
+      <div class="sv-section-title">Behavioral Signals</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:.5rem">
+        <div class="sv-stat"><div class="sv-stat-val crimson" id="sv-avoid">—</div><div class="sv-stat-label">Avoidance</div></div>
+        <div class="sv-stat"><div class="sv-stat-val amber" id="sv-uncert">—</div><div class="sv-stat-label">Uncertainty</div></div>
+        <div class="sv-stat"><div class="sv-stat-val teal" id="sv-false">—</div><div class="sv-stat-label">False mastery</div></div>
+        <div class="sv-stat"><div class="sv-stat-val" id="sv-hints">—</div><div class="sv-stat-label">Hints used</div></div>
+      </div>
+      <div class="sv-section-title">Misconception Profile</div>
+      <div id="sv-misc"></div>
+      <div id="sv-ai-block" style="display:none">
+        <div class="sv-section-title">AI Risk Prediction</div>
+        <div class="card" style="padding:1rem" id="sv-ai"></div>
+      </div>
+      <div class="sv-section-title">Recent Errors</div>
+      <div id="sv-wrong"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-root"></div>
+
+<script type="module">
+// ═══════════════════════════════════════════════════════════════════
+// CS LIFELINE — TEACHER DASHBOARD
+// Rule: ALL window.* assignments come BEFORE any await
+// ═══════════════════════════════════════════════════════════════════
+
+import { requireRole, signOutUser as _so } from "/js/auth.js";
+import { db } from "/js/firebase-config.js";
+import {
+  collection, query, where, getDocs, onSnapshot, doc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getClassResponses, getClassStudents } from "/js/sync.js";
+import { CHAPTERS } from "/data/questions.js";
+
+// ── State ───────────────────────────────────────────────────────────
+let currentClass = localStorage.getItem('csl_teacher_class') || '';
+let allResponses = [];
+let allStudents  = [];
+let predUnsub    = null;
+let svRadar      = null;
+let svResponses  = [];
+let svPaperSel   = 'P1';
+
+const MISC_TAGS = [
+  'BINARY_CONVERSION_ERROR','TWO_COMPLEMENT_ERROR','BINARY_SHIFT_ERROR','STORAGE_CONCEPT_ERROR',
+  'NETWORK_CONCEPT_ERROR','SOFTWARE_CONCEPT_ERROR','SENSOR_MODEL_ERROR','AI_CONCEPT_ERROR',
+  'PSEUDOCODE_SYNTAX_ERROR','ASSIGN_EQUALITY_CONFUSION','LOOP_TERMINATION_ERROR',
+  'DATA_TYPE_CONFUSION','ARRAY_INDEX_ERROR','VARIABLE_SCOPE_ERROR','BOOLEAN_LOGIC_ERROR',
+  'SEQUENTIAL_EXECUTION_ERROR','TRACE_PREDICTION_ERROR','TEST_DATA_CONFUSION'
+];
+
+// ─────────────────────────────────────────────────────────────────────
+// ALL window.* DEFINED HERE — before any await
+// ─────────────────────────────────────────────────────────────────────
+
+window.signOutUser = _so;
+
+// ── Firestore timeout guard ─────────────────────────────────────────
+// No await against Firestore is allowed to hang the UI forever: if a
+// request neither resolves nor rejects within TIMEOUT_MS, we surface a
+// clear, actionable error instead of leaving a spinner spinning.
+function withTimeout(promise, ms = 10000, label = 'Firestore request') {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(
+        label + ' timed out after ' + (ms / 1000) + 's — check your connection or Firestore security rules'
+      )), ms)
+    ),
+  ]);
+}
+window.withTimeout = withTimeout; // must be on window: called from the plain (non-module) QB/upload script block too
+
+const SECTIONS = ['overview','students','misconceptions','behavioral','predictions','ml','upload','assessments'];
+
+window.showSec = name => {
+  SECTIONS.forEach(s => {
+    const el = document.getElementById('sec-'+s);
+    if (el) el.style.display = s === name ? '' : 'none';
+    ['nl-','sl-'].forEach(p => {
+      const lnk = document.getElementById(p+s);
+      if (lnk) lnk.classList.toggle('active', s === name);
+    });
+  });
+  if (name === 'overview')       window.loadOverview();
+  if (name === 'misconceptions') window.loadMisconceptions();
+  if (name === 'behavioral')     window.loadBehavioral();
+  if (name === 'students')       window.loadStudents();
+  if (name === 'predictions')    window.loadPredictions();
+  if (name === 'upload')         { setTimeout(() => window.switchQBTab && window.switchQBTab('bank'), 80); }
+  if (name === 'assessments')    window.loadPublishedAssessments();
+};
+
+window.setClass = cls => {
+  currentClass = cls;
+  localStorage.setItem('csl_teacher_class', cls);
+  document.querySelectorAll('.class-chip').forEach(b =>
+    b.classList.toggle('active', b.dataset.cls === cls));
+  window.loadOverview();
+};
+
+window.setManualClass = () => {
+  const input = document.getElementById('class-input');
+  const cls   = (input?.value || '').trim();
+  if (!cls) return;
+  currentClass = cls;
+  localStorage.setItem('csl_teacher_class', cls);
+  // Add chip if not already there
+  const chips = document.getElementById('class-chips');
+  if (chips) {
+    chips.querySelectorAll('.class-chip').forEach(b => b.classList.remove('active'));
+    let btn = chips.querySelector(`[data-cls="${cls}"]`);
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.className = 'class-chip';
+      btn.dataset.cls = cls;
+      btn.textContent = cls;
+      btn.onclick = () => window.setClass(cls);
+      chips.appendChild(btn);
+    }
+    btn.classList.add('active');
+  }
+  if (input) input.value = '';
+  window.loadOverview();
+};
+
+window.loadOverview = async () => {
+  if (!currentClass) {
+    toast('Enter a class code in the sidebar first', 'info');
+    return;
+  }
+  const upd = document.getElementById('last-updated');
+  if (upd) upd.textContent = 'Loading…';
+  try {
+    const [students, responses] = await Promise.all([
+      getClassStudents(currentClass),
+      getClassResponses(currentClass)
+    ]);
+    allStudents  = students;
+    allResponses = responses;
+
+    const total   = responses.length;
+    const correct = responses.filter(r => r.correct).length;
+    const acc     = total ? Math.round(correct/total*100) : 0;
+    const atRisk  = students.filter(s => {
+      const sr = responses.filter(r => r.student_uid === s.uid);
+      return sr.length && sr.filter(r => r.correct).length / sr.length < 0.5;
+    }).length;
+
+    setText('ov-students',  students.length || '0');
+    setText('ov-responses', total || '0');
+    setText('ov-accuracy',  total ? acc+'%' : '0%');
+    setText('ov-atrisk',    atRisk || '0');
+    if (upd) upd.textContent = new Date().toLocaleTimeString();
+
+    // Heatmap
+    const tagCounts = {};
+    responses.filter(r => !r.correct && r.misconception_tag)
+      .forEach(r => { tagCounts[r.misconception_tag] = (tagCounts[r.misconception_tag]||0)+1; });
+    const sorted = Object.entries(tagCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const maxC   = sorted[0]?.[1] || 1;
+    const hmEl   = document.getElementById('ov-heatmap');
+    if (hmEl) hmEl.innerHTML = sorted.length
+      ? sorted.map(([tag,count]) => {
+          const pct = Math.round(count/maxC*100);
+          const col = pct>60?'var(--crimson)':pct>30?'var(--amber)':'var(--teal)';
+          return `<div class="hmap-row"><div class="hmap-label">${tag.replace(/_/g,' ')}</div><div class="hmap-track"><div class="hmap-fill" style="width:${pct}%;background:${col}"></div></div><div class="hmap-pct" style="color:${col}">${count}</div></div>`;
+        }).join('')
+      : '<p style="font-size:.82rem;color:var(--text-3)">No misconception data yet.</p>';
+
+    // Activity table
+    const recent = [...responses].reverse().slice(0,12);
+    const tbody  = document.getElementById('ov-activity');
+    if (tbody) tbody.innerHTML = recent.length
+      ? recent.map(r => `<tr>
+          <td>${(r.student_uid||'').slice(0,8)}…</td>
+          <td>${r.chapter_id||'—'}</td>
+          <td><span class="badge badge-muted" style="font-size:.65rem">${(r.misconception_tag||'—').replace(/_/g,' ')}</span></td>
+          <td>${r.correct?'<span class="badge badge-emerald">✓</span>':'<span class="badge badge-crimson">✗</span>'}</td>
+          <td>${Math.round((r.net_think_time_ms||0)/1000)}s</td>
+          <td>${r.tab_switch_count||0}</td>
+          <td style="font-size:.7rem">${r.signal_avoidance?'<span class="badge badge-crimson">avoidance</span>':''}${r.signal_uncertainty?'<span class="badge badge-amber">uncertain</span>':''}${r.signal_false_mastery?'<span class="badge badge-teal">false mastery</span>':''}</td>
+        </tr>`).join('')
+      : '<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:1.5rem">No responses yet for class ' + currentClass + '</td></tr>';
+
+  } catch(e) {
+    toast('Error loading overview: '+e.message, 'error');
+    console.error('loadOverview:', e);
+  }
+};
+
+window.loadStudents = async () => {
+  if (!currentClass) { toast('Enter a class code first','info'); return; }
+  try {
+    const [students, responses, predsSnap] = await Promise.all([
+      getClassStudents(currentClass),
+      getClassResponses(currentClass),
+      getDocs(query(collection(db,'predictions'), where('class_code','==',currentClass)))
+    ]);
+    allStudents  = students;
+    allResponses = responses;
+    const preds  = {};
+    predsSnap.docs.forEach(d => { preds[d.id] = d.data(); });
+
+    const filter = document.getElementById('risk-filter')?.value || '';
+    const rows   = students
+      .map(s => {
+        const sr   = responses.filter(r => r.student_uid === s.uid);
+        const tot  = sr.length;
+        const corr = sr.filter(r => r.correct).length;
+        const acc  = tot ? Math.round(corr/tot*100) : null;
+        const tabs = tot ? (sr.reduce((a,r) => a+(r.tab_switch_count||0),0)/tot).toFixed(1) : '—';
+        const errs = sr.filter(r => !r.correct && r.misconception_tag).length;
+        const pred = preds[s.uid];
+        const risk = pred?.risk_category || (acc!==null ? (acc<50?'high':acc<70?'borderline':'low') : 'low');
+        const top  = pred?.top_features?.[0]?.replace(/_/g,' ') || '—';
+        return { s, tot, acc, tabs, errs, risk, top };
+      })
+      .filter(r => !filter || r.risk === filter);
+
+    const tbody = document.getElementById('student-table');
+    if (tbody) tbody.innerHTML = rows.length
+      ? rows.map(({s,tot,acc,tabs,errs,risk,top}) =>
+          `<tr style="${risk==='high'?'background:rgba(255,77,106,.04)':''}cursor:pointer"
+               onclick="openSV('${s.uid}','${(s.displayName||'Student').replace(/'/g,"\\'")}')">
+            <td style="color:var(--teal);font-weight:600">${s.displayName||s.uid?.slice(0,8)}</td>
+            <td>${tot}</td>
+            <td>${acc!==null?acc+'%':'—'}</td>
+            <td>${tabs}</td>
+            <td>${errs}</td>
+            <td><div class="risk-pill risk-${risk}"><div class="risk-dot"></div>${risk.toUpperCase()}</div></td>
+            <td style="font-size:.75rem;color:var(--text-2)">${top}</td>
+          </tr>`).join('')
+      : `<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:1.5rem">No students found for class ${currentClass}</td></tr>`;
+  } catch(e) {
+    toast('Error loading students: '+e.message,'error');
+    console.error('loadStudents:', e);
+  }
+};
+
+window.loadMisconceptions = async () => {
+  if (!currentClass) { toast('Enter a class code first','info'); return; }
+  try {
+    const responses = allResponses.length ? allResponses : await getClassResponses(currentClass);
+    const tagCounts = {};
+    responses.filter(r => !r.correct && r.misconception_tag)
+      .forEach(r => { tagCounts[r.misconception_tag] = (tagCounts[r.misconception_tag]||0)+1; });
+    const total = Object.values(tagCounts).reduce((a,b)=>a+b,0) || 1;
+    const el = document.getElementById('misc-heatmap');
+    if (el) el.innerHTML = MISC_TAGS.map(tag => {
+      const count = tagCounts[tag]||0;
+      const pct   = Math.round(count/total*100);
+      const col   = pct>40?'var(--crimson)':pct>20?'var(--amber)':'var(--teal)';
+      return `<div class="hmap-row"><div class="hmap-label">${tag.replace(/_/g,' ')}</div><div class="hmap-track"><div class="hmap-fill" style="width:${Math.max(pct,2)}%;background:${col}"></div></div><div class="hmap-pct" style="color:${col}">${count}</div></div>`;
+    }).join('');
+
+    const p1 = responses.filter(r=>!r.correct&&r.paper==='P1').length;
+    const p2 = responses.filter(r=>!r.correct&&r.paper==='P2').length;
+    const ctx = document.getElementById('paper-chart')?.getContext('2d');
+    if (ctx) new Chart(ctx,{type:'bar',data:{labels:['Paper 1 — Theory','Paper 2 — Programming'],datasets:[{data:[p1,p2],backgroundColor:['rgba(99,102,241,.7)','rgba(0,212,170,.7)'],borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'var(--text-3)'}},x:{grid:{display:false},ticks:{color:'var(--text-3)'}}}}});
+  } catch(e) { toast('Error: '+e.message,'error'); }
+};
+
+window.loadBehavioral = async () => {
+  if (!currentClass) { toast('Enter a class code first','info'); return; }
+  try {
+    const responses = allResponses.length ? allResponses : await getClassResponses(currentClass);
+    setText('sig-avoidance',    responses.filter(r=>r.signal_avoidance).length);
+    setText('sig-uncertainty',  responses.filter(r=>r.signal_uncertainty).length);
+    setText('sig-false-mastery',responses.filter(r=>r.signal_false_mastery).length);
+    setText('sig-tab-switches', responses.reduce((a,r)=>a+(r.tab_switch_count||0),0));
+
+    const chapters = Object.keys(CHAPTERS);
+    const labels   = chapters.map(c=>CHAPTERS[c].title.split(' ').slice(0,2).join(' '));
+    const ctx = document.getElementById('behavioral-chart')?.getContext('2d');
+    if (ctx) new Chart(ctx,{type:'bar',data:{labels,datasets:[
+      {label:'Avoidance',data:chapters.map(c=>responses.filter(r=>r.chapter_id===c&&r.signal_avoidance).length),backgroundColor:'rgba(255,77,106,.7)',borderRadius:3},
+      {label:'Uncertainty',data:chapters.map(c=>responses.filter(r=>r.chapter_id===c&&r.signal_uncertainty).length),backgroundColor:'rgba(255,181,71,.7)',borderRadius:3},
+      {label:'False Mastery',data:chapters.map(c=>responses.filter(r=>r.chapter_id===c&&r.signal_false_mastery).length),backgroundColor:'rgba(0,212,170,.7)',borderRadius:3},
+    ]},options:{plugins:{legend:{labels:{color:'var(--text-2)',font:{size:11}}}},scales:{x:{stacked:true,ticks:{color:'var(--text-3)',font:{size:10}},grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'var(--text-3)'}}}}});
+  } catch(e) { toast('Error: '+e.message,'error'); }
+};
+
+window.loadPredictions = () => {
+  if (!currentClass) { toast('Enter a class code first','info'); return; }
+  if (predUnsub) predUnsub();
+  predUnsub = onSnapshot(
+    query(collection(db,'predictions'), where('class_code','==',currentClass)),
+    snap => {
+      const preds = snap.docs.map(d=>({uid:d.id,...d.data()}));
+      preds.sort((a,b)=>(b.risk_probability||0)-(a.risk_probability||0));
+      const cont = document.getElementById('predictions-content');
+      if (!cont) return;
+      if (!preds.length) {
+        cont.innerHTML = '<div class="card" style="text-align:center;padding:3rem"><p style="color:var(--text-2)">No predictions yet. Run the Colab notebook.</p></div>';
+        return;
+      }
+      setText('ov-atrisk', preds.filter(p=>p.risk_category==='high').length);
+      cont.innerHTML = preds.map(p => `
+        <div class="card" style="margin-bottom:1rem;border-left:3px solid ${p.risk_category==='high'?'var(--crimson)':p.risk_category==='borderline'?'var(--amber)':'var(--emerald)'}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
+            <strong style="font-size:.875rem">${p.uid?.slice(0,8)||'—'}…</strong>
+            <div style="display:flex;align-items:center;gap:.6rem">
+              <div class="risk-pill risk-${p.risk_category}"><div class="risk-dot"></div>${(p.risk_category||'').toUpperCase()}</div>
+              <span style="font-family:var(--font-m);font-size:.75rem;color:var(--text-3)">${Math.round((p.risk_probability||0)*100)}%</span>
+            </div>
+          </div>
+          <p style="font-size:.84rem;line-height:1.7;color:var(--text-2);margin-bottom:.65rem">${p.shap_narrative||'No narrative.'}</p>
+          ${p.top_features?.length?'<div style="display:flex;gap:.35rem;flex-wrap:wrap">'+p.top_features.map(f=>`<span class="badge badge-teal">${f.replace(/_/g,' ')}</span>`).join('')+'</div>':''}
+        </div>`).join('');
+    }
+  );
+};
+
+// ── CSV Exports ────────────────────────────────────────────────────
+function dlCSV(rows, fname) {
+  if (!rows.length) { toast('No data to export','error'); return; }
+  const h = Object.keys(rows[0]);
+  const csv = [h.join(','),...rows.map(r=>h.map(k=>JSON.stringify(r[k]??'')).join(','))].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = fname; a.click();
+  toast('Downloaded '+fname,'success');
+}
+
+window.exportH1 = async () => {
+  if (!currentClass) { toast('Enter a class code first','info'); return; }
+  toast('Building H1 feature matrix…','info');
+  const [students, responses] = await Promise.all([getClassStudents(currentClass), getClassResponses(currentClass)]);
+  dlCSV(students.map(s=>{
+    const sr=responses.filter(r=>r.student_uid===s.uid),tot=sr.length||1,corr=sr.filter(r=>r.correct).length;
+    return {student_uid:s.uid,class_code:currentClass,question_count:sr.length,accuracy_pct:Math.round(corr/tot*100),avg_tab_switches:(sr.reduce((a,r)=>a+(r.tab_switch_count||0),0)/tot).toFixed(2),avg_away_ms:Math.round(sr.reduce((a,r)=>a+(r.away_time_ms||0),0)/tot),avg_net_think_ms:Math.round(sr.reduce((a,r)=>a+(r.net_think_time_ms||0),0)/tot),hint_usage_rate:(sr.filter(r=>r.hint_used).length/tot).toFixed(3),avoidance_count:sr.filter(r=>r.signal_avoidance).length,uncertainty_count:sr.filter(r=>r.signal_uncertainty).length,false_mastery_count:sr.filter(r=>r.signal_false_mastery).length,avg_revision_count:(sr.reduce((a,r)=>a+(r.revision_count||0),0)/tot).toFixed(2),misconception_freq_score:(sr.filter(r=>!r.correct&&r.misconception_tag).length/tot).toFixed(3),at_risk:corr/tot<0.5?1:0};
+  }), `CSLifeline_H1_${currentClass}_${new Date().toISOString().split('T')[0]}.csv`);
+};
+
+window.exportH2 = async () => {
+  if (!currentClass) { toast('Enter a class code first','info'); return; }
+  toast('Building H2 misconception matrix…','info');
+  const [students, responses] = await Promise.all([getClassStudents(currentClass), getClassResponses(currentClass)]);
+  dlCSV(students.map(s=>{
+    const sr=responses.filter(r=>r.student_uid===s.uid&&!r.correct&&r.misconception_tag);
+    const row={student_uid:s.uid};
+    MISC_TAGS.forEach(t=>row[t]=sr.filter(r=>r.misconception_tag===t).length);
+    return row;
+  }), `CSLifeline_H2_${currentClass}_${new Date().toISOString().split('T')[0]}.csv`);
+};
+
+window.exportResponses = async () => {
+  if (!currentClass) { toast('Enter a class code first','info'); return; }
+  toast('Exporting…','info');
+  const r = allResponses.length ? allResponses : await getClassResponses(currentClass);
+  dlCSV(r.map(x=>({...x,recorded_at:x.recorded_at?.toDate?.()?.toISOString()||''})), `CSLifeline_Responses_${currentClass}_${new Date().toISOString().split('T')[0]}.csv`);
+};
+
+window.exportStudents = async () => {
+  if (!currentClass) { toast('Enter a class code first','info'); return; }
+  toast('Exporting…','info');
+  const [students, responses] = await Promise.all([getClassStudents(currentClass), getClassResponses(currentClass)]);
+  dlCSV(students.map(s=>{const sr=responses.filter(r=>r.student_uid===s.uid),tot=sr.length||1,corr=sr.filter(r=>r.correct).length;return{student_uid:s.uid,class_code:currentClass,display_name:s.displayName||'',session_count:new Set(sr.map(r=>r.session_id)).size,question_count:sr.length,accuracy_pct:Math.round(corr/tot*100),misconception_count:sr.filter(r=>!r.correct&&r.misconception_tag).length,at_risk_flag:corr/tot<0.5?1:0};}), `CSLifeline_Students_${currentClass}_${new Date().toISOString().split('T')[0]}.csv`);
+};
+
+// ── Student View ────────────────────────────────────────────────────
+window.openSV = async (uid, name) => {
+  document.getElementById('sv-name').textContent = name || uid.slice(0,8);
+  document.getElementById('sv-meta').textContent = 'Loading…';
+  document.getElementById('sv-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  try {
+    const [profileSnap, respSnap, predSnap] = await Promise.all([
+      getDoc(doc(db,'users',uid)),
+      getDocs(query(collection(db,'responses'), where('student_uid','==',uid))),
+      getDoc(doc(db,'predictions',uid))
+    ]);
+    const profile = profileSnap.exists() ? profileSnap.data() : {};
+    svResponses   = respSnap.docs.map(d => d.data());
+    svPaperSel    = 'P1';
+    const tot = svResponses.length, corr = svResponses.filter(r=>r.correct).length;
+    const acc = tot ? Math.round(corr/tot*100) : 0;
+    document.getElementById('sv-meta').textContent = `Class: ${profile.classCode||'—'} · ${new Set(svResponses.map(r=>r.session_id)).size} sessions · ${tot} questions`;
+    setText('sv-accuracy', tot ? acc+'%' : '—');
+    setText('sv-answered', tot || '—');
+    setText('sv-errors',   svResponses.filter(r=>!r.correct&&r.misconception_tag).length || '0');
+    setText('sv-tabs',     svResponses.reduce((a,r)=>a+(r.tab_switch_count||0),0) || '0');
+    setText('sv-avoid',    svResponses.filter(r=>r.signal_avoidance).length);
+    setText('sv-uncert',   svResponses.filter(r=>r.signal_uncertainty).length);
+    setText('sv-false',    svResponses.filter(r=>r.signal_false_mastery).length);
+    setText('sv-hints',    svResponses.filter(r=>r.hint_used).length);
+    buildSVRadar(svResponses);
+    buildSVBars(svResponses,'P1');
+    document.querySelectorAll('.sv-ptab').forEach((b,i)=>b.classList.toggle('active',i===0));
+    buildSVMisc(svResponses);
+    const pred = predSnap.exists() ? predSnap.data() : null;
+    const pill = document.getElementById('sv-risk-pill');
+    if (pred?.risk_category) {
+      pill.innerHTML = `<div class="risk-pill risk-${pred.risk_category}"><div class="risk-dot"></div>${pred.risk_category.toUpperCase()}</div>`;
+      pill.style.display = '';
+    } else { pill.style.display = 'none'; }
+    const aiBlock = document.getElementById('sv-ai-block');
+    if (pred) {
+      aiBlock.style.display = '';
+      document.getElementById('sv-ai').innerHTML = `<p style="font-size:.84rem;line-height:1.75;color:var(--text-2)">${pred.shap_narrative||'No SHAP narrative yet.'}</p>${pred.top_features?.length?'<div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.6rem">'+pred.top_features.map(f=>`<span class="badge badge-teal">${f.replace(/_/g,' ')}</span>`).join('')+'</div>':''}`;
+    } else aiBlock.style.display = 'none';
+    const wrong = svResponses.filter(r=>!r.correct).slice(0,8);
+    document.getElementById('sv-wrong').innerHTML = wrong.length
+      ? wrong.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);gap:.5rem;flex-wrap:wrap"><div><div style="font-size:.8rem;font-weight:600">${r.question_id||'—'}</div><div style="font-size:.7rem;color:var(--text-3)">${r.chapter_id||'—'} · ${(r.misconception_tag||'—').replace(/_/g,' ')}</div></div><span class="badge badge-crimson">✗</span></div>`).join('')
+      : '<p style="font-size:.8rem;color:var(--text-3)">No errors yet.</p>';
+  } catch(e) {
+    document.getElementById('sv-meta').textContent = 'Error: '+e.message;
+    console.error('openSV:',e);
+  }
+};
+
+window.svPaper = (paper, btn) => {
+  svPaperSel = paper;
+  document.querySelectorAll('.sv-ptab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildSVBars(svResponses, paper);
+};
+
+window.closeSV = () => {
+  document.getElementById('sv-modal').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+function buildSVRadar(responses) {
+  const topics = Object.keys(CHAPTERS);
+  const ctx    = document.getElementById('sv-radar')?.getContext('2d');
+  if (!ctx) return;
+  if (svRadar) svRadar.destroy();
+  svRadar = new Chart(ctx,{type:'radar',data:{labels:topics.map(t=>CHAPTERS[t].title.split(' ')[0]),datasets:[{label:'Accuracy %',data:topics.map(t=>{const tr=responses.filter(r=>r.chapter_id===t);return tr.length?Math.round(tr.filter(r=>r.correct).length/tr.length*100):0;}),borderColor:'rgba(0,212,170,.85)',backgroundColor:'rgba(0,212,170,.12)',pointBackgroundColor:'#00D4AA',pointRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,color:'#475569',backdropColor:'transparent',font:{size:9}},grid:{color:'rgba(255,255,255,.06)'},angleLines:{color:'rgba(255,255,255,.06)'},pointLabels:{color:'#94A3B8',font:{size:9}}}}}});
+}
+
+function buildSVBars(responses, paper) {
+  const el = document.getElementById('sv-chapter-bars');
+  if (!el) return;
+  const chs = Object.entries(CHAPTERS).filter(([,v])=>v.paper===paper);
+  el.innerHTML = chs.map(([id,ch])=>{
+    const r=responses.filter(x=>x.chapter_id===id);
+    const pct=r.length?Math.round(r.filter(x=>x.correct).length/r.length*100):null;
+    const col=pct===null?'rgba(255,255,255,.2)':pct>=70?'var(--teal)':pct>=50?'var(--amber)':'var(--crimson)';
+    return `<div class="ch-bar-row"><div class="ch-bar-name">${ch.title}</div><div class="ch-bar-track"><div class="ch-bar-fill" style="width:${pct||0}%;background:${col}"></div></div><div class="ch-bar-pct" style="color:${col}">${pct!==null?pct+'%':'—'}</div></div>`;
+  }).join('');
+}
+
+function buildSVMisc(responses) {
+  const el = document.getElementById('sv-misc');
+  if (!el) return;
+  const tc={};
+  responses.filter(r=>!r.correct&&r.misconception_tag).forEach(r=>{tc[r.misconception_tag]=(tc[r.misconception_tag]||0)+1;});
+  const active = MISC_TAGS.filter(t=>tc[t]).sort((a,b)=>(tc[b]||0)-(tc[a]||0));
+  const total  = active.reduce((a,t)=>a+(tc[t]||0),0)||1;
+  el.innerHTML = active.length
+    ? active.map(t=>{const c=tc[t]||0,pct=Math.round(c/total*100),col=pct>40?'var(--crimson)':pct>20?'var(--amber)':'var(--teal)';return `<div class="hmap-row"><div class="hmap-label">${t.replace(/_/g,' ')}</div><div class="hmap-track"><div class="hmap-fill" style="width:${Math.max(pct,3)}%;background:${col}"></div></div><div class="hmap-pct" style="color:${col}">${c}</div></div>`;}).join('')
+    : '<p style="font-size:.8rem;color:var(--text-3)">No misconceptions yet.</p>';
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function toast(msg, type='info') {
+  const c = document.getElementById('toast-root');
+  if (!c) return;
+  const t = document.createElement('div');
+  t.className = 'toast '+type;
+  t.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/></svg><span>'+msg+'</span>';
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.transition='.2s'; t.style.opacity='0'; t.style.transform='translateX(110%)'; setTimeout(()=>t.remove(),200); }, 4500);
+}
+
+window.toast = toast;
+
+// Keyboard close for student modal
+document.addEventListener('keydown', e => { if (e.key==='Escape') window.closeSV(); });
+
+// ─────────────────────────────────────────────────────────────────────
+// BOOT — all window.* are already defined above
+// ─────────────────────────────────────────────────────────────────────
+(async () => {
+  try {
+    // If we have a saved class, show it immediately and start loading
+    if (currentClass) {
+      const nav = document.getElementById('nav-email');
+      if (nav) nav.textContent = 'Class: ' + currentClass;
+      renderClassChip(currentClass, true);
+      window.loadOverview();  // start loading right away — no need to wait for auth
+    }
+
+    // Auth in background
+    const { user } = await requireRole('teacher');
+    const em = document.getElementById('nav-email');
+    const av = document.getElementById('nav-av');
+    if (em) em.textContent = user.email || user.displayName || 'Teacher';
+    if (av) av.textContent = ((user.email || user.displayName || 'T')[0]).toUpperCase();
+
+    // Discover enrolled classes
+    const snap    = await getDocs(query(collection(db,'users'), where('role','==','student')));
+    const classes = [...new Set(snap.docs.map(d=>d.data().classCode).filter(Boolean))];
+    const chips   = document.getElementById('class-chips');
+    if (chips) {
+      if (classes.length) {
+        chips.innerHTML = '';
+        classes.forEach(c => renderClassChip(c, c === currentClass));
+      } else {
+        chips.innerHTML = '<p style="font-size:.72rem;color:var(--text-3);padding:.2rem .1rem">No students yet</p>';
+      }
+      // If no class selected yet, auto-select first enrolled class
+      if (!currentClass && classes.length) {
+        window.setClass(classes[0]);
+      }
+    }
+
+    // If still no class after all that, just remove the spinner
+    if (!currentClass) {
+      const c = document.getElementById('class-chips');
+      if (c && c.querySelector('.spinner')) {
+        c.innerHTML = '<p style="font-size:.72rem;color:var(--text-3);padding:.2rem">Enter class code above</p>';
+      }
+    }
+
+  } catch(e) {
+    console.warn('Teacher boot error:', e.message);
+  }
+})();
+
+// Pre-load question bank in background immediately on page load
+// so it's ready when teacher clicks Build Assessment
+setTimeout(() => {
+  if (typeof window.initAssessmentBuilder === 'function') {
+    window.initAssessmentBuilder();
+  }
+}, 500);
+
+function renderClassChip(cls, active) {
+  const chips = document.getElementById('class-chips');
+  if (!chips) return;
+  // Remove spinner if present
+  const spinner = chips.querySelector('.spinner');
+  if (spinner) spinner.remove();
+  // Don't duplicate
+  if (chips.querySelector(`[data-cls="${cls}"]`)) {
+    chips.querySelectorAll('.class-chip').forEach(b=>b.classList.toggle('active',b.dataset.cls===cls));
+    return;
+  }
+  const btn = document.createElement('button');
+  btn.className = 'class-chip' + (active ? ' active' : '');
+  btn.dataset.cls = cls;
+  btn.textContent = cls;
+  btn.onclick = () => window.setClass(cls);
+  chips.appendChild(btn);
+}
+</script>
+
+<!-- Publish Modal -->
+<div id="pub-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center" onclick="if(event.target===this)closePubModal()">
+  <div style="width:100%;max-width:420px;margin:1rem;background:var(--midnight-2);border:1px solid var(--glass-b);border-radius:var(--r3);padding:1.5rem">
+    <div style="font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:.25rem">Publish to Students</div>
+    <p style="font-size:.8rem;color:var(--text-2);margin-bottom:1.1rem">Students in the selected class will see this assessment in their dashboard.</p>
+    <div style="margin-bottom:.6rem">
+      <label style="font-size:.74rem;color:var(--text-3);display:block;margin-bottom:.25rem">Class code</label>
+      <input id="pub-class" placeholder="e.g. 10B"
+        style="width:100%;padding:.42rem .65rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.8rem;color:var(--text);outline:none;font-family:var(--font)">
+    </div>
+    <div style="margin-bottom:.6rem">
+      <label style="font-size:.74rem;color:var(--text-3);display:block;margin-bottom:.25rem">Deadline</label>
+      <input type="datetime-local" id="pub-deadline"
+        style="width:100%;padding:.42rem .65rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.78rem;color:var(--text);outline:none;font-family:var(--font)">
+    </div>
+    <div style="margin-bottom:1rem">
+      <label style="font-size:.74rem;color:var(--text-3);display:block;margin-bottom:.25rem">Time limit for students (minutes, optional)</label>
+      <input type="number" id="pub-timelimit" placeholder="Leave blank for no limit" min="5" max="180"
+        style="width:100%;padding:.42rem .65rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-b);border-radius:var(--r);font-size:.78rem;color:var(--text);outline:none;font-family:var(--font)">
+    </div>
+    <div style="display:flex;gap:.6rem;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" onclick="closePubModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmPublish()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Confirm &amp; Publish
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden print frame -->
+<iframe id="print-frame" style="display:none" title="Print preview"></iframe>
+<script>// ═══════════════════════════════════════════════════════════════════
+// QUESTION BANK · ASSESSMENT BUILDER · UPLOAD
+// Clean rewrite — all state on window.*, all DOM access null-guarded
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Shared state (on window so module script can read) ─────────────
+window.QB_ALL      = [];        // full question bank
+window.QB_FILTERED = [];        // after filters
+window.QB_SEL      = new Set(); // selected _id strings
+window.QB_READY    = false;     // true once questions loaded
+let   AB_DATA      = null;      // staged publish payload
+
+const CH = {
+  T01:'Data Representation', T02:'Data Transmission', T03:'Hardware',
+  T04:'Software', T05:'Internet & Uses', T06:'Emerging Tech',
+  T07:'Algorithm Design', T08:'Programming', T09:'Arrays',
+  T10:'Procedures & Functions', T11:'File Handling',
+  T12:'Searching & Sorting', T13:'Boolean Logic'
+};
+const DL = ['','Foundation','Core','Extended'];
+
+// ── Safe DOM helpers ───────────────────────────────────────────────
+function gel(id)         { return document.getElementById(id); }
+function setText(id, v)  { const e=gel(id); if(e) e.textContent=v; }
+function setHtml(id, v)  { const e=gel(id); if(e) e.innerHTML=v; }
+function setDisp(id, v)  { const e=gel(id); if(e) e.style.display=v; }
+function val(id)         { const e=gel(id); return e ? e.value : ''; }
+
+// ── Tab switching ─────────────────────────────────────────────────
+window.switchQBTab = function(tab) {
+  ['bank','builder','upload'].forEach(t => {
+    const panel = gel('qb-tab-'+t);
+    const btn   = gel('qbt-'+t);
+    if (panel) panel.style.display = t===tab ? '' : 'none';
+    if (btn)   btn.classList.toggle('active', t===tab);
+  });
+  if (tab === 'bank') {
+    if (!window.QB_READY) window.initQB();
+    else renderBank();
+  }
+  if (tab === 'builder') renderBuilder();
+};
+
+// ── Nav button actions ─────────────────────────────────────────────
+window.refreshQuestionBank = function() {
+  window.QB_ALL   = [];
+  window.QB_READY = false;
+  window.showSec('upload');
+  setTimeout(() => window.switchQBTab('bank'), 50);
+};
+
+window.openAddQuestion = function() {
+  window.showSec('upload');
+  setTimeout(() => window.switchQBTab('upload'), 50);
+};
+
+window.openUploadPanel = function() {
+  window.showSec('upload');
+  setTimeout(() => window.switchQBTab('upload'), 50);
+};
+
+// ── Called by showSec('upload') in module script ───────────────────
+window.initAssessmentBuilder = function() {
+  window.switchQBTab('bank');
+};
+
+// ── Load questions ─────────────────────────────────────────────────
+window.initQB = function() {
+  const countEl = gel('qb-bank-count');
+  setHtml('qb-bank-list', '<div style="text-align:center;padding:2rem"><div class="spinner"></div></div>');
+  setText('qb-bank-count', 'Loading…');
+
+  // Load from window.QUESTIONS_DATA — set by <script src="/data/questions.js">
+  const builtIn = window.QUESTIONS_DATA || [];
+  window.QB_ALL = builtIn.map(q => ({ _id: 'local_' + q.id, ...q, source: q.source || 'builtin' }));
+  if (!window.QB_ALL.length) {
+    setHtml('qb-bank-list', '<p style="color:var(--crimson);font-size:.82rem;padding:1rem">Error: QUESTIONS_DATA not available. Refresh the page.</p>');
+    return;
+  }
+
+  window.QB_FILTERED = [...window.QB_ALL];
+  window.QB_READY    = true;
+  buildChapterFilter();
+  buildQuickChips();
+  renderBank();
+  setText('qb-bank-count', window.QB_ALL.length + ' questions');
+
+  // Sync Firestore in background — no await, never blocks UI
+  syncFirestore();
+};
+
+async function syncFirestore() {
+  try {
+    const { getApps }   = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, getDocs, writeBatch, doc, serverTimestamp } =
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const db = getFirestore(getApps()[0]);
+    const snap = await withTimeout(getDocs(collection(db, 'questions')), 10000, 'Question bank sync');
+    const fsDocs = snap.docs.map(d => ({_id:d.id,...d.data()})).filter(q => q.active !== false);
+
+    if (fsDocs.length) {
+      const fsIds = new Set(fsDocs.map(q => q.id));
+      const localOnly = window.QB_ALL.filter(q => !fsIds.has(q.id));
+      window.QB_ALL = [...fsDocs, ...localOnly];
+    } else {
+      // Seed Firestore with built-in questions (from window.QUESTIONS_DATA)
+      const batch = writeBatch(db);
+      (window.QUESTIONS_DATA||[]).forEach(q =>
+        batch.set(doc(collection(db,'questions')), {...q, active:true, source:'builtin', created_at:serverTimestamp()})
+      );
+      await batch.commit();
+    }
+
+    window.QB_FILTERED = [...window.QB_ALL];
+    renderBank();
+    setText('qb-bank-count', window.QB_ALL.length + ' questions in bank');
+  } catch(e) {
+    console.warn('Firestore sync skipped (offline):', e.message);
+    const c = gel('qb-bank-count');
+    if (c && !c.textContent.includes('offline'))
+      c.textContent += ' (Firestore offline)';
+  }
+}
+
+// ── Filter / render bank ───────────────────────────────────────────
+window.filterQBank = function() {
+  const paper   = val('qbf-paper');
+  const chapter = val('qbf-chapter');
+  const type    = val('qbf-type');
+  const diff    = val('qbf-diff');
+  const source  = val('qbf-source');
+  const search  = val('qbf-search').toLowerCase();
+  window.QB_FILTERED = window.QB_ALL.filter(q =>
+    (!paper   || q.paper === paper) &&
+    (!chapter || q.chapter_id === chapter) &&
+    (!type    || q.type === type) &&
+    (!diff    || String(q.difficulty) === diff) &&
+    (!source  || (source==='custom' ? q.source==='custom' : q.source!=='custom')) &&
+    (!search  || (q.text||'').toLowerCase().includes(search) ||
+                 (q.topic||'').toLowerCase().includes(search))
+  );
+  renderBank();
+};
+
+function renderBank() {
+  const el = gel('qb-bank-list');
+  if (!el) return;
+  const c = gel('qb-bank-count');
+  if (c) c.textContent = window.QB_FILTERED.length + ' / ' + window.QB_ALL.length + ' questions';
+  const sc = gel('qb-sel-count');
+  if (sc) sc.textContent = window.QB_SEL.size + ' selected';
+
+  if (!window.QB_FILTERED.length) {
+    el.innerHTML = '<p style="font-size:.82rem;color:var(--text-3);text-align:center;padding:2rem">No questions match the filters.</p>';
+    return;
+  }
+  el.innerHTML = window.QB_FILTERED.map(q => {
+    const sel = window.QB_SEL.has(q._id);
+    const col = q.difficulty===1?'var(--teal)':q.difficulty===2?'var(--amber)':'var(--crimson)';
+    return `<div class="ab-q-card${sel?' selected':''}" onclick="toggleQ('${q._id}')" id="qbc-${q._id}" style="cursor:pointer">
+      <div class="ab-q-num" style="${sel?'background:var(--teal-ghost);border-color:var(--teal);color:var(--teal)':''}">${sel?'✓':''}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.3rem">
+          <span class="ab-tag" style="color:${q.paper==='P1'?'var(--teal)':'var(--amber)'}">${q.paper}</span>
+          <span class="ab-tag">${q.chapter_id}</span>
+          <span class="ab-tag">${q.type==='trace_output'?'Trace':q.type==='coding'?'Coding':'MCQ'}</span>
+          <span class="ab-tag" style="color:${col}">${DL[q.difficulty]||''}</span>
+          ${q.source==='custom'?'<span class="ab-tag" style="color:var(--teal)">Custom</span>':''}
+        </div>
+        <div style="font-size:.78rem;color:var(--text-2);line-height:1.5">${(q.text||'').slice(0,110)}${(q.text||'').length>110?'…':''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.35rem;flex-shrink:0">
+        <div style="width:18px;height:18px;border-radius:4px;border:1.5px solid ${sel?'var(--teal)':'var(--glass-b)'};background:${sel?'var(--teal)':'transparent'};display:flex;align-items:center;justify-content:center">
+          ${sel?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}
+        </div>
+        <button onclick="event.stopPropagation();delQ('${q._id}')" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:.7rem;line-height:1" title="Remove">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleQ = function(id) {
+  if (window.QB_SEL.has(id)) window.QB_SEL.delete(id);
+  else window.QB_SEL.add(id);
+  // Update just this card's visuals
+  const card = gel('qbc-'+id);
+  if (card) {
+    const sel = window.QB_SEL.has(id);
+    card.className = 'ab-q-card' + (sel?' selected':'');
+    const num = card.querySelector('.ab-q-num');
+    if (num) { num.textContent=sel?'✓':''; num.style.cssText=sel?'background:var(--teal-ghost);border-color:var(--teal);color:var(--teal)':''; }
+    const box = card.querySelector('div:last-child > div');
+    if (box) { box.style.borderColor=sel?'var(--teal)':'var(--glass-b)'; box.style.background=sel?'var(--teal)':'transparent'; box.innerHTML=sel?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''; }
+  }
+  const sc = gel('qb-sel-count');
+  if (sc) sc.textContent = window.QB_SEL.size + ' selected';
+  const ac = gel('ab-count');
+  if (ac) ac.textContent = '(' + window.QB_SEL.size + ')';
+};
+
+window.selectAllFiltered = function() {
+  window.QB_FILTERED.forEach(q => window.QB_SEL.add(q._id));
+  renderBank();
+};
+
+window.clearBankSelection = function() {
+  window.QB_SEL.clear();
+  renderBank();
+  renderBuilder();
+};
+
+window.buildFromSelected = function() {
+  if (!window.QB_SEL.size) { window.toast?.('Select at least one question first','error'); return; }
+  window.switchQBTab('builder');
+};
+
+window.delQ = async function(id) {
+  if (!confirm('Remove this question from the bank?')) return;
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await updateDoc(doc(getFirestore(getApps()[0]),'questions',id), {active:false});
+    window.QB_ALL      = window.QB_ALL.filter(q => q._id!==id);
+    window.QB_FILTERED = window.QB_FILTERED.filter(q => q._id!==id);
+    window.QB_SEL.delete(id);
+    renderBank();
+    window.toast?.('Question removed','success');
+  } catch(e) { window.toast?.('Error: '+e.message,'error'); }
+};
+
+function buildChapterFilter() {
+  const sel = gel('qbf-chapter');
+  if (!sel || sel.options.length > 1) return;
+  Object.entries(CH).forEach(([id, name]) => {
+    const o = document.createElement('option');
+    o.value = id; o.textContent = id + ' — ' + name;
+    sel.appendChild(o);
+  });
+}
+
+function buildQuickChips() {
+  const el = gel('quick-add-chips');
+  if (!el) return;
+  el.innerHTML = Object.keys(CH).map(id =>
+    `<button class="class-chip" onclick="quickAdd('${id}')" style="font-size:.68rem;margin:.15rem">${id}</button>`
+  ).join('');
+}
+
+window.quickAdd = function(chId) {
+  const pool = window.QB_ALL.filter(q => q.chapter_id===chId);
+  if (!pool.length) { window.toast?.('No questions for '+chId,'info'); return; }
+  const pick = [...pool].sort(()=>Math.random()-.5).slice(0,3);
+  pick.forEach(q => window.QB_SEL.add(q._id));
+  renderBuilder();
+  window.toast?.('Added '+pick.length+' '+chId+' questions','success');
+};
+
+// ── Builder ────────────────────────────────────────────────────────
+function renderBuilder() {
+  const el  = gel('ab-selected-list');
+  const cnt = gel('ab-count');
+  if (cnt) cnt.textContent = '(' + window.QB_SEL.size + ')';
+  if (!el) return;
+  if (!window.QB_SEL.size) {
+    el.innerHTML = '<p style="font-size:.78rem;color:var(--text-3);padding:.75rem;text-align:center">No questions selected — go to Question Bank tab.</p>';
+    return;
+  }
+  const list = window.QB_ALL.filter(q => window.QB_SEL.has(q._id));
+  el.innerHTML = list.map((q,i) => `
+    <div class="ab-selected-item">
+      <div class="ab-selected-num">${i+1}</div>
+      <div style="flex:1;min-width:0;font-size:.77rem;color:var(--text-2)">${(q.text||'').slice(0,65)}${(q.text||'').length>65?'…':''}</div>
+      <span class="ab-tag" style="font-size:.65rem;flex-shrink:0">${q.chapter_id}</span>
+      <button onclick="toggleQ('${q._id}');renderBuilder()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:.1rem .25rem;flex-shrink:0">✕</button>
+    </div>`).join('');
+  const d = gel('ab-date');
+  if (d && !d.value) d.value = new Date().toISOString().split('T')[0];
+}
+
+window.renderBuilderList = renderBuilder; // alias used by switchQBTab
+
+window.abShuffle = function() {
+  const ids = [...window.QB_SEL];
+  for (let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}
+  window.QB_SEL = new Set(ids);
+  renderBuilder();
+  window.toast?.('Shuffled','info');
+};
+
+// ── Print ──────────────────────────────────────────────────────────
+window.abPrint = function() {
+  const list = window.QB_ALL.filter(q => window.QB_SEL.has(q._id));
+  if (!list.length) { window.toast?.('Select questions first','error'); return; }
+  const title    = val('ab-title') || 'CS Lifeline Assessment';
+  const date     = val('ab-date');
+  const duration = val('ab-duration');
+  const nameF    = val('ab-namefield') || 'blank';
+  const extras   = val('ab-extra-fields').split('\n').filter(Boolean);
+  const instrux  = val('ab-instructions');
+  const dateStr  = date ? new Date(date+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) : '___________________';
+  const marks    = list.reduce((a,q)=>a+(q.type==='coding'?4:q.type==='trace_output'?2:1),0);
+
+  const hdrRows = [
+    nameF==='blank' ? '<tr><td style="width:160px;padding:.25em 0;border-bottom:1px solid #000">Name:</td><td style="border-bottom:1px solid #000;width:100%">&nbsp;</td></tr>' : '',
+    ...extras.map(f=>`<tr><td style="padding:.25em 0;border-bottom:1px solid #ccc">${f}</td><td style="border-bottom:1px solid #ccc">&nbsp;</td></tr>`)
+  ].filter(Boolean).join('');
+
+  const qHtml = list.map((q,i) => {
+    const m = q.type==='coding'?4:q.type==='trace_output'?2:1;
+    let body = '';
+    if (q.type!=='coding') {
+      body = (q.options||[]).map((o,oi)=>`<div style="margin:.3em 0;padding-left:1.5em"><strong>${String.fromCharCode(65+oi)}.</strong> ${o}</div>`).join('');
+      body += '<div style="border:1px solid #aaa;height:28px;margin-top:.4em"></div>';
+    } else {
+      body = q.starter?`<pre style="background:#f5f5f5;border:1px solid #ccc;padding:.5em;font-size:.85em">${q.starter}</pre>`:'';
+      body += '<div style="border:1px solid #aaa;height:90px;margin-top:.4em"></div>';
+    }
+    return `<div style="page-break-inside:avoid;margin-bottom:1.4em">
+      <div style="display:flex;justify-content:space-between;margin-bottom:.35em"><strong>Question ${i+1}</strong><span style="font-size:.85em;color:#555">[${m} mark${m>1?'s':''}] ${DL[q.difficulty]||''} · ${q.chapter_id}</span></div>
+      <div style="margin-bottom:.5em;line-height:1.7;white-space:pre-wrap">${q.text}</div>${body}
+    </div>`;
+  }).join('<hr style="margin:1em 0;border:none;border-top:1px dashed #ddd">');
+
+  const win = window.open('','_blank','width=900,height=700');
+  if (!win) { window.toast?.('Allow pop-ups to print','error'); return; }
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+title+'</title>'
+    +'<style>*{box-sizing:border-box}body{font-family:"Times New Roman",serif;font-size:11pt;padding:2cm 2.5cm;max-width:21cm;margin:0 auto;color:#000}'
+    +'@media print{@page{margin:0;size:A4}}</style></head><body>'
+    +'<div style="border-bottom:2px solid #000;padding-bottom:.75em;margin-bottom:1em">'
+    +'<div style="font-size:18pt;font-weight:bold;margin-bottom:.2em">'+title+'</div>'
+    +'<div style="font-size:10pt;color:#444;margin-bottom:.6em">Cambridge IGCSE Computer Science 0478</div>'
+    +'<div style="font-size:10pt;display:flex;gap:2em;flex-wrap:wrap;margin-bottom:.6em">'
+    +'<span>Date: <strong>'+dateStr+'</strong></span>'
+    +(duration?'<span>Time: <strong>'+duration+' minutes</strong></span>':'')
+    +'<span>Total: <strong>'+marks+' marks</strong></span></div>'
+    +(hdrRows?'<table style="width:100%;border-collapse:collapse;font-size:10.5pt">'+hdrRows+'</table>':'')
+    +(instrux?'<div style="background:#f8f8f8;border:1px solid #ccc;padding:.5em .85em;font-size:10pt;margin-top:.6em"><strong>Instructions:</strong> '+instrux+'</div>':'')
+    +'</div>'+qHtml+'</body></html>');
+  win.document.close();
+  win.onload = () => win.print();
+};
+
+// ── Publish ────────────────────────────────────────────────────────
+window.abPublish = function() {
+  const list = window.QB_ALL.filter(q => window.QB_SEL.has(q._id));
+  if (!list.length) { window.toast?.('Select questions first','error'); return; }
+  AB_DATA = { title: val('ab-title')||'Assessment', questions: list,
+    duration: parseInt(val('ab-duration'))||null, instructions: val('ab-instructions') };
+  const ci = gel('pub-class');
+  if (ci && !ci.value) ci.value = window.currentClass || localStorage.getItem('csl_teacher_class') || '';
+  const dl = gel('pub-deadline');
+  if (dl && !dl.value) { const t=new Date(); t.setDate(t.getDate()+1); t.setHours(9,0,0,0); dl.value=t.toISOString().slice(0,16); }
+  const m = gel('pub-modal'); if (m) m.style.display='flex';
+};
+
+window.closePubModal = function() { const m=gel('pub-modal'); if(m) m.style.display='none'; };
+
+window.confirmPublish = async function() {
+  if (!AB_DATA) return;
+  const cls = val('pub-class').trim();
+  const dlv = val('pub-deadline');
+  const tlm = parseInt(val('pub-timelimit'))||null;
+  if (!cls)  { window.toast?.('Enter a class code','error'); return; }
+  if (!dlv)  { window.toast?.('Set a deadline','error'); return; }
+  const dl = new Date(dlv);
+  if (dl <= new Date()) { window.toast?.('Deadline must be in the future','error'); return; }
+  const btn = document.querySelector('#pub-modal .btn-primary');
+  if (btn) { btn.disabled=true; btn.textContent='Publishing…'; }
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, addDoc, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const db = getFirestore(getApps()[0]);
+    await withTimeout(addDoc(collection(db,'published_assessments'), {
+      title: AB_DATA.title, class_code: cls,
+      questions: AB_DATA.questions.map(q=>({id:q.id||q._id,paper:q.paper,chapter_id:q.chapter_id,type:q.type,difficulty:q.difficulty,misconception_tag:q.misconception_tag,text:q.text,options:q.options||[],correct:q.correct??null,starter:q.starter||''})),
+      question_count: AB_DATA.questions.length,
+      total_marks: AB_DATA.questions.reduce((a,q)=>a+(q.type==='coding'?4:q.type==='trace_output'?2:1),0),
+      instructions: AB_DATA.instructions, time_limit_min: tlm,
+      deadline: Timestamp.fromDate(dl), created_at: Timestamp.fromDate(new Date()), status:'active'
+    }), 10000, 'Assessment publish');
+    window.closePubModal();
+    window.toast?.('Published '+AB_DATA.questions.length+' questions to class '+cls,'success');
+    AB_DATA = null;
+    setTimeout(() => window.showSec?.('assessments'), 800);
+  } catch(e) { window.toast?.('Error: '+e.message,'error'); }
+  finally { if(btn){btn.disabled=false;btn.textContent='Confirm & Publish';} }
+};
+
+// ── Upload JSON ────────────────────────────────────────────────────
+window.handleJsonFile = async function(input) {
+  const file = input.files?.[0]; if (!file) return;
+  gel('json-paste').value = await file.text();
+  window.validateJsonPaste();
+};
+
+window.handleJsonDrop = async function(e) {
+  e.preventDefault();
+  const dz = gel('json-dropzone'); if (dz) dz.style.borderColor='';
+  const file = e.dataTransfer?.files?.[0];
+  if (!file || !file.name.endsWith('.json')) { window.toast?.('Drop a .json file','error'); return; }
+  gel('json-paste').value = await file.text();
+  window.validateJsonPaste();
+};
+
+window.validateJsonPaste = function() {
+  const fb  = gel('json-feedback');
+  const raw = val('json-paste').trim();
+  if (!raw) { if(fb) fb.innerHTML=''; return null; }
+  try {
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) { if(fb) fb.innerHTML='<span style="color:var(--crimson)">❌ Must be a JSON array</span>'; return null; }
+    const good = arr.filter(q=>q.id&&q.text&&q.paper&&q.chapter_id);
+    const bad  = arr.length - good.length;
+    if(fb) fb.innerHTML = '<span style="color:var(--teal)">✓ '+good.length+' valid'+
+      (bad?' <span style="color:var(--amber)">· '+bad+' missing required fields (id,text,paper,chapter_id)</span>':'')+' </span>';
+    return good;
+  } catch(e) { if(fb) fb.innerHTML='<span style="color:var(--crimson)">❌ '+e.message+'</span>'; return null; }
+};
+
+window.uploadJsonQuestions = async function() {
+  const questions = window.validateJsonPaste();
+  if (!questions?.length) { window.toast?.('No valid questions','error'); return; }
+  const existIds = new Set(window.QB_ALL.map(q=>q.id));
+  const newOnes  = questions.filter(q=>!existIds.has(q.id));
+  const dupes    = questions.length - newOnes.length;
+  if (dupes) window.toast?.('Skipped '+dupes+' duplicate IDs','info');
+  if (!newOnes.length) { window.toast?.('All questions already in bank','info'); return; }
+  const fb = gel('json-feedback');
+  if(fb) fb.innerHTML='<span style="color:var(--teal)">Uploading '+newOnes.length+' questions…</span>';
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const db = getFirestore(getApps()[0]);
+    let n = 0;
+    for (const q of newOnes) {
+      const ref = await withTimeout(addDoc(collection(db,'questions'), {...q, active:true, source:'custom', created_at:serverTimestamp()}), 10000, 'Question upload');
+      window.QB_ALL.push({_id:ref.id, ...q, active:true, source:'custom'});
+      n++;
+      if(fb) fb.innerHTML='<span style="color:var(--teal)">Uploading… '+n+'/'+newOnes.length+'</span>';
+    }
+    window.QB_FILTERED = [...window.QB_ALL];
+    gel('json-paste').value = '';
+    if(fb) fb.innerHTML='<span style="color:var(--teal)">✓ '+n+' questions added</span>';
+    window.toast?.(n+' questions uploaded','success');
+    setText('qb-bank-count', window.QB_ALL.length + ' questions in bank');
+  } catch(e) {
+    if(fb) fb.innerHTML='<span style="color:var(--crimson)">❌ '+e.message+'</span>';
+    window.toast?.('Upload failed: '+e.message,'error');
+  }
+};
+
+// ── Add single question ────────────────────────────────────────────
+window.updateSQTypeFields = function() {
+  const t = val('sq-type');
+  setDisp('sq-mcq-fields',    t!=='coding' ? '' : 'none');
+  setDisp('sq-coding-fields', t==='coding' ? '' : 'none');
+};
+
+window.saveSingleQuestion = async function() {
+  const id   = val('sq-id').trim();
+  const text = val('sq-text').trim();
+  if (!id || !text) { window.toast?.('ID and question text are required','error'); return; }
+  if (window.QB_ALL.some(q=>q.id===id)) { window.toast?.('ID "'+id+'" already exists','error'); return; }
+  const type = val('sq-type');
+  const q = { id, paper:val('sq-paper'), chapter_id:val('sq-chapter'),
+    topic:CH[val('sq-chapter')]||val('sq-chapter'), type,
+    difficulty:parseInt(val('sq-diff'))||2,
+    misconception_tag:val('sq-tag'), text, hint:val('sq-hint'), source:'custom' };
+  if (type!=='coding') {
+    const opts = val('sq-options').split('\n').map(l=>l.trim()).filter(Boolean);
+    if (opts.length<2) { window.toast?.('Add at least 2 options','error'); return; }
+    q.options=opts; q.correct=parseInt(val('sq-correct'))||0;
+  } else { q.starter=val('sq-starter'); }
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const ref = await withTimeout(addDoc(collection(getFirestore(getApps()[0]),'questions'), {...q, active:true, created_at:serverTimestamp()}), 10000, 'Question save');
+    q._id = ref.id;
+    window.QB_ALL.push(q);
+    window.QB_FILTERED = [...window.QB_ALL];
+    renderBank();
+    ['sq-id','sq-tag','sq-text','sq-options','sq-correct','sq-starter','sq-hint'].forEach(f=>{const e=gel(f);if(e)e.value='';});
+    setText('qb-bank-count', window.QB_ALL.length + ' questions in bank');
+    window.toast?.('Question "'+id+'" added','success');
+  } catch(e) { window.toast?.('Error: '+e.message,'error'); }
+};
+
+// ── Published Assessments ──────────────────────────────────────────
+let PA_TIMER = null;
+window.loadPublishedAssessments = async function() {
+  const el = gel('assessments-list');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:2rem"><div class="spinner"></div></div>';
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap = await withTimeout(getDocs(collection(getFirestore(getApps()[0]),'published_assessments')), 10000, 'Published assessments load');
+    const now  = new Date();
+    const docs = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.created_at?.seconds||0)-(a.created_at?.seconds||0));
+    if (!docs.length) { el.innerHTML='<div class="card" style="text-align:center;padding:3rem"><p style="color:var(--text-2);font-weight:600">No assessments published yet</p></div>'; return; }
+    el.innerHTML = docs.map(a => {
+      const dl = a.deadline?.toDate ? a.deadline.toDate() : new Date(a.deadline);
+      const exp = dl < now;
+      const ms  = dl - now;
+      const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000);
+      const col = exp?'var(--text-3)':ms<3600000?'var(--crimson)':ms<86400000?'var(--amber)':'var(--teal)';
+      const tl  = exp?'Expired':h>0?h+'h '+m+'m left':m+'m left';
+      return `<div class="card" style="margin-bottom:1rem;border-left:3px solid ${exp?'var(--glass-b)':col};opacity:${exp?.6:1}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+          <div><div style="font-family:var(--font-d);font-size:.95rem;font-weight:700;margin-bottom:.3rem">${a.title}</div>
+          <div style="font-size:.75rem;color:var(--text-3);display:flex;gap:.75rem;flex-wrap:wrap">
+            <span>Class: <strong style="color:var(--teal)">${a.class_code}</strong></span>
+            <span>${a.question_count} questions · ${a.total_marks} marks</span>
+            ${a.time_limit_min?'<span>'+a.time_limit_min+' min</span>':''}
+            <span style="color:${col};font-weight:600">⏱ ${tl}</span>
+            <span>${dl.toLocaleString()}</span>
+          </div></div>
+          <div style="display:flex;gap:.4rem">
+            ${!exp?`<button class="btn btn-ghost btn-sm" onclick="closePA('${a.id}')" style="font-size:.72rem">Close</button>`:''}
+            <button class="btn btn-ghost btn-sm" onclick="deletePA('${a.id}')" style="font-size:.72rem;color:var(--crimson)">Delete</button>
+          </div>
+        </div></div>`;
+    }).join('');
+    if (PA_TIMER) clearInterval(PA_TIMER);
+    PA_TIMER = setInterval(() => {
+      const s = gel('sec-assessments');
+      if (s && s.style.display!=='none') window.loadPublishedAssessments();
+      else clearInterval(PA_TIMER);
+    }, 30000);
+  } catch(e) {
+    el.innerHTML = '<div class="card" style="text-align:center;padding:2rem">'
+      + '<p style="color:var(--crimson);margin-bottom:.75rem">' + e.message + '</p>'
+      + '<button class="btn btn-ghost btn-sm" onclick="loadPublishedAssessments()">Retry</button></div>';
+  }
+};
+
+window.closePA = async function(id) {
+  if (!confirm('Close this assessment early?')) return;
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, doc, updateDoc, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await withTimeout(updateDoc(doc(getFirestore(getApps()[0]),'published_assessments',id), {status:'closed',deadline:Timestamp.fromDate(new Date())}), 10000, 'Assessment close');
+    window.toast?.('Closed','success'); window.loadPublishedAssessments();
+  } catch(e) { window.toast?.('Error: '+e.message,'error'); }
+};
+
+window.deletePA = async function(id) {
+  if (!confirm('Permanently delete this assessment?')) return;
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await withTimeout(deleteDoc(doc(getFirestore(getApps()[0]),'published_assessments',id)), 10000, 'Assessment delete');
+    window.toast?.('Deleted','success'); window.loadPublishedAssessments();
+  } catch(e) { window.toast?.('Error: '+e.message,'error'); }
+};
+
+// ── Student View (preserved from earlier) ─────────────────────────
+let SV_RADAR = null; let SV_RESP = []; let SV_PAPER = 'P1';
+
+window.openSV = async function(uid, name) {
+  setText('sv-name', name || uid.slice(0,8));
+  setText('sv-meta', 'Loading…');
+  const m = gel('sv-modal'); if(m) m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  try {
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, query, where, getDocs, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const db = getFirestore(getApps()[0]);
+    const [pSnap, rSnap, predSnap] = await Promise.all([
+      getDoc(doc(db,'users',uid)),
+      getDocs(query(collection(db,'responses'), where('student_uid','==',uid))),
+      getDoc(doc(db,'predictions',uid))
+    ]);
+    const profile = pSnap.exists() ? pSnap.data() : {};
+    SV_RESP = rSnap.docs.map(d=>d.data()); SV_PAPER='P1';
+    const tot=SV_RESP.length, corr=SV_RESP.filter(r=>r.correct).length;
+    setText('sv-meta','Class: '+(profile.classCode||'—')+' · '+new Set(SV_RESP.map(r=>r.session_id)).size+' sessions · '+tot+' questions');
+    setText('sv-accuracy', tot ? Math.round(corr/tot*100)+'%' : '—');
+    setText('sv-answered', tot||'—'); setText('sv-errors', SV_RESP.filter(r=>!r.correct&&r.misconception_tag).length||'0');
+    setText('sv-tabs', SV_RESP.reduce((a,r)=>a+(r.tab_switch_count||0),0)||'0');
+    setText('sv-avoid',  SV_RESP.filter(r=>r.signal_avoidance).length);
+    setText('sv-uncert', SV_RESP.filter(r=>r.signal_uncertainty).length);
+    setText('sv-false',  SV_RESP.filter(r=>r.signal_false_mastery).length);
+    setText('sv-hints',  SV_RESP.filter(r=>r.hint_used).length);
+    svRadar(SV_RESP); svBars(SV_RESP,'P1'); svMisc(SV_RESP);
+    document.querySelectorAll('.sv-ptab').forEach((b,i)=>b.classList.toggle('active',i===0));
+    const pred = predSnap.exists()?predSnap.data():null;
+    const pill = gel('sv-risk-pill');
+    if (pred?.risk_category&&pill) { pill.innerHTML='<div class="risk-pill risk-'+pred.risk_category+'"><div class="risk-dot"></div>'+pred.risk_category.toUpperCase()+'</div>'; pill.style.display=''; }
+    else if(pill) pill.style.display='none';
+    const ab=gel('sv-ai-block');
+    if(pred&&ab){ab.style.display='';setHtml('sv-ai','<p style="font-size:.84rem;line-height:1.75;color:var(--text-2)">'+(pred.shap_narrative||'No SHAP narrative yet.')+'</p>'+(pred.top_features?.length?'<div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.6rem">'+pred.top_features.map(f=>'<span class="badge badge-teal">'+f.replace(/_/g,' ')+'</span>').join('')+'</div>':''));}
+    else if(ab) ab.style.display='none';
+    const wrong=SV_RESP.filter(r=>!r.correct).slice(0,8);
+    setHtml('sv-wrong', wrong.length ? wrong.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);gap:.5rem"><div><div style="font-size:.8rem;font-weight:600">${r.question_id||'—'}</div><div style="font-size:.7rem;color:var(--text-3)">${r.chapter_id||'—'} · ${(r.misconception_tag||'—').replace(/_/g,' ')}</div></div><span class="badge badge-crimson">✗</span></div>`).join('') : '<p style="font-size:.8rem;color:var(--text-3)">No errors yet.</p>');
+  } catch(e) { setText('sv-meta','Error: '+e.message); }
+};
+
+window.svPaper = function(p, btn) {
+  SV_PAPER=p; document.querySelectorAll('.sv-ptab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); svBars(SV_RESP,p);
+};
+
+window.closeSV = function() {
+  const m=gel('sv-modal'); if(m) m.classList.remove('open'); document.body.style.overflow='';
+};
+
+function svRadar(resp) {
+  const ctx=gel('sv-radar')?.getContext('2d'); if(!ctx) return;
+  if(SV_RADAR) SV_RADAR.destroy();
+  const topics=Object.keys(CH);
+  SV_RADAR=new Chart(ctx,{type:'radar',data:{labels:topics.map(t=>CH[t].split(' ')[0]),datasets:[{label:'%',data:topics.map(t=>{const r=resp.filter(x=>x.chapter_id===t);return r.length?Math.round(r.filter(x=>x.correct).length/r.length*100):0;}),borderColor:'rgba(0,212,170,.85)',backgroundColor:'rgba(0,212,170,.12)',pointBackgroundColor:'#00D4AA',pointRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,color:'#475569',backdropColor:'transparent',font:{size:9}},grid:{color:'rgba(255,255,255,.06)'},angleLines:{color:'rgba(255,255,255,.06)'},pointLabels:{color:'#94A3B8',font:{size:9}}}}}});
+}
+
+function svBars(resp, paper) {
+  const el=gel('sv-chapter-bars'); if(!el) return;
+  el.innerHTML=Object.entries(CH).filter(([,v])=>{
+    const p=Object.keys(CH).indexOf(Object.keys(CH).find(k=>CH[k]===v))>=6?'P2':'P1';
+    return p===paper;
+  }).map(([id,name])=>{
+    const r=resp.filter(x=>x.chapter_id===id);
+    const pct=r.length?Math.round(r.filter(x=>x.correct).length/r.length*100):null;
+    const col=pct===null?'rgba(255,255,255,.2)':pct>=70?'var(--teal)':pct>=50?'var(--amber)':'var(--crimson)';
+    return `<div class="ch-bar-row"><div class="ch-bar-name">${name}</div><div class="ch-bar-track"><div class="ch-bar-fill" style="width:${pct||0}%;background:${col}"></div></div><div class="ch-bar-pct" style="color:${col}">${pct!==null?pct+'%':'—'}</div></div>`;
+  }).join('');
+}
+
+function svMisc(resp) {
+  const el=gel('sv-misc'); if(!el) return;
+  const tc={};
+  resp.filter(r=>!r.correct&&r.misconception_tag).forEach(r=>{tc[r.misconception_tag]=(tc[r.misconception_tag]||0)+1;});
+  const tags=['BINARY_CONVERSION_ERROR','TWO_COMPLEMENT_ERROR','BINARY_SHIFT_ERROR','STORAGE_CONCEPT_ERROR','NETWORK_CONCEPT_ERROR','SOFTWARE_CONCEPT_ERROR','SENSOR_MODEL_ERROR','AI_CONCEPT_ERROR','PSEUDOCODE_SYNTAX_ERROR','ASSIGN_EQUALITY_CONFUSION','LOOP_TERMINATION_ERROR','DATA_TYPE_CONFUSION','ARRAY_INDEX_ERROR','VARIABLE_SCOPE_ERROR','BOOLEAN_LOGIC_ERROR','SEQUENTIAL_EXECUTION_ERROR','TRACE_PREDICTION_ERROR','TEST_DATA_CONFUSION'];
+  const active=tags.filter(t=>tc[t]).sort((a,b)=>(tc[b]||0)-(tc[a]||0));
+  const tot=active.reduce((s,t)=>s+(tc[t]||0),0)||1;
+  el.innerHTML=active.length?active.map(t=>{const c=tc[t]||0,p=Math.round(c/tot*100),col=p>40?'var(--crimson)':p>20?'var(--amber)':'var(--teal)';return `<div class="hmap-row"><div class="hmap-label">${t.replace(/_/g,' ')}</div><div class="hmap-track"><div class="hmap-fill" style="width:${Math.max(p,3)}%;background:${col}"></div></div><div class="hmap-pct" style="color:${col}">${c}</div></div>`;}).join(''):'<p style="font-size:.8rem;color:var(--text-3)">No misconceptions yet.</p>';
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') window.closeSV?.(); });
+</script>
+</body>
+</html>
