@@ -124,7 +124,9 @@ test('a single wrong answer is never a misconception', () => {
 test('repeated diagnostic distractor choices across questions → demonstrated', () => {
   const rs = [resp('V4_T08_ASG_01', false, 0, 1), resp('P2_T8_001', false, 0, 2), resp('V4_T08_ASG_02', false, 0, 3), resp('V4_T08_ASG_03', false, 0, 4)];
   const f = detectForStudent(rs, Q).find(x => x.misconception_id === 'MC-ASSIGN-01');
-  assert.equal(f.status, 'demonstrated'); assert.ok(f.evidence_strength >= 0.8); assert.equal(f.counts.diagnostic_hits, 4);
+  assert.equal(f.status, 'demonstrated'); assert.ok(f.evidence_strength >= 0.8);
+  // mce-1.1: the true/false item has only one wrong option, so choosing it cannot be told apart from a guess — 3 of 4 errors are diagnostic.
+  assert.equal(f.counts.diagnostic_hits, 3);
   assert.equal(f.evidence.length, 4, 'evidence is traceable to responses');
 });
 test('wrong answers that avoid the diagnostic distractors → knowledge gap, not misconception', () => {
@@ -232,4 +234,13 @@ test('import: template parses; invalid rows rejected with reasons; duplicates ne
   assert.ok(textSimilarity('Convert 1010 to denary', 'Convert 1010 into denary') > 0.7);
   const wow = prepareImport({ csvText: 'id,topicKey,type,text,optionA,optionB,optionC,optionD,answer,explanation,difficulty,points,chapter,imageUrl\nW1,gr9-cpu,mcq,What does the ALU do?,Arithmetic and logic,Stores data,Fetches,Displays,0,Explained,easy,1,,\n' }, []);
   assert.equal(wow.ready.length, 1, 'WOW Sir template accepted'); assert.equal(wow.ready[0].external_ref.platform, 'WOW_SIR');
+});
+
+test('mce-1.1: errors no higher than the learner\'s own baseline are a knowledge gap, not a misconception', async () => {
+  // Learner is wrong on almost everything (baseline error rate high), including the assignment items.
+  const rs = [resp('V4_T08_ASG_01', false, 0, 1), resp('P2_T8_001', false, 0, 2), resp('V4_T08_ASG_03', false, 0, 3)];
+  for (let i = 0; i < 8; i++) rs.push(resp('V4_T08_OP_0' + (1 + (i % 3)), false, 3, 10 + i));
+  const f = detectForStudent(rs, Q).find(x => x.misconception_id === 'MC-ASSIGN-01');
+  assert.notEqual(f.status, 'demonstrated');
+  assert.equal(f.baseline_error_rate, 1);
 });

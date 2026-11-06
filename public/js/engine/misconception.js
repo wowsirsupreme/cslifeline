@@ -21,7 +21,7 @@
 
 import { TAXONOMY } from './taxonomy-data.js';
 
-export const ENGINE_VERSION = 'mce-1.0';
+export const ENGINE_VERSION = 'mce-1.1'; // 1.1: discriminating distractors only; errors must exceed the learner's own baseline
 
 export const STATUS = {
   demonstrated: { label: 'Demonstrated misconception', rank: 5, tone: 'danger' },
@@ -33,6 +33,9 @@ export const STATUS = {
 };
 
 const DEFAULT_EVIDENCE = { min_opportunities: 3, min_errors: 2, min_distinct_questions: 2 };
+// Specificity margins: how far the error rate on a misconception's questions must exceed the learner's
+// error rate on all other questions (tuned on synthetic cohort H1, evaluated on H2 — see scripts/evaluate-misconceptions.mjs).
+export const SPECIFICITY = { demonstrated: 0.25, possible: 0.15 };
 
 /** P(theta > 0.5) for theta ~ Beta(a, b) with integer a, b >= 1.
  *  Uses I_x(a,b) = P(Binomial(a+b-1, x) >= a). */
@@ -84,6 +87,7 @@ export function detectForStudent(responses, questionsById, opts = {}) {
   const byMis = new Map();
   const sorted = [...responses].filter(r => r.correct === true || r.correct === false)
     .sort((a, b) => (a.recorded_at || 0) - (b.recorded_at || 0));
+  const totalErr = sorted.filter(r => !r.correct).length;
 
   for (const r of sorted) {
     const q = getQ(r.question_id);
@@ -92,8 +96,13 @@ export function detectForStudent(responses, questionsById, opts = {}) {
     for (const hit of r.misconception_hits || []) if (!targets.has(hit)) targets.set(hit, { primary: false, diagnosticOptions: new Set(), viaHit: true });
     for (const [mid, info] of targets) {
       if (!byMis.has(mid)) byMis.set(mid, []);
-      const diagnosticAvailable = info.diagnosticOptions.size > 0 || !!info.viaHit;
-      const diagnosticHit = !r.correct && ((r.chosen !== null && r.chosen !== undefined && info.diagnosticOptions.has(Number(r.chosen))) || (r.misconception_hits || []).includes(mid));
+      // A linked distractor is informative only if some OTHER wrong option is not linked to this misconception;
+      // when every wrong option is linked, choosing one cannot be told apart from a guess.
+      const wrongOptions = Array.isArray(q?.options) && q.options.length ? q.options.length - (Array.isArray(q.answer) ? q.answer.length : 1) : 0;
+      const discriminating = info.diagnosticOptions.size > 0 && info.diagnosticOptions.size < wrongOptions;
+      const diagnosticAvailable = discriminating || !!info.viaHit;
+      const typedHit = !q?.options?.length && (r.misconception_hits || []).includes(mid);
+      const diagnosticHit = !r.correct && ((discriminating && r.chosen !== null && r.chosen !== undefined && info.diagnosticOptions.has(Number(r.chosen))) || typedHit || (!!info.viaHit && (r.misconception_hits || []).includes(mid)));
       const med = medianTime.get(r.question_id);
       const rapid = !r.correct && med && r.time_ms != null && r.time_ms < 0.25 * med;
       byMis.get(mid).push({
@@ -106,14 +115,18 @@ export function detectForStudent(responses, questionsById, opts = {}) {
 
   const findings = [];
   for (const [mid, ops] of byMis) {
-    const f = classify(mid, ops, tx.get(mid));
+    // Learner's error rate on every OTHER marked response: the baseline a misconception must stand out from.
+    const ids = new Set(ops.map(o => o.response_id || `${o.question_id}|${o.recorded_at}`));
+    const others = sorted.filter(r => !ids.has(r.id || `${r.question_id}|${r.recorded_at || 0}`));
+    const baseline = others.length >= 5 ? others.filter(r => !r.correct).length / others.length : null;
+    const f = classify(mid, ops, tx.get(mid), { baseline });
     if (f) findings.push(f);
   }
   return findings.sort((a, b) => STATUS[b.status].rank - STATUS[a.status].rank || b.evidence_strength - a.evidence_strength);
 }
 
 /** Classify one (student, misconception) evidence set. Returns null when there is no concern (no errors). */
-export function classify(mid, ops, entry) {
+export function classify(mid, ops, entry, { baseline = null } = {}) {
   const ev = { ...DEFAULT_EVIDENCE, ...(entry?.evidence || {}) };
   const n = ops.length;
   const errors = ops.filter(o => !o.correct);
@@ -149,13 +162,20 @@ export function classify(mid, ops, entry) {
       ? 'One error among otherwise correct answers; the error looks like a slip (fast response or harder items answered correctly).'
       : 'One error among otherwise correct answers.';
   } else if (nErr >= ev.min_errors && n >= ev.min_opportunities && distinctErrQ >= ev.min_distinct_questions
-             && diagHits >= Math.max(2, ev.min_errors) && (consistency ?? 0) >= 0.5 && errorRate >= 0.5 && pAbove >= 0.8) {
+             && diagHits >= Math.max(2, ev.min_errors) && (consistency ?? 0) >= 0.5 && errorRate >= 0.5 && pAbove >= 0.8
+             && (baseline === null || errorRate - baseline >= SPECIFICITY.demonstrated)) {
     status = 'demonstrated';
-    reason = `${diagHits} diagnostic distractor choices across ${distinctErrQ} different questions; error rate ${Math.round(errorRate * 100)}%.`;
+    reason = `${diagHits} diagnostic distractor choices across ${distinctErrQ} different questions; error rate ${Math.round(errorRate * 100)}%${baseline !== null ? ` against ${Math.round(baseline * 100)}% on other questions` : ''}.`;
   } else if (nErr >= 2 && diagAvailOnErrors >= 2 && diagHits === 0) {
     status = 'knowledge_gap';
     reason = 'Repeated errors, but none match the answers this misconception typically produces — more likely a gap in knowledge than this specific wrong belief.';
-  } else if (nErr >= 2 && (diagHits >= 1 || distinctErrQ >= 2) && errorRate >= 0.4) {
+  } else if (nErr >= 2 && baseline !== null && errorRate - baseline < SPECIFICITY.possible) {
+    status = 'knowledge_gap';
+    reason = `Errors here (${Math.round(errorRate * 100)}%) are in line with this learner's error rate on other questions (${Math.round(baseline * 100)}%): general difficulty rather than this specific misconception.`;
+  } else if (nErr >= 2 && diagHits === 0 && distinctErrQ >= 2 && errorRate >= 0.4) {
+    status = 'knowledge_gap';
+    reason = `${nErr} errors across ${distinctErrQ} questions, but none of the answers is specific to this misconception, so a knowledge gap is the more likely explanation.`;
+  } else if (nErr >= 2 && diagHits >= 1 && errorRate >= 0.4) {
     status = 'possible';
     reason = diagHits
       ? `${nErr} errors including ${diagHits} diagnostic distractor choice${diagHits > 1 ? 's' : ''}; more evidence needed to confirm.`
@@ -175,6 +195,7 @@ export function classify(mid, ops, entry) {
     reason,
     trend,
     counts: { opportunities: n, errors: nErr, correct: nCorrect, diagnostic_hits: diagHits, distinct_questions_wrong: distinctErrQ, sessions_with_errors: distinctSessions },
+    baseline_error_rate: baseline === null ? null : Math.round(baseline * 1000) / 1000,
     error_rate: Math.round(errorRate * 1000) / 1000,
     evidence: ops.map(o => ({ question_id: o.question_id, response_id: o.response_id, correct: o.correct, diagnostic_hit: o.diagnostic_hit, recorded_at: o.recorded_at })),
     first_seen: ops[0].recorded_at || null,
