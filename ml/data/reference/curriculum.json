@@ -1,357 +1,203 @@
 {
- "T01": {
-  "title": "Data Representation",
-  "paper": "P1",
-  "order": 1,
-  "color": "#6d5bd0",
-  "subchapters": {
-   "T01.1": {
-    "title": "Number systems",
-    "topics": [
-     "Binary and denary",
-     "Hexadecimal",
-     "Binary addition and overflow",
-     "Two's complement",
-     "Logical shifts"
-    ]
-   },
-   "T01.2": {
-    "title": "Text, sound and images",
-    "topics": [
-     "ASCII and Unicode",
-     "Sound representation",
-     "Image representation",
-     "File size calculation"
-    ]
-   },
-   "T01.3": {
-    "title": "Data storage and compression",
-    "topics": [
-     "Units of storage",
-     "Lossy and lossless compression"
-    ]
-   }
-  }
- },
- "T02": {
-  "title": "Data Transmission",
-  "paper": "P1",
-  "order": 2,
-  "color": "#c2417a",
-  "subchapters": {
-   "T02.1": {
-    "title": "Types and methods of transmission",
-    "topics": [
-     "Packets and packet switching",
-     "Serial and parallel",
-     "Simplex, half-duplex, full-duplex",
-     "USB"
-    ]
-   },
-   "T02.2": {
-    "title": "Error detection",
-    "topics": [
-     "Parity check",
-     "Checksum",
-     "Echo check",
-     "Check digit",
-     "ARQ"
-    ]
-   },
-   "T02.3": {
-    "title": "Encryption",
-    "topics": [
-     "Symmetric encryption",
-     "Asymmetric encryption"
-    ]
-   }
-  }
- },
- "T03": {
-  "title": "Hardware",
-  "paper": "P1",
-  "order": 3,
-  "color": "#b7791f",
-  "subchapters": {
-   "T03.1": {
-    "title": "Computer architecture",
-    "topics": [
-     "CPU components",
-     "Fetch-decode-execute cycle",
-     "Cores, cache and clock",
-     "Instruction set",
-     "Embedded systems"
-    ]
-   },
-   "T03.2": {
-    "title": "Input and output devices",
-    "topics": [
-     "Input devices",
-     "Output devices",
-     "Sensors"
-    ]
-   },
-   "T03.3": {
-    "title": "Data storage",
-    "topics": [
-     "Primary storage",
-     "Secondary storage",
-     "Virtual memory",
-     "Cloud storage"
-    ]
-   },
-   "T03.4": {
-    "title": "Network hardware",
-    "topics": [
-     "NIC and MAC address",
-     "IP address",
-     "Router"
-    ]
-   }
-  }
- },
- "T04": {
-  "title": "Software",
-  "paper": "P1",
-  "order": 4,
-  "color": "#2f855a",
-  "subchapters": {
-   "T04.1": {
-    "title": "Types of software and interrupts",
-    "topics": [
-     "System and application software",
-     "Operating system functions",
-     "Interrupts"
-    ]
-   },
-   "T04.2": {
-    "title": "Types of programming language, translators and IDEs",
-    "topics": [
-     "High- and low-level languages",
-     "Assembly language",
-     "Compilers and interpreters",
-     "IDE features"
-    ]
-   }
-  }
- },
- "T05": {
-  "title": "The Internet and its Uses",
-  "paper": "P1",
-  "order": 5,
-  "color": "#2b6cb0",
-  "subchapters": {
-   "T05.1": {
-    "title": "The internet and the world wide web",
-    "topics": [
-     "Internet vs WWW",
-     "URLs",
-     "HTTP and HTTPS",
-     "Web browsers",
-     "Cookies"
-    ]
-   },
-   "T05.2": {
-    "title": "Digital currency",
-    "topics": [
-     "Blockchain"
-    ]
-   },
-   "T05.3": {
-    "title": "Cyber security",
-    "topics": [
-     "Threats",
-     "Prevention methods"
-    ]
-   }
-  }
- },
- "T06": {
-  "title": "Automated and Emerging Technologies",
-  "paper": "P1",
-  "order": 6,
-  "color": "#c53030",
-  "subchapters": {
-   "T06.1": {
-    "title": "Automated systems",
-    "topics": [
-     "Sensors, microprocessors and actuators"
-    ]
-   },
-   "T06.2": {
-    "title": "Robotics",
-    "topics": [
-     "Characteristics of robots"
-    ]
-   },
-   "T06.3": {
-    "title": "Artificial intelligence",
-    "topics": [
-     "Expert systems",
-     "Machine learning"
-    ]
-   }
-  }
- },
- "T07": {
-  "title": "Algorithm Design and Problem-Solving",
-  "paper": "P2",
-  "order": 7,
-  "color": "#0b7a8a",
-  "subchapters": {
-   "T07.1": {
-    "title": "Program development life cycle",
-    "topics": [
-     "Analysis, design, coding, testing",
-     "Decomposition",
-     "Abstraction"
-    ]
-   },
-   "T07.2": {
-    "title": "Algorithms",
-    "topics": [
-     "Flowcharts",
-     "Pseudocode",
-     "Trace tables",
-     "Validation and verification",
-     "Test data"
-    ]
-   }
-  }
- },
- "T08": {
-  "title": "Programming Concepts",
-  "paper": "P2",
-  "order": 8,
-  "color": "#4c51bf",
-  "subchapters": {
-   "T08.1": {
-    "title": "Variables, constants and data types",
-    "topics": [
-     "Variables and constants",
-     "Data types",
-     "Input and output"
-    ]
-   },
-   "T08.2": {
-    "title": "Sequence, selection and iteration",
-    "topics": [
-     "Sequence",
-     "Selection",
-     "Iteration",
-     "Nested statements",
-     "Totalling and counting"
-    ]
-   },
-   "T08.3": {
-    "title": "Operators and string handling",
-    "topics": [
-     "Arithmetic operators",
-     "Comparison and assignment",
-     "String handling"
-    ]
-   }
-  }
- },
- "T09": {
-  "title": "Arrays",
-  "paper": "P2",
-  "order": 9,
-  "color": "#5f8f1b",
-  "subchapters": {
-   "T09.1": {
-    "title": "One- and two-dimensional arrays",
-    "topics": [
-     "Declaring arrays",
-     "Indexing",
-     "Iterating over arrays",
-     "2D arrays"
-    ]
-   }
-  }
- },
- "T10": {
-  "title": "Procedures and Functions",
-  "paper": "P2",
-  "order": 10,
-  "color": "#c05621",
-  "subchapters": {
-   "T10.1": {
-    "title": "Subroutines",
-    "topics": [
-     "Procedures",
-     "Functions and return values",
-     "Parameters and arguments",
-     "Local and global scope",
-     "Library routines"
-    ]
-   }
-  }
- },
- "T11": {
-  "title": "File Handling",
-  "paper": "P2",
-  "order": 11,
-  "color": "#238a7d",
-  "subchapters": {
-   "T11.1": {
-    "title": "Reading and writing files",
-    "topics": [
-     "Opening and closing files",
-     "Reading and writing lines"
-    ]
-   }
-  }
- },
- "T12": {
-  "title": "Searching and Sorting",
-  "paper": "P2",
-  "order": 12,
-  "color": "#805ad5",
-  "subchapters": {
-   "T12.1": {
-    "title": "Standard methods",
-    "topics": [
-     "Linear search",
-     "Bubble sort",
-     "Totalling, counting, max, min, average"
-    ]
-   }
-  }
- },
- "T13": {
-  "title": "Boolean Logic",
-  "paper": "P2",
-  "order": 13,
-  "color": "#9b2c2c",
-  "subchapters": {
-   "T13.1": {
-    "title": "Logic gates and circuits",
-    "topics": [
-     "Logic gate symbols",
-     "Truth tables",
-     "Logic expressions",
-     "Logic circuits"
-    ]
-   }
-  }
- },
- "T14": {
-  "title": "Databases",
-  "paper": "P2",
-  "order": 14,
-  "color": "#2c7a7b",
-  "subchapters": {
-   "T14.1": {
-    "title": "Single-table databases and SQL",
-    "topics": [
-     "Tables, records and fields",
-     "Data types",
-     "Primary keys",
-     "SQL SELECT",
-     "SQL aggregate functions"
-    ]
-   }
+ "chapters": {
+  "T01": {
+   "id": "T01",
+   "title": "Data Representation",
+   "paper": "P1",
+   "syllabus": "1",
+   "subject": "CS-0478",
+   "color": "#7C3AED",
+   "topics": [
+    "Number systems",
+    "Binary arithmetic and overflow",
+    "Logical shifts",
+    "Two's complement",
+    "Text, sound and images",
+    "Data storage and compression"
+   ]
+  },
+  "T02": {
+   "id": "T02",
+   "title": "Data Transmission",
+   "paper": "P1",
+   "syllabus": "2",
+   "subject": "CS-0478",
+   "color": "#DB2777",
+   "topics": [
+    "Packets and packet switching",
+    "Methods of transmission",
+    "USB",
+    "Error detection",
+    "Encryption"
+   ]
+  },
+  "T03": {
+   "id": "T03",
+   "title": "Hardware",
+   "paper": "P1",
+   "syllabus": "3",
+   "subject": "CS-0478",
+   "color": "#D97706",
+   "topics": [
+    "Computer architecture",
+    "Fetch-decode-execute cycle",
+    "Input and output devices",
+    "Data storage",
+    "Network hardware"
+   ]
+  },
+  "T04": {
+   "id": "T04",
+   "title": "Software",
+   "paper": "P1",
+   "syllabus": "4",
+   "subject": "CS-0478",
+   "color": "#059669",
+   "topics": [
+    "Types of software and interrupts",
+    "Types of programming language, translators and IDEs"
+   ]
+  },
+  "T05": {
+   "id": "T05",
+   "title": "The Internet and its Uses",
+   "paper": "P1",
+   "syllabus": "5",
+   "subject": "CS-0478",
+   "color": "#2563EB",
+   "topics": [
+    "The internet and the world wide web",
+    "Digital currency",
+    "Cyber security"
+   ]
+  },
+  "T06": {
+   "id": "T06",
+   "title": "Automated and Emerging Technologies",
+   "paper": "P1",
+   "syllabus": "6",
+   "subject": "CS-0478",
+   "color": "#DC2626",
+   "topics": [
+    "Automated systems",
+    "Robotics",
+    "Artificial intelligence"
+   ]
+  },
+  "T07": {
+   "id": "T07",
+   "title": "Algorithm Design and Problem-Solving",
+   "paper": "P2",
+   "syllabus": "7",
+   "subject": "CS-0478",
+   "color": "#0891B2",
+   "topics": [
+    "Program development life cycle",
+    "Decomposition",
+    "Validation and verification",
+    "Test data",
+    "Trace tables",
+    "Standard methods of solution"
+   ]
+  },
+  "T08": {
+   "id": "T08",
+   "title": "Programming Concepts",
+   "paper": "P2",
+   "syllabus": "8.1",
+   "subject": "CS-0478",
+   "color": "#4F46E5",
+   "topics": [
+    "Variables and constants",
+    "Data types",
+    "Input and output",
+    "Sequence",
+    "Selection",
+    "Iteration",
+    "Totalling and counting",
+    "String handling",
+    "Operators",
+    "Nested statements"
+   ]
+  },
+  "T09": {
+   "id": "T09",
+   "title": "Arrays",
+   "paper": "P2",
+   "syllabus": "8.2",
+   "subject": "CS-0478",
+   "color": "#65A30D",
+   "topics": [
+    "One-dimensional arrays",
+    "Two-dimensional arrays"
+   ]
+  },
+  "T10": {
+   "id": "T10",
+   "title": "Procedures and Functions",
+   "paper": "P2",
+   "syllabus": "8.1",
+   "subject": "CS-0478",
+   "color": "#EA580C",
+   "topics": [
+    "Procedures",
+    "Functions",
+    "Parameters",
+    "Local and global variables",
+    "Library routines"
+   ]
+  },
+  "T11": {
+   "id": "T11",
+   "title": "File Handling",
+   "paper": "P2",
+   "syllabus": "8.3",
+   "subject": "CS-0478",
+   "color": "#0D9488",
+   "topics": [
+    "Opening, reading, writing and closing files"
+   ]
+  },
+  "T12": {
+   "id": "T12",
+   "title": "Searching and Sorting",
+   "paper": "P2",
+   "syllabus": "7",
+   "subject": "CS-0478",
+   "color": "#9333EA",
+   "topics": [
+    "Linear search",
+    "Binary search",
+    "Bubble sort"
+   ]
+  },
+  "T13": {
+   "id": "T13",
+   "title": "Boolean Logic",
+   "paper": "P2",
+   "syllabus": "10",
+   "subject": "CS-0478",
+   "color": "#BE123C",
+   "topics": [
+    "Logic gates",
+    "Truth tables",
+    "Logic expressions",
+    "Logic circuits"
+   ]
+  },
+  "T14": {
+   "id": "T14",
+   "title": "Databases",
+   "paper": "P2",
+   "syllabus": "9",
+   "subject": "CS-0478",
+   "color": "#475569",
+   "topics": [
+    "Single-table databases",
+    "Data types",
+    "Primary keys",
+    "SQL"
+   ]
   }
  }
 }

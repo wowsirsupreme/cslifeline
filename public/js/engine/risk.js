@@ -11,7 +11,7 @@
 
 import { DAY, mean, median, slope, toMs, weekKey } from './stats.js';
 
-export const FEATURE_VERSION = 'fv-1.0';
+export const FEATURE_VERSION = 'fv-1.1'; // 1.1: session completion judged by ended_at before the cut-off
 
 export const FEATURES = [
   { name: 'acc_all',            label: 'Overall accuracy',                   direction: -1, desc: 'Share of marked responses that are correct, all history before the cut-off.' },
@@ -62,7 +62,8 @@ export function computeFeatures(responses, sessions = [], asOf = Date.now(), ctx
   const distinctQ = new Set(rs.map(r => r.question_id)).size;
   const repeat = distinctQ ? [...wrongByQ.values()].filter(c => c >= 2).length / distinctQ : 0;
   const ss = sessions.map(s => ({ ...s, _t: toMs(s.started_at) })).filter(s => s._t !== null && s._t < asOf);
-  const completion = ss.length ? ss.filter(s => s.status === 'completed' || (s.ended_at && toMs(s.ended_at) < asOf)).length / ss.length : null;
+  // A session counts as completed only if it ended before the cut-off (its final status may be known only later).
+  const completion = ss.length ? ss.filter(s => (s.ended_at ? toMs(s.ended_at) < asOf : s.status === 'completed')).length / ss.length : null;
   const days = new Set(rs.filter(r => r._t >= asOf - 28 * DAY).map(r => new Date(r._t).toISOString().slice(0, 10))).size;
   const last = n ? rs[n - 1]._t : null;
   const sinceActive = last === null ? 60 : Math.min(60, (asOf - last) / DAY);

@@ -63,6 +63,17 @@ function deepMerge(base, patch) {
   return out;
 }
 
+const ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+/** Copy of a document with every ISO timestamp (and client_ts / startedAt epoch values) moved forward by delta ms. */
+export function shiftDates(v, delta, depth = 0) {
+  if (typeof v === 'string') return ISO_RE.test(v) ? new Date(Date.parse(v) + delta).toISOString() : v;
+  if (depth > 4 || v === null || typeof v !== 'object') return v;
+  if (Array.isArray(v)) return v.map(x => shiftDates(x, delta, depth + 1));
+  const out = {};
+  for (const [k, x] of Object.entries(v)) out[k] = (k === 'client_ts' || k === 'startedAt') && typeof x === 'number' ? x + delta : shiftDates(x, delta, depth + 1);
+  return out;
+}
+
 export class DemoBackend {
   constructor({ datasetUrl, dataset } = {}) {
     this.mode = 'demo';
@@ -87,10 +98,15 @@ export class DemoBackend {
           data = await res.json();
         }
         this.meta = data.meta || {};
+        // The dataset describes a term "as of" a fixed moment. Shift every timestamp so that
+        // moment is now; otherwise activity windows ("active in the last 14 days") would empty
+        // out as the file ages. Only synthetic demonstration data is ever shifted.
+        const asOf = Date.parse(this.meta.as_of || '');
+        this.timeShiftMs = Number.isFinite(asOf) ? Math.max(0, Date.now() - asOf) : 0;
         this.base = {};
         for (const [col, docs] of Object.entries(data.collections || {})) {
           const m = new Map();
-          for (const d of docs) m.set(d.id, d);
+          for (const d of docs) m.set(d.id, this.timeShiftMs ? shiftDates(d, this.timeShiftMs) : d);
           this.base[col] = m;
         }
       })();
